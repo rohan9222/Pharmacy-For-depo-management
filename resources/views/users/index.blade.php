@@ -1,7 +1,4 @@
-@extends('layouts.app')
-
-@section('content')
-
+<x-app-layout>
 <div class="card">
     <div class="card-header">Manage Users</div>
     <div class="card-body">
@@ -12,8 +9,6 @@
             <thead>
                 <tr>
                 <th scope="col">S#</th>
-                <th scope="col">Svc No</th>
-                <th scope="col">Rank</th>
                 <th scope="col">Name</th>
                 <th scope="col">Email</th>
                 <th scope="col">Roles</th>
@@ -24,8 +19,6 @@
                 @forelse ($users as $user)
                 <tr>
                     <th scope="row">{{ $loop->iteration }}</th>
-                    <td>{{ $user->serviceno }}</td>
-                    <td>{{ $user->rank }}</td>
                     <td>{{ $user->name }}</td>
                     <td>{{ $user->email }}</td>
                     <td>
@@ -92,5 +85,4 @@
 
     </div>
 </div>
-
-@endsection
+</x-app-layout>

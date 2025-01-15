@@ -1,6 +1,4 @@
-@extends('layouts.app')
-
-@section('content')
+<x-app-layout>
 <div class="card">
     <div class="card-header">Manage Roles</div>
     <div class="card-body">
@@ -69,4 +67,4 @@
 
     </div>
 </div>
-@endsection
+</x-app-layout>

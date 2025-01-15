@@ -1,0 +1,37 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('stock_invoices', function (Blueprint $table) {
+            $table->id();
+            $table->string('invoice_no')->unique();
+            $table->timestamp('invoice_date')->default(now());
+            $table->foreignId('customer_list_id')->nullable()->constrained()->nullOnDelete()->cascadeOnUpdate();
+            $table->decimal('sub_total', 11, 2)->default(0.00);
+            $table->decimal('discount', 11, 2)->default(0.00);
+            $table->enum('discount_type', ['percentage', 'fixed'])->default('percentage')->nullable();
+            $table->decimal('total', 11, 2)->default(0.00);
+            $table->decimal('paid', 11, 2)->default(0.00);
+            $table->decimal('due', 11, 2)->default(0.00);
+            $table->string('payment_method')->nullable();
+            $table->timestamps();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('stock_invoices');
+    }
+};

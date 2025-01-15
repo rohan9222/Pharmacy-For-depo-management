@@ -14,11 +14,11 @@ class RoleController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth');
-        $this->middleware('permission:create-role|edit-role|delete-role', ['only' => ['index','show']]);
-        $this->middleware('permission:create-role', ['only' => ['create','store']]);
-        $this->middleware('permission:edit-role', ['only' => ['edit','update']]);
-        $this->middleware('permission:delete-role', ['only' => ['destroy']]);
+        // $this->middleware('auth');
+        // $this->middleware('permission:create-role|edit-role|delete-role', ['only' => ['index','show']]);
+        // $this->middleware('permission:create-role', ['only' => ['create','store']]);
+        // $this->middleware('permission:edit-role', ['only' => ['edit','update']]);
+        // $this->middleware('permission:delete-role', ['only' => ['destroy']]);
     }
     /**
      * Display a listing of the resource.
@@ -45,7 +45,7 @@ class RoleController extends Controller
      */
     public function store(StoreRoleRequest $request): RedirectResponse
     {
-        $role = Role::create(['name' => $request->name]);
+        $role = Role::create(['name' => $request->name, 'guard_name' => 'web']);
 
         $permissions = Permission::whereIn('id', $request->permissions)->get(['name'])->toArray();
 

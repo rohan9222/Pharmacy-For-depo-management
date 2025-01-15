@@ -66,7 +66,7 @@
                                         <i class="fa-solid fa-user-gear"></i> Manage Users</a>
                                 @endcanany
                                 @canany(['create', 'edit', 'delete','view'])
-                                    <a class="btn btn-info col-md mx-1" href="{{ route('dashboard') }}"><i class="fa-brands fa-squarespace"></i> {{ __('Dashboard') }}</a>
+                                    <a class="btn btn-info col-md mx-1" href="{{ route('dashboard.index') }}"><i class="fa-brands fa-squarespace"></i> {{ __('Dashboard') }}</a>
                                 @endcanany
                                 <p>&nbsp;</p>
                             </div>
@@ -270,5 +270,4 @@ $(document).ready(function() {
 </script>
 
 @endpush
-
 </x-app-layout>

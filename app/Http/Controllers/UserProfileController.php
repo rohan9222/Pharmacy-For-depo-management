@@ -20,10 +20,10 @@ class UserProfileController extends Controller
     *
     * @return void
     */
-    public function __construct()
-    {
-
-    }
+   public function __construct()
+   {
+    //    $this->middleware('auth');
+   }
 
     /**
     * Show the application dashboard.
@@ -34,10 +34,10 @@ class UserProfileController extends Controller
     public function index()
     {
         $user = auth()->user(); // Fetch user details
-        $imagePath = 'images/' . $user->id . '.jpg';
+        $imagePath = 'images/' . $user->id . '.gif';
         $imageUrl = Storage::disk('public')->exists($imagePath)
             ? Storage::url($imagePath)
-            : Storage::url('images/demo.jpg');
+            : Storage::url('images/demo.gif');
 
         $user = User::with('roles')->findOrFail($user->id); // Fetch user with roles
         $roles = Role::all(); // Fetch all available roles
@@ -55,7 +55,7 @@ class UserProfileController extends Controller
         if ($request->hasFile('image')) {
             $userId = auth()->id(); // Get the authenticated user's ID
             $file = $request->file('image');
-            $fileName = $userId . '.jpg'; // Name the file using the user's ID
+            $fileName = $userId . '.gif'; // Name the file using the user's ID
             $path = $file->storeAs('images', $fileName, 'public'); // Store the file with the new name
 
             return response()->json([
