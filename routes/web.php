@@ -3,6 +3,9 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\{DashboardController,UserProfileController};
 use App\Http\Controllers\Admin\{RoleController,UserController};
+use App\Livewire\{CustomersList};
+
+
 Route::get('/', function () {
     return view('welcome');
 });
@@ -12,6 +15,9 @@ Route::middleware([
     config('jetstream.auth_session'),
     'verified',
 ])->group(function () {
+
+// customer management
+    Route::get('/customers', CustomersList::class)->name('customers');
 // profile
     Route::get('/user/profile', [UserProfileController::class, 'index'])->name('user.profile');
     Route::post('/user/profile/upload', [UserProfileController::class, 'uploadFile'])->name('user.profile.upload');

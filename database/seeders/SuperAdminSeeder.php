@@ -29,13 +29,13 @@ class SuperAdminSeeder extends Seeder
         $sales_manager = User::create([
             'name' => 'Sales Manager',
             'email' => 'sales_manager@gmail.com',
-            'password' => Hash::make('manager@sales_manager.com')
+            'password' => Hash::make('sales_manager@gmail.com')
         ]);
 
         $field_officer = User::create([
             'name' => 'Field Officer',
-            'email' => 'field_officer$field_officer@gmail.com',
-            'password' => Hash::make('manager@field_officer$field_officer.com')
+            'email' => 'field_officer@gmail.com',
+            'password' => Hash::make('field_officer@gmail.com')
         ]);
 
         $superAdmin->assignRole('Super Admin');
