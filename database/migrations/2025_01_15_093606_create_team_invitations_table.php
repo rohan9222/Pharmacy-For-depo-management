@@ -17,7 +17,9 @@ return new class extends Migration
             $table->string('email');
             $table->string('role')->nullable();
             $table->timestamps();
-
+            $table->foreignId('manager')->constrained('users')->restrictOnDelete()->cascadeOnUpdate()->comment('user id who has manager role');
+            $table->foreignId('sales_manager')->constrained('users')->restrictOnDelete()->cascadeOnUpdate()->comment('user id who has sales manager role');
+            $table->foreignId('field_officer')->constrained('users')->restrictOnDelete()->cascadeOnUpdate()->comment('user id who has field officer role');
             $table->unique(['team_id', 'email']);
         });
     }
