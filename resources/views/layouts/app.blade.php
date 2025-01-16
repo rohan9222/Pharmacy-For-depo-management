@@ -15,12 +15,70 @@
         @vite(['resources/css/app.css','resources/sass/app.scss', 'resources/js/app.js'])
 
         <!-- Styles -->
+        <style>
+            body {
+                min-height: 100vh;
+                overflow-x: hidden;
+            }
+            .sidebar {
+                height: 100vh;
+                width: 250px;
+                position: fixed;
+                top: 0;
+                left: 0;
+                padding-top: 1rem;
+                transition: width 0.3s;
+            }
+            .sidebar.collapsed {
+                width: 70px;
+            }
+            .sidebar a {
+                padding: 10px 15px;
+                display: block;
+                text-decoration: none;
+            }
+            .sidebar a:hover {
+                background: #495057;
+            }
+            .sidebar.collapsed a {
+                text-align: center;
+                padding: 10px 0;
+            }
+            .sidebar.collapsed .sidebar-text {
+                display: none;
+            }
+            .content {
+                margin-left: 250px;
+                padding: 20px;
+                transition: margin-left 0.3s;
+            }
+            .content.collapsed {
+                margin-left: 70px;
+            }
+            .navbar {
+                left: 250px;
+                transition: left 0.3s;
+            }
+            .navbar.collapsed {
+                left: 70px;
+            }
+            #sidebar, #navbar {
+                background-color: #fff !important;
+            }
+        </style>
         @livewireStyles
     </head>
     <body class="font-sans antialiased">
         <x-banner />
-
-        <div class="min-h-screen bg-gray-100 dark:bg-gray-900">
+        {{-- old code --}}
+        {{-- <div class="min-h-screen bg-gray-100 dark:bg-gray-900">
+            <div id="sidebar" class="sidebar">
+                <button id="toggleSidebar" class="btn btn-sm btn-light mb-3 ms-2">Toggle</button>
+                <a href="#home"><span class="sidebar-text">Home</span></a>
+                <a href="#profile"><span class="sidebar-text">Profile</span></a>
+                <a href="#settings"><span class="sidebar-text">Settings</span></a>
+                <a href="#reports"><span class="sidebar-text">Reports</span></a>
+            </div>
             @livewire('navigation-menu')
 
             <!-- Page Heading -->
@@ -33,13 +91,37 @@
             @endif
 
             <!-- Page Content -->
+             <!-- Main Content -->
+            <div id="content" class="content pt-5 mt-5">
+                <main>
+                    {{ $slot }}
+                </main>
+            </div>
+        </div> --}}
+
+        @include('layouts.partial.sidebar')
+        @livewire('navigation-menu')
+
+        <div id="content" class="content pt-5 mt-5">
             <main>
                 {{ $slot }}
             </main>
         </div>
-
         @stack('modals')
 
         @livewireScripts
+
+        <script>
+            const toggleButton = document.getElementById('toggleSidebar');
+            const sidebar = document.getElementById('sidebar');
+            const navbar = document.getElementById('navbar');
+            const content = document.getElementById('content');
+
+            toggleButton.addEventListener('click', () => {
+                sidebar.classList.toggle('collapsed');
+                navbar.classList.toggle('collapsed');
+                content.classList.toggle('collapsed');
+            });
+        </script>
     </body>
 </html>

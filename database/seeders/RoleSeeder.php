@@ -14,30 +14,60 @@ class RoleSeeder extends Seeder
     public function run(): void
     {
         Role::create(['name' => 'Super Admin']);
-        $admin = Role::create(['name' => 'Admin']);
-        $operator = Role::create(['name' => 'Operator']);
-        $user = Role::create(['name' => 'User']);
+        $manager = Role::create(['name' => 'Manager']);
+        $sales_manager = Role::create(['name' => 'Sales Manager']);
+        $field_officer = Role::create(['name' => 'Field Officer']);
 
-        $admin->givePermissionTo([
+        $manager->givePermissionTo([
             'admin-role',
             'create-user',
             'edit-user',
             'delete-user',
+            'create-manager',
+            'create-sales-manager',
+            'edit-sales-manager',
+            'delete-sales-manager',
+            'create-field-officer',
+            'edit-field-officer',
+            'delete-field-officer',
+            'create-customer',
+            'edit-customer',
+            'delete-customer',
+            'create-supplier',
+            'edit-supplier',
             'create',
             'edit',
             'delete',
             'view'
         ]);
-        $operator->givePermissionTo([
+        $sales_manager->givePermissionTo([
+            'create-user',
+            'edit-user',
+            'delete-user',
+            'create-sales-manager',
+            'edit-sales-manager',
+            'create-field-officer',
+            'edit-field-officer',
+            'delete-field-officer',
+            'create-customer',
+            'edit-customer',
+            'delete-customer',
             'create',
             'edit',
             'delete',
             'view'
         ]);
 
-        $user->givePermissionTo([
+        $field_officer->givePermissionTo([
+            'create-field-officer',
+            'edit-field-officer',
+            'create-customer',
+            'edit-customer',
+            'delete-customer',
+            'create',
+            'edit',
+            'delete',
             'view'
         ]);
-
     }
 }
