@@ -1,21 +1,21 @@
 <div x-data="{ isOpen: false }">
     <!-- Header -->
     <x-slot name="header">
-        {{ __('Customer List') }}
+        {{ __($customer .' List') }}
     </x-slot>
 
     <div class="d-flex justify-content-center">
         <div class="col-8">
-            @if(auth()->user()->can('create-customer') || $customerId)
+            @if(auth()->user()->can('create-customer') || auth()->user()->can('create-supplier'))
                 <div class="row">
                     <div class="col">
                         <div class="p-1">
                             <!-- Toggle Button -->
                             <button
-                                @click="isOpen = !isOpen; if (!isOpen) { $wire.set('name', ''); $wire.set('email', ''); $wire.set('mobile', ''); $wire.set('address', ''); $wire.set('balance', ''); $wire.set('customerId', ''); }"
+                                @click="isOpen = !isOpen; if (!isOpen) { $wire.set('name', ''); $wire.set('email', ''); $wire.set('mobile', ''); $wire.set('address', ''); $wire.set('balance', ''); }"
                                 class="btn btn-sm btn-primary"
                                 type="button">
-                                <span x-text="isOpen ? 'Hide This' : 'Add Customer'"></span>
+                                <span x-text="isOpen ? 'Hide This' : 'Add {{$customer}}'"></span>
                             </button>
                         </div>
 
@@ -25,7 +25,7 @@
                                 <form wire:submit.prevent="submit">
                                     <div class="row g-2">
                                         <div class="col-3">
-                                            <input class="form-control" type="text" id="name" wire:model="name" placeholder="customer Name" aria-label="customer Name">
+                                            <input class="form-control" type="text" id="name" wire:model="name" placeholder="{{$customer}} Name" aria-label="{{$customer}} Name">
                                             @error('name') <span class="text-danger">{{ $message }}</span> @enderror
                                         </div>
                                         <div class="col-3">
@@ -44,20 +44,17 @@
                                             <input class="form-control" type="number" id="balance" wire:model="balance" placeholder="Balance" aria-label="Balance">
                                             @error('balance') <span class="text-danger">{{ $message }}</span> @enderror
                                         </div>
-                                        <div class="col-3">
-                                            <select name="field_officer_team" id="field_officer_team" class="form-control" wire:model="field_officer_team">
-                                                <option value="">Select Field Officer</option>
-                                                @foreach ($field_officers as $field_officer)
-                                                    <option value="{{ $field_officer->id }}"
-                                                        {{ isset($field_officer->fieldOfficer) && $field_officer->fieldOfficer->id == $field_officer->id
-                                                            ? 'selected'
-                                                            : ($field_officer->id == auth()->user()->id ? 'selected' : '') }}>
-                                                        {{ $field_officer->name }}
-                                                    </option>
-                                                @endforeach
-                                            </select>
-                                            @error('field_officer_team') <span class="text-danger">{{ $message }}</span> @enderror
-                                        </div>
+                                        @if ($customer == 'Customer' && $field_officers->isNotEmpty())
+                                            <div class="col-3">
+                                                <select name="field_officer_team" id="field_officer_team" class="form-control" wire:model="field_officer_team">
+                                                    <option value="">Select Field Officer</option>
+                                                    @foreach ($field_officers as $field_officer)
+                                                        <option value="{{ $field_officer->id }}" {{ $field_officer->id == auth()->user()->id ? 'selected' : '' }}>{{ $field_officer->name }}</option>
+                                                    @endforeach
+                                                </select>
+                                                @error('field_officer_team') <span class="text-danger">{{ $message }}</span> @enderror
+                                            </div>
+                                        @endif
                                     </div>
                                     <button class="btn btn-primary mt-2" type="submit">Submit</button>
                                 </form>
@@ -77,12 +74,11 @@
                     <thead>
                         <tr>
                             <th>SN</th>
-                            <th>customer Name</th>
+                            <th>{{$customer}} Name</th>
                             <th>Email Address</th>
                             <th>mobile</th>
                             {{-- <th>Balance</th> --}}
                             <th>Address</th>
-                            <th>Field Officer</th>
                             <th>Action</th>
                         </tr>
                     </thead>
@@ -95,15 +91,9 @@
                                 <td>{{ $customer->mobile }}</td>
                                 {{-- <td>{{ $customer->balance }}</td> --}}
                                 <td>{{ $customer->address }}</td>
-                                <td>{{ $customer->fieldOfficer->name ?? 'N/A' }}</td>
                                 <td>
-                                    @can('edit-customer')
-                                        <button class="btn btn-sm btn-info" wire:click="edit({{ $customer->id }})" @click="isOpen = true"><i class="bi bi-pencil-square"></i></button>
-                                    @endcan
-
-                                    @can('delete-customer')
-                                        <button class="btn btn-sm btn-danger" wire:click="delete({{ $customer->id }})"><i class="bi bi-trash"></i></button>
-                                    @endcan
+                                    <button class="btn btn-sm btn-info" wire:click="edit({{ $customer->id }})" @click="isOpen = true"><i class="bi bi-pencil-square"></i></button>
+                                    <button class="btn btn-sm btn-danger" wire:click="delete({{ $customer->id }})"><i class="bi bi-trash"></i></button>
                                 </td>
                             </tr>
                         @endforeach

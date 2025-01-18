@@ -13,13 +13,13 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        User::factory(10)->withPersonalTeam()->create();
+        User::factory(20)->withPersonalTeam()->create();
 
         User::factory()->withPersonalTeam()->create([
             'name' => 'Test User',
             'email' => 'test@gmail.com',
         ]);
-        
+
         $this->call([
             // PersonnelInfosSeeder::class,
             // Add more seeders if necessary

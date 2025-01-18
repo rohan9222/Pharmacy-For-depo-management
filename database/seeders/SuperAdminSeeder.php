@@ -38,10 +38,17 @@ class SuperAdminSeeder extends Seeder
             'password' => Hash::make('field_officer@gmail.com')
         ]);
 
+        $depo_incharge = User::create([
+            'name' => 'Depo Incharge',
+            'email' => 'depo_incharge@gmail.com',
+            'password' => Hash::make('depo_incharge@gmail.com')
+        ]);
+
         $superAdmin->assignRole('Super Admin');
         $manager->assignRole('Manager');
         $sales_manager->assignRole('Sales Manager');
         $field_officer->assignRole('Field Officer');
+        $depo_incharge->assignRole('Depo Incharge');
 
     }
 }

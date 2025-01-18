@@ -1,21 +1,21 @@
 <div x-data="{ isOpen: false }">
     <!-- Header -->
     <x-slot name="header">
-        {{ __('Customer List') }}
+        {{ __('supplier List') }}
     </x-slot>
 
     <div class="d-flex justify-content-center">
         <div class="col-8">
-            @if(auth()->user()->can('create-customer') || $customerId)
+            @if(auth()->user()->can('create-supplier') || $supplierId)
                 <div class="row">
                     <div class="col">
                         <div class="p-1">
                             <!-- Toggle Button -->
                             <button
-                                @click="isOpen = !isOpen; if (!isOpen) { $wire.set('name', ''); $wire.set('email', ''); $wire.set('mobile', ''); $wire.set('address', ''); $wire.set('balance', ''); $wire.set('customerId', ''); }"
+                                @click="isOpen = !isOpen; if (!isOpen) { $wire.set('name', ''); $wire.set('email', ''); $wire.set('mobile', ''); $wire.set('address', ''); $wire.set('balance', ''); $wire.set('supplierId', ''); }"
                                 class="btn btn-sm btn-primary"
                                 type="button">
-                                <span x-text="isOpen ? 'Hide This' : 'Add Customer'"></span>
+                                <span x-text="isOpen ? 'Hide This' : 'Add supplier'"></span>
                             </button>
                         </div>
 
@@ -25,7 +25,7 @@
                                 <form wire:submit.prevent="submit">
                                     <div class="row g-2">
                                         <div class="col-3">
-                                            <input class="form-control" type="text" id="name" wire:model="name" placeholder="customer Name" aria-label="customer Name">
+                                            <input class="form-control" type="text" id="name" wire:model="name" placeholder="supplier Name" aria-label="supplier Name">
                                             @error('name') <span class="text-danger">{{ $message }}</span> @enderror
                                         </div>
                                         <div class="col-3">
@@ -45,18 +45,14 @@
                                             @error('balance') <span class="text-danger">{{ $message }}</span> @enderror
                                         </div>
                                         <div class="col-3">
-                                            <select name="field_officer_team" id="field_officer_team" class="form-control" wire:model="field_officer_team">
-                                                <option value="">Select Field Officer</option>
-                                                @foreach ($field_officers as $field_officer)
-                                                    <option value="{{ $field_officer->id }}"
-                                                        {{ isset($field_officer->fieldOfficer) && $field_officer->fieldOfficer->id == $field_officer->id
-                                                            ? 'selected'
-                                                            : ($field_officer->id == auth()->user()->id ? 'selected' : '') }}>
-                                                        {{ $field_officer->name }}
-                                                    </option>
-                                                @endforeach
+                                            <select name="supplier_type" id="supplier_type" class="form-control" wire:model="supplier_type">
+                                                <option value="">Select Supplier Type</option>
+                                                @can('create-supplier')
+                                                    <option value="manufacturer">Manufacturer</option>
+                                                    <option value="supplier">Supplier</option>
+                                                @endcan
                                             </select>
-                                            @error('field_officer_team') <span class="text-danger">{{ $message }}</span> @enderror
+                                            @error('supplier_type') <span class="text-danger">{{ $message }}</span> @enderror
                                         </div>
                                     </div>
                                     <button class="btn btn-primary mt-2" type="submit">Submit</button>
@@ -77,33 +73,28 @@
                     <thead>
                         <tr>
                             <th>SN</th>
-                            <th>customer Name</th>
+                            <th>Supplier Name</th>
                             <th>Email Address</th>
                             <th>mobile</th>
-                            {{-- <th>Balance</th> --}}
+                            <th>Balance</th>
                             <th>Address</th>
-                            <th>Field Officer</th>
+                            <th>Supplier Type</th>
                             <th>Action</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach ($customers as $customer)
+                        @foreach ($suppliers as $supplier)
                             <tr>
                                 <td>{{ $loop->iteration }}</td>
-                                <td>{{ $customer->name }}</td>
-                                <td>{{ $customer->email }}</td>
-                                <td>{{ $customer->mobile }}</td>
-                                {{-- <td>{{ $customer->balance }}</td> --}}
-                                <td>{{ $customer->address }}</td>
-                                <td>{{ $customer->fieldOfficer->name ?? 'N/A' }}</td>
+                                <td>{{ $supplier->name }}</td>
+                                <td>{{ $supplier->email }}</td>
+                                <td>{{ $supplier->mobile }}</td>
+                                <td>{{ $supplier->balance }}</td>
+                                <td>{{ $supplier->address }}</td>
+                                <td>{!! ($supplier->supplier_type == 'supplier') ? '<span class="badge text-bg-info">Supplier</span>' : '<span class="badge text-bg-success">Manufacturer</span>' !!}</td>
                                 <td>
-                                    @can('edit-customer')
-                                        <button class="btn btn-sm btn-info" wire:click="edit({{ $customer->id }})" @click="isOpen = true"><i class="bi bi-pencil-square"></i></button>
-                                    @endcan
-
-                                    @can('delete-customer')
-                                        <button class="btn btn-sm btn-danger" wire:click="delete({{ $customer->id }})"><i class="bi bi-trash"></i></button>
-                                    @endcan
+                                    <button class="btn btn-sm btn-info" wire:click="edit({{ $supplier->id }})" @click="isOpen = true"><i class="bi bi-pencil-square"></i></button>
+                                    <button class="btn btn-sm btn-danger" wire:click="delete({{ $supplier->id }})"><i class="bi bi-trash"></i></button>
                                 </td>
                             </tr>
                         @endforeach
@@ -112,7 +103,7 @@
             </div>
 
             <div class="pagination">
-                {{ $customers->links() }}
+                {{ $suppliers->links() }}
             </div>
         </div>
     </div>

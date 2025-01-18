@@ -23,7 +23,6 @@
                         </div>
                     @endif
 
-
                     <section class="section profile">
                         <div class="row">
                           <div class="col-xl-5">

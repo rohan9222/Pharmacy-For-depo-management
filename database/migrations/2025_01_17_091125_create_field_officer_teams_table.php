@@ -11,11 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('teams', function (Blueprint $table) {
+        Schema::create('field_officer_teams', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->nullOnDelete()->cascadeOnUpdate()->index()->comment('user id who has manager role');
-            $table->string('name');
-            $table->boolean('personal_team');
+            $table->foreignId('sales_manager_team_id')->index()->nullOnDelete()->cascadeOnUpdate()->comment('user id who has manager role');
+            $table->foreignId('user_id')->constrained()->cascadeOnDelete()->cascadeOnUpdate()->comment('user id who has field officer role');
             $table->timestamps();
         });
     }
@@ -25,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('teams');
+        Schema::dropIfExists('field_officer_teams');
     }
 };

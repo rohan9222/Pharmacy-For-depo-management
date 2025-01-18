@@ -15,7 +15,7 @@
         @vite(['resources/css/app.css','resources/sass/app.scss', 'resources/js/app.js'])
 
         <!-- Styles -->
-        <style>
+        {{-- <style>
             body {
                 min-height: 100vh;
                 overflow-x: hidden;
@@ -65,6 +65,87 @@
             #sidebar, #navbar {
                 background-color: #fff !important;
             }
+        </style> --}}
+        <style>
+            body {
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+.sidebar {
+    height: 100vh;
+    width: 250px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    padding-top: 1rem;
+    transition: width 0.3s;
+    background-color: #343a40;
+    color: #fff;
+}
+
+.sidebar.collapsed {
+    width: 70px;
+}
+
+.sidebar.collapsed:hover {
+    width: 250px;
+}
+
+.sidebar a {
+    padding: 10px 15px;
+    display: block;
+    text-decoration: none;
+    color: #fff;
+    transition: color 0.3s;
+}
+
+.sidebar a:hover {
+    background: #495057;
+}
+
+.sidebar.collapsed a {
+    text-align: center;
+    padding: 10px 0;
+}
+
+.sidebar.collapsed:hover a {
+    text-align: left;
+    padding: 10px 15px;
+}
+
+.sidebar.collapsed .sidebar-text {
+    display: none;
+}
+
+.sidebar.collapsed:hover .sidebar-text {
+    display: inline;
+}
+
+.content {
+    margin-left: 250px;
+    padding: 20px;
+    transition: margin-left 0.3s;
+}
+
+.content.collapsed {
+    margin-left: 70px;
+}
+
+.navbar {
+    left: 250px;
+    transition: left 0.3s;
+}
+
+.navbar.collapsed {
+    left: 70px;
+}
+
+#sidebar,
+#navbar {
+    background-color: #fff !important;
+}
+
         </style>
         @livewireStyles
     </head>
@@ -111,7 +192,8 @@
 
         @livewireScripts
 
-        <script>
+        {{-- <script>
+
             const toggleButton = document.getElementById('toggleSidebar');
             const sidebar = document.getElementById('sidebar');
             const navbar = document.getElementById('navbar');
@@ -122,6 +204,10 @@
                 navbar.classList.toggle('collapsed');
                 content.classList.toggle('collapsed');
             });
-        </script>
+        </script> --}}
+
+
+
+        @stack('scripts')
     </body>
 </html>

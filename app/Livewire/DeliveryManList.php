@@ -6,16 +6,16 @@ use Illuminate\Support\Facades\Hash;
 use App\Models\User;
 use Livewire\Component;
 
-class CustomersList extends Component
+class DeliveryManList extends Component
 {
-    public $customerId, $name, $email, $mobile, $address, $balance, $supplier_type, $search, $field_officers, $field_officer_team;
+    public $customerId, $name, $email, $mobile, $address, $balance, $supplier_type, $search;
 
     public function mount()
     {
         if(auth()->user()->hasRole('Super Admin')) {
             return true;
         }
-        if (!auth()->user()->hasAnyPermission(['create-customer', 'edit-customer', 'delete-customer']) || auth()->user()->hasRole('Super Admin')) {
+        if (!auth()->user()->hasAnyPermission(['create-delivery-man', 'edit-delivery-man', 'delete-delivery-man'])) {
             abort(403, 'Unauthorized action.');
         }
         return true;
@@ -23,10 +23,9 @@ class CustomersList extends Component
 
     public function render()
     {
-        $this->field_officers = User::select('id', 'name')->role('Field Officer')->get(); // Pre-fetch Field Officers
-        $customers = User::search($this->search)->with('fieldOfficer')->where('role', 'Customer')->paginate(10);
+        $customers = User::search($this->search)->where('role', 'Delivery Man')->paginate(10);
 
-        return view('livewire.customers-list', ['customers' => $customers])->layout('layouts.app');
+        return view('livewire.delivery-man-list', ['customers' => $customers])->layout('layouts.app');
     }
 
     // Updated rules method
@@ -45,15 +44,15 @@ class CustomersList extends Component
             'mobile' => 'required|numeric|digits:11',
             'address' => 'required|string|max:255',
             'balance' => 'nullable|numeric',
-            'field_officer_team' => 'required',
         ];
     }
 
     public function submit()
     {
         $this->validate($this->role());
+
         try {
-            $newCustomer = User::updateOrCreate(
+            User::updateOrCreate(
                 ['id' => $this->customerId],
                 [
                     'name' => $this->name,
@@ -61,16 +60,12 @@ class CustomersList extends Component
                     'password' => Hash::make($this->email.$this->mobile.$this->name),
                     'mobile' => $this->mobile,
                     'address' => $this->address,
-                    'balance' => $this->balance ?? 0.00,
-                    'role' => 'Customer',
-                    'field_officer_id' => $this->field_officer_team,
-                    'sales_manager_id' => User::where('id', $this->field_officer_team)->first()->sales_manager_id,
-                    'manager_id' => User::where('id', $this->field_officer_team)->first()->manager_id,
+                    'balance' => $this->balance,
+                    'role' => 'Delivery Man',
                 ]
             );
-
             $this->reset();
-            flash()->success('Customer added successfully!');
+            flash()->success('Delivery Man added successfully!');
         } catch (\Exception $e) {
             flash()->error('Error: ' . $e->getMessage());
             return;
@@ -97,7 +92,7 @@ class CustomersList extends Component
         $customer = User::find($id);
         if ($customer) {
             $customer->forceDelete();
-            flash()->success('Customer deleted successfully!');
+            flash()->success('Delivery Man deleted successfully!');
         }else {
             flash()->error('Something went wrong!');
         }

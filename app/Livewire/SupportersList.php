@@ -5,28 +5,42 @@ namespace App\Livewire;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
 use Livewire\Component;
+use Livewire\WithPagination;
+use Illuminate\Validation\Rule;
 
-class CustomersList extends Component
+class SupportersList extends Component
 {
-    public $customerId, $name, $email, $mobile, $address, $balance, $supplier_type, $search, $field_officers, $field_officer_team;
+    use WithPagination;
+    public $customer, $customerId, $name, $email, $mobile, $address, $balance, $search, $field_officers, $field_officer_team;
 
-    public function mount()
+    public function mount($customer)
     {
-        if(auth()->user()->hasRole('Super Admin')) {
-            return true;
+        $this->customer = $customer;
+        // Validate the customer type
+        if (!in_array($customer, ['Customer', 'Delivery Man']) && auth()->user()->cannot('create-customer')) {
+            abort(403, 'Access Denied: Invalid Customer Type');
         }
-        if (!auth()->user()->hasAnyPermission(['create-customer', 'edit-customer', 'delete-customer']) || auth()->user()->hasRole('Super Admin')) {
-            abort(403, 'Unauthorized action.');
-        }
-        return true;
+
     }
+
+    public function hydrate()
+    {
+        if (!$this->customer) {
+            $this->customer = request()->route('customer') ?? 'Customer'; // রুট থেকে বা ডিফল্ট সেট করুন
+        }
+    }
+
 
     public function render()
     {
         $this->field_officers = User::select('id', 'name')->role('Field Officer')->get(); // Pre-fetch Field Officers
-        $customers = User::search($this->search)->with('fieldOfficer')->where('role', 'Customer')->paginate(10);
+        // Fetch customers based on search and role
+        $customers = User::query()
+            ->search($this->search)
+            ->where('role', $this->customer)
+            ->paginate(10);
 
-        return view('livewire.customers-list', ['customers' => $customers])->layout('layouts.app');
+        return view('livewire.supporters-list', ['customers' => $customers])->layout('layouts.app');
     }
 
     // Updated rules method
@@ -34,26 +48,36 @@ class CustomersList extends Component
     {
         return [
             'name' => 'required|string|max:255',
+            // 'email' => 'required|email|max:255|unique:users,email,'.$this->customerId,
+            // 'email' => ['required', 'email', 'max:255', Rule::unique('users')->ignore($this->customerId)],
             'email' => ['required', 'email', 'max:255',
                 function ($attribute, $value, $fail) {
                     $users = User::where('email', $value)->where('id', '!=', $this->customerId)->first();
                     if ($users) {
-                        $fail('The email address is already associated with a '.ucfirst($users->role).' list. Please use a different email address');
+                        $fail('The email address is already associated with a '.ucfirst($users->role).' role. Please use a different email address');
                     }
                 }
             ],
             'mobile' => 'required|numeric|digits:11',
             'address' => 'required|string|max:255',
             'balance' => 'nullable|numeric',
-            'field_officer_team' => 'required',
+            'field_officer_team' => 'required_if:customer,Customer',
+
+        ];
+    }
+    public function messages()
+    {
+        return [
+            'field_officer_team.required_if' => 'The field officer is required.',
         ];
     }
 
     public function submit()
     {
         $this->validate($this->role());
+
         try {
-            $newCustomer = User::updateOrCreate(
+            User::updateOrCreate(
                 ['id' => $this->customerId],
                 [
                     'name' => $this->name,
@@ -62,13 +86,9 @@ class CustomersList extends Component
                     'mobile' => $this->mobile,
                     'address' => $this->address,
                     'balance' => $this->balance ?? 0.00,
-                    'role' => 'Customer',
-                    'field_officer_id' => $this->field_officer_team,
-                    'sales_manager_id' => User::where('id', $this->field_officer_team)->first()->sales_manager_id,
-                    'manager_id' => User::where('id', $this->field_officer_team)->first()->manager_id,
+                    'role' => $this->customer,
                 ]
             );
-
             $this->reset();
             flash()->success('Customer added successfully!');
         } catch (\Exception $e) {
@@ -87,6 +107,7 @@ class CustomersList extends Component
             $this->mobile = $customer->mobile;
             $this->address = $customer->address;
             $this->balance = $customer->balance;
+            $this->supplier_type = $customer->supplier_type;
         }else {
             flash()->error('Something went wrong!');
         }
@@ -102,4 +123,5 @@ class CustomersList extends Component
             flash()->error('Something went wrong!');
         }
     }
+
 }

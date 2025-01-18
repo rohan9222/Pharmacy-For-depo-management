@@ -14,9 +14,25 @@ class RoleSeeder extends Seeder
     public function run(): void
     {
         Role::create(['name' => 'Super Admin']);
+        $depo = Role::create(['name' => 'Depo Incharge']);
         $manager = Role::create(['name' => 'Manager']);
         $sales_manager = Role::create(['name' => 'Sales Manager']);
         $field_officer = Role::create(['name' => 'Field Officer']);
+        $delivery_man = Role::create(['name' => 'Delivery Man']);
+
+        $delivery_man->givePermissionTo([
+            'view'
+        ]);
+
+        $depo->givePermissionTo([
+            'create-delivery-man',
+            'edit-delivery-man',
+            'delete-delivery-man',
+            'create',
+            'edit',
+            'delete',
+            'view'
+        ]);
 
         $manager->givePermissionTo([
             'admin-role',
@@ -40,6 +56,7 @@ class RoleSeeder extends Seeder
             'delete',
             'view'
         ]);
+
         $sales_manager->givePermissionTo([
             'create-user',
             'edit-user',
