@@ -1,5 +1,5 @@
 {{-- <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top"> --}}
-<nav x-data="{ open: false }" id="navbar" class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
+<nav x-data="{ open: false }" id="navbar" class="main-header navbar navbar-expand navbar-white navbar-light fixed-top">
     <div class="container-fluid">
         <!-- Hamburger Toggle for Mobile View -->
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -8,6 +8,7 @@
 
         <!-- Navigation Links -->
         <div class="collapse navbar-collapse" id="navbarNav">
+            <button id="toggleSidebar" class="btn btn-sm btn-light ms-2"><i class="bi bi-arrow-left-square"></i></button>
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 <li class="nav-item">
                     <a class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}" href="{{ route('dashboard.index') }}">

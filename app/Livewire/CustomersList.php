@@ -45,7 +45,14 @@ class CustomersList extends Component
             'mobile' => 'required|numeric|digits:11',
             'address' => 'required|string|max:255',
             'balance' => 'nullable|numeric',
-            'field_officer_team' => 'required',
+            'field_officer_team' => ['required','exists:users,id',
+                function ($attribute, $value, $fail) {
+                    $user = User::find($value); // Retrieve the user once to avoid multiple queries
+                    if (!$user || (!$user->sales_manager_id && !$user->manager_id)) {
+                        $fail('This field officer team does not exist or not assigned to any manager and sales manager.');
+                    }
+                }
+            ],
         ];
     }
 

@@ -5,55 +5,40 @@
         {{-- <span class="sidebar-text fs-4">Sidebar</span> --}}
     </a>
     <hr>
-    <button id="toggleSidebar" class="btn btn-sm btn-light ms-2"><i class="bi bi-arrow-left-square"></i></button>
 
     <ul class="nav nav-pills flex-column mb-auto">
-        <li class="mb-1">
-            <button class="btn btn-toggle d-inline-flex align-items-center rounded border-0 collapsed" data-bs-toggle="collapse" data-bs-target="#home-collapse" aria-expanded="false">
-            Home
-            </button>
-            <div class="collapse" id="home-collapse" style="">
-            <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
-                <li><a href="#" class="link-body-emphasis d-inline-flex text-decoration-none rounded">Overview</a></li>
-                <li><a href="#" class="link-body-emphasis d-inline-flex text-decoration-none rounded">Updates</a></li>
-                <li><a href="#" class="link-body-emphasis d-inline-flex text-decoration-none rounded">Reports</a></li>
-            </ul>
-            </div>
-        </li>
-    </ul>
-    <ul class="list-unstyled ps-0">
         <li class="nav-item">
-            <a href="{{ url('/') }}" class="nav-link active" aria-current="page">
+            <a href="{{ url('/') }}" class="nav-link" aria-current="page">
                 <i class="bi bi-house-door-fill me-2"></i>
                 <span class="sidebar-text">Home</span>
             </a>
         </li>
         <li class="nav-item">
-            <a href="{{ route('dashboard.index') }}" class="nav-link link-body-emphasis">
+            <a href="{{ route('dashboard.index') }}" class="nav-link link-body-emphasis {{ request()->routeIs('dashboard') ? 'active' : '' }}">
                 <i class="bi bi-pie-chart-fill me-2"></i>
                 <span class="sidebar-text">Dashboard</span>
             </a>
         </li>
         <li class="nav-item">
-            <a href="{{ route('suppliers') }}" class="nav-list nav-link link-body-emphasis">
+            <a href="{{ route('suppliers') }}" class="nav-list nav-link link-body-emphasis {{ request()->routeIs('suppliers') ? 'active' : '' }}">
                 <i class="bi bi-people me-2"></i>
                 <span class="sidebar-text">Suppliers/Manufacturer</span>
             </a>
         </li>
         <li class="nav-item">
-            <a href="{{ route('customers') }}" class="nav-link link-body-emphasis">
+            <a href="{{ route('customers') }}" class="nav-link link-body-emphasis {{ request()->routeIs('customers') ? 'active' : '' }}">
                 <i class="bi bi-people me-2"></i>
                 <span class="sidebar-text">Customers</span>
             </a>
         </li>
         <li class="nav-item">
-            <a href="{{ route('delivery-man') }}" class="nav-link link-body-emphasis">
+            <a href="{{ route('delivery-man') }}" class="nav-link link-body-emphasis {{ request()->routeIs('delivery-man') ? 'active' : '' }}">
                 <i class="bi bi-people me-2"></i>
                 <span class="sidebar-text">Delivery Man</span>
             </a>
         </li>
         <li class="nav-item">
-            <a href="{{ route('medicines') }}" class="nav-link link-body-emphasis">
+            <a href="{{ route('medicines') }}" class="nav-link link-body-emphasis {{ request()->routeIs('medicines') ? 'active' : '' }}">
                 <i class="bi bi-capsule-pill me-2"></i>
                 <span class="sidebar-text">Medicine</span>
             </a>
@@ -70,17 +55,17 @@
     <hr>
     <div class="dropdown">
         <a href="#" class="d-flex align-items-center link-body-emphasis text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-          <img src="https://github.com/mdo.png" alt="" width="32" height="32" class="rounded-circle me-2">
-          <strong class="sidebar-text">mdo</strong>
+            <img src="https://github.com/mdo.png" alt="" width="32" height="32" class="rounded-circle me-2">
+            <strong class="sidebar-text">mdo</strong>
         </a>
         <ul class="dropdown-menu text-small shadow sidebar-text">
-          <li><a class="dropdown-item" href="#">New project...</a></li>
-          <li><a class="dropdown-item" href="#">Settings</a></li>
-          <li><a class="dropdown-item" href="#">Profile</a></li>
-          <li><hr class="dropdown-divider"></li>
-          <li><a class="dropdown-item" href="#">Sign out</a></li>
+            <li><a class="dropdown-item" href="#">New project...</a></li>
+            <li><a class="dropdown-item" href="#">Settings</a></li>
+            <li><a class="dropdown-item" href="#">Profile</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="#">Sign out</a></li>
         </ul>
-      </div>
+    </div>
 </div>
 
 @push('scripts')

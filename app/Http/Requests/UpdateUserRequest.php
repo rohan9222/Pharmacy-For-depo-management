@@ -26,9 +26,9 @@ class UpdateUserRequest extends FormRequest
         return [
             'name' => 'required|string|max:250',
             // 'email' => 'required|string|email:rfc,dns|max:250|unique:users,email,'.$this->user->id,
-            'email' => ['required', 'email', 'max:255',
+            'email' => ['required', 'email:rfc,dns', 'max:255',
                 function ($attribute, $value, $fail) {
-                    $users = User::where('email', $value)->where('id', '!=', $this->customerId)->first();
+                    $users = User::where('email', $value)->where('id', '!=', $this->user->id)->first();
                     if ($users) {
                         $fail('The email address is already associated with a '.ucfirst($users->role).' list. Please use a different email address');
                     }
