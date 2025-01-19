@@ -16,6 +16,12 @@ return new class extends Migration
             $table->foreignId('team_id');
             $table->foreignId('user_id');
             $table->string('role')->nullable();
+            // $table->foreignId('manager')->nullable()->constrained('users')->nullOnDelete()->cascadeOnUpdate()->comment('user id who has manager role');
+            // $table->foreignId('sales_manager')->nullable()->constrained('users')->nullOnDelete()->cascadeOnUpdate()->comment('user id who has sales manager role');
+            // $table->foreignId('field_officer')->nullable()->constrained('users')->nullOnDelete()->cascadeOnUpdate()->comment('user id who has field officer role');
+            // $table->foreignId('customer')->nullable()->constrained('users')->nullOnDelete()->cascadeOnUpdate()->comment('user id who has customer role');
+            // $table->string('product_target')->nullable();
+            // $table->string('sales_target')->nullable();
             $table->timestamps();
 
             $table->unique(['team_id', 'user_id']);

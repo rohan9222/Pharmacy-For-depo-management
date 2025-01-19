@@ -1,7 +1,11 @@
-@tailwind base;
+/* @tailwind base;
 @tailwind components;
-@tailwind utilities;
+@tailwind utilities; */
 
 [x-cloak] {
     display: none;
+}
+
+.fl-wrapper[data-position^=top-] {
+    top: 5.7em !important;
 }

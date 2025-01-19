@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('medicine_lists', function (Blueprint $table) {
+        Schema::create('medicines', function (Blueprint $table) {
             $table->id();
             $table->string('bar_code')->unique();
             $table->string('name');
@@ -29,6 +29,7 @@ return new class extends Migration
             $table->integer('quantity')->default(0);
             $table->boolean('status')->default(1);
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
@@ -37,6 +38,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('medicine_lists');
+        Schema::dropIfExists('medicines');
     }
 };

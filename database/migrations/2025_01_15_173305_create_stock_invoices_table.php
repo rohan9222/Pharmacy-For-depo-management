@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('invoice_no')->unique();
             $table->timestamp('invoice_date')->default(now());
-            $table->foreignId('customer_list_id')->nullable()->constrained()->nullOnDelete()->cascadeOnUpdate();
+            $table->foreignId('supplier_id')->nullable()->constrained()->nullOnDelete()->cascadeOnUpdate()->comment('supplier list id');
             $table->decimal('sub_total', 11, 2)->default(0.00);
             $table->decimal('discount', 11, 2)->default(0.00);
             $table->enum('discount_type', ['percentage', 'fixed'])->default('percentage')->nullable();
@@ -29,7 +29,7 @@ return new class extends Migration
 
     /**
      * Reverse the migrations.
-     */
+     **/
     public function down(): void
     {
         Schema::dropIfExists('stock_invoices');

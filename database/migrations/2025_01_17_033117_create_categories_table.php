@@ -11,11 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('teams', function (Blueprint $table) {
+        Schema::create('categories', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->nullOnDelete()->cascadeOnUpdate()->index()->comment('user id who has manager role');
-            $table->string('name');
-            $table->boolean('personal_team');
+            $table->string('name')->unique();
+            $table->string('description')->nullable();
+            $table->boolean('status')->default(1);
             $table->timestamps();
         });
     }
@@ -25,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('teams');
+        Schema::dropIfExists('categories');
     }
 };

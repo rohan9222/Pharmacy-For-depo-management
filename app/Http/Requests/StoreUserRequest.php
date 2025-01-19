@@ -2,6 +2,8 @@
 
 namespace App\Http\Requests;
 
+use App\Models\User;
+
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreUserRequest extends FormRequest
@@ -23,9 +25,21 @@ class StoreUserRequest extends FormRequest
     {
         return [
             'name' => 'required|string|max:250',
-            'email' => 'required|string|email:rfc,dns|max:250|unique:users,email',
+            'email' => ['required', 'email', 'max:255',
+                function ($attribute, $value, $fail) {
+                    $users = User::where('email', $value)->where('id', '!=', $this->customerId)->first();
+                    if ($users) {
+                        $fail('The email address is already associated with a '.ucfirst($users->role).' list. Please use a different email address');
+                    }
+                }
+            ],
+            'address' => 'nullable|string|max:255',
+            'mobile' => 'required|numeric|digits:11',
+            'balance' => 'nullable|numeric',
+            'product_target' => 'nullable|numeric',
+            'sales_target' => 'nullable|numeric',
             'password' => 'required|string|min:8|confirmed',
-            'roles' => 'required'
+            'roles' => 'required|array',
         ];
     }
 }

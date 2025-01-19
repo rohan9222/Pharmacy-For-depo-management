@@ -10,8 +10,11 @@ use Laravel\Fortify\TwoFactorAuthenticatable;
 use Laravel\Jetstream\HasProfilePhoto;
 use Laravel\Jetstream\HasTeams;
 use Laravel\Sanctum\HasApiTokens;
+use App\Models\FieldOfficerTeam;
 
 use Spatie\Permission\Traits\HasRoles;
+
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class User extends Authenticatable
 {
@@ -24,6 +27,7 @@ class User extends Authenticatable
     use Notifiable;
     use TwoFactorAuthenticatable;
     use HasRoles;
+    use SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
@@ -33,7 +37,16 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'email',
+        'mobile',
+        'address',
+        'balance',
+        'role',
         'password',
+        'product_target',
+        'sales_target',
+        'field_officer_id',
+        'sales_manager_id',
+        'manager_id',
     ];
 
     /**
@@ -69,4 +82,31 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    // Define the search scope
+    public function scopeSearch($query, $search)
+    {
+        return $query->where('name', 'like', '%' . $search . '%')
+            ->orWhere('email', 'like', '%' . $search . '%')
+            ->orWhere('mobile', 'like', '%' . $search . '%')
+            ->orWhere('balance', 'like', '%' . $search . '%')
+            ->orWhere('address', 'like', '%' . $search . '%');
+    }
+
+    // User.php
+    public function manager()
+    {
+        return $this->belongsTo(User::class, 'manager_id');
+    }
+
+    public function salesManager()
+    {
+        return $this->belongsTo(User::class, 'sales_manager_id');
+    }
+
+    public function fieldOfficer()
+    {
+        return $this->belongsTo(User::class, 'field_officer_id');
+    }
+
 }

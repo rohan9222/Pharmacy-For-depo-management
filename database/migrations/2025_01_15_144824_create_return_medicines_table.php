@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('return_medicines', function (Blueprint $table) {
             $table->id();
             $table->foreignId('invoice_id')->constrained()->cascadeOnDelete()->cascadeOnUpdate();
-            $table->foreignId('medicine_list_id')->nullable()->constrained()->nullOnDelete()->cascadeOnUpdate();
+            $table->foreignId('medicine_id')->nullable()->constrained()->nullOnDelete()->cascadeOnUpdate();
             $table->string('medicine_name');
             $table->string('batch_number')->nullable();
             $table->timestamp('expiry_date')->nullable();

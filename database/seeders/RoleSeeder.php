@@ -14,30 +14,77 @@ class RoleSeeder extends Seeder
     public function run(): void
     {
         Role::create(['name' => 'Super Admin']);
-        $admin = Role::create(['name' => 'Admin']);
-        $operator = Role::create(['name' => 'Operator']);
-        $user = Role::create(['name' => 'User']);
+        $depo = Role::create(['name' => 'Depo Incharge']);
+        $manager = Role::create(['name' => 'Manager']);
+        $sales_manager = Role::create(['name' => 'Sales Manager']);
+        $field_officer = Role::create(['name' => 'Field Officer']);
+        $delivery_man = Role::create(['name' => 'Delivery Man']);
 
-        $admin->givePermissionTo([
+        $delivery_man->givePermissionTo([
+            'view'
+        ]);
+
+        $depo->givePermissionTo([
+            'create-delivery-man',
+            'edit-delivery-man',
+            'delete-delivery-man',
+            'create',
+            'edit',
+            'delete',
+            'view'
+        ]);
+
+        $manager->givePermissionTo([
             'admin-role',
             'create-user',
             'edit-user',
             'delete-user',
-            'create',
-            'edit',
-            'delete',
-            'view'
-        ]);
-        $operator->givePermissionTo([
+            'create-manager',
+            'create-sales-manager',
+            'edit-sales-manager',
+            'delete-sales-manager',
+            'create-field-officer',
+            'edit-field-officer',
+            'delete-field-officer',
+            'create-customer',
+            'edit-customer',
+            'delete-customer',
+            'create-supplier',
+            'edit-supplier',
             'create',
             'edit',
             'delete',
             'view'
         ]);
 
-        $user->givePermissionTo([
+        $sales_manager->givePermissionTo([
+            'create-user',
+            'edit-user',
+            'delete-user',
+            'create-sales-manager',
+            'edit-sales-manager',
+            'create-field-officer',
+            'edit-field-officer',
+            'delete-field-officer',
+            'create-customer',
+            'edit-customer',
+            'delete-customer',
+            'create',
+            'edit',
+            'delete',
             'view'
         ]);
 
+        $field_officer->givePermissionTo([
+            'create-field-officer',
+            'edit-field-officer',
+            'create-customer',
+            'edit-customer',
+            'delete-customer',
+            'create',
+            'edit',
+            'delete',
+            'view'
+        ]);
     }
 }
