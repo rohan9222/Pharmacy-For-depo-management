@@ -216,22 +216,6 @@
 
         @livewireScripts
 
-        {{-- <script>
-
-            const toggleButton = document.getElementById('toggleSidebar');
-            const sidebar = document.getElementById('sidebar');
-            const navbar = document.getElementById('navbar');
-            const content = document.getElementById('content');
-
-            toggleButton.addEventListener('click', () => {
-                sidebar.classList.toggle('collapsed');
-                navbar.classList.toggle('collapsed');
-                content.classList.toggle('collapsed');
-            });
-        </script> --}}
-
-
-
         @stack('scripts')
     </body>
 </html>

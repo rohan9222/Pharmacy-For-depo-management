@@ -5,7 +5,7 @@
     </x-slot>
 
     <div class="d-flex justify-content-center">
-        <div class="col-8">
+        <div class="col-11">
             @if(auth()->user()->can('create-medicine') || $medicineId)
                 <div class="row">
                     <div class="col">
@@ -25,7 +25,14 @@
                                 <form wire:submit.prevent="submit">
                                     <div class="row g-2">
                                         <div class="col-3">
-                                            <input class="form-control" type="text" id="name" wire:model="name" placeholder="medicine Name" aria-label="medicine Name">
+                                            <div class="input-group">
+                                                <input class="form-control" type="text" id="barcode" wire:model="barcode" placeholder="Bar Code" aria-label="Bar Code">
+                                                <span class="input-group-text bg-info bg-opacity-10"><i class="bi bi-upc-scan"></i></span>
+                                            </div>
+                                            @error('barcode') <span class="text-danger">{{ $message }}</span> @enderror
+                                        </div>
+                                        <div class="col-3">
+                                            <input class="form-control" type="text" id="name" wire:model="name" placeholder="Medicine Name" aria-label="Medicine Name">
                                             @error('name') <span class="text-danger">{{ $message }}</span> @enderror
                                         </div>
                                         <div class="col-3">
@@ -33,12 +40,23 @@
                                             @error('generic_name') <span class="text-danger">{{ $message }}</span> @enderror
                                         </div>
                                         <div class="col-3">
-                                            <input class="form-control" type="text" id="description" wire:model="description" placeholder="description" aria-label="description">
+                                            <input class="form-control" type="text" id="description" wire:model="description" placeholder="Description" aria-label="Description">
                                             @error('description') <span class="text-danger">{{ $message }}</span> @enderror
                                         </div>
                                         <div class="col-3">
-                                            <input class="form-control" type="shelf" id="shelf" wire:model="shelf" placeholder="shelf" aria-label="shelf">
+                                            <input class="form-control" type="text" id="shelf" wire:model="shelf" placeholder="Shelf No" aria-label="Shelf No">
                                             @error('shelf') <span class="text-danger">{{ $message }}</span> @enderror
+                                        </div>
+                                        <div class="col-3">
+                                            <select name="category_name" id="category_name" class="form-control" wire:model="category_name">
+                                                <option value="">Select Category Name</option>
+                                                @foreach ($categoryLists as $categoryList)
+                                                    <option value="{{ $categoryList->name }}" {{ ($categoryList->name ?? '') == $category_name ? 'selected' : '' }}>
+                                                        {{ $categoryList->name }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                            @error('category_name') <span class="text-danger">{{ $message }}</span> @enderror
                                         </div>
                                         <div class="col-3">
                                             <select name="supplier_name" id="supplier_name" class="form-control" wire:model="supplier_name">
@@ -52,15 +70,59 @@
                                             @error('category_name') <span class="text-danger">{{ $message }}</span> @enderror
                                         </div>
                                         <div class="col-3">
-                                            <select name="category_name" id="category_name" class="form-control" wire:model="category_name">
-                                                <option value="">Select Category Name</option>
-                                                @foreach ($categoryLists as $categoryList)
-                                                    <option value="{{ $categoryList->name }}" {{ ($categoryList->name ?? '') == $category_name ? 'selected' : '' }}>
-                                                        {{ $categoryList->name }}
-                                                    </option>
-                                                @endforeach
+                                            <div class="input-group">
+                                                <input type="text" name="supplier_price" placeholder="Supplier Price" id="supplier_price" class="form-control" wire:model="supplier_price">
+                                                <span class="input-group-text bg-info bg-opacity-10">৳</span>
+                                            </div>
+                                            @error('supplier_price') <span class="text-danger">{{ $message }}</span> @enderror
+                                        </div>
+                                        <div class="col-3">
+                                            <div class="input-group">
+                                                <input type="text" name="price" id="price" placeholder="Price" class="form-control" wire:model="price">
+                                                <span class="input-group-text bg-info bg-opacity-10">৳</span>
+                                            </div>
+                                            @error('price') <span class="text-danger">{{ $message }}</span> @enderror
+                                        </div>
+
+                                        {{-- <div class="col-3">
+                                            <input type="text" name="discount" id="discount" placeholder="Discount" class="form-control" wire:model="discount">
+                                            @error('discount') <span class="text-danger">{{ $message }}</span> @enderror
+                                        </div>
+                                        <div class="col-3">
+                                            <select name="discount_type" id="discount_type" class="form-control" wire:model="discount_type">
+                                                <option value="percentage" {{ ($discount_type ?? '') == 'percentage' ? 'selected' : '' }}>Percentage (%)</option>
+                                                <option value="fixed" {{ ($discount_type ?? '') == 'fixed' ? 'selected' : '' }}>Fixed</option>
                                             </select>
-                                            @error('category_name') <span class="text-danger">{{ $message }}</span> @enderror
+                                            @error('discount_type') <span class="text-danger">{{ $message }}</span> @enderror
+                                        </div>
+                                         --}}
+                                        <div class="col-3">
+                                            <div class="input-group">
+                                                <input type="text" name="vat" id="vat" placeholder="VAT" class="form-control" wire:model="vat">
+                                                <span class="input-group-text bg-info bg-opacity-10">৳</span>
+                                            </div>
+                                            @error('vat') <span class="text-danger">{{ $message }}</span> @enderror
+                                        </div>
+                                        <div class="col-3">
+                                            <input type="text" name="quantity" id="quantity" placeholder="Quantity" class="form-control" wire:model="quantity">
+                                            @error('quantity') <span class="text-danger">{{ $message }}</span> @enderror
+                                        </div>
+                                        <div class="col-3">
+                                            <select name="status" class="form-control" id="status" wire:model="status">
+                                                <option value="1" selected>Active</option>
+                                                <option value="0">Inactive</option>
+                                            </select>
+                                            @error('status') <span class="text-danger">{{ $message }}</span> @enderror
+                                        </div>
+                                        <div class="col-3">
+                                            <input type="file" name="image_url" wire:model="image_url" id="image_url" class="form-control">
+                                            @error('image_url') <span class="text-danger">{{ $message }}</span> @enderror
+                                        </div>
+                                        <div class="col-3">
+                                            @if ($image_url)
+                                                <label class="form-label" for="upload_image_url">Photo Preview:</label>
+                                                <img id="upload_image_url" src="{{ $image_url->temporaryUrl() }}" alt="Image Preview" class="img-fluid img-thumbnail" style="max-width: 200px; max-height: 200px;"><button type="button" class="btn btn-white btn-sm text-danger mx-2 fs-4" wire:click="removePhoto"><i class="bi bi-x-circle-fill"></i></button>
+                                            @endif
                                         </div>
                                     </div>
                                     <button class="btn btn-primary mt-2" type="submit">Submit</button>
@@ -77,7 +139,7 @@
                         <input id="search" class="form-control" type="search" wire:model.live="search" placeholder="Search By Name" aria-label="Search By Name">
                     </div>
                 </div>
-                <table class="table table-bordered table-sm">
+                <table class="table table-bordered table-sm table-responsive">
                     <thead>
                         <tr>
                             <th>SN</th>

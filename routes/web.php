@@ -3,7 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\{DashboardController,UserProfileController};
 use App\Http\Controllers\Admin\{RoleController,UserController};
-use App\Livewire\{CustomersList,DeliveryManList,SupplierList,MedicinesList};
+use App\Livewire\{CustomersList,DeliveryManList,SupplierList,MedicinesList,CategoryList};
 
 
 Route::get('/', function () {
@@ -26,6 +26,9 @@ Route::middleware([
 
 // medicine management
     Route::get('/medicines', MedicinesList::class)->name('medicines');
+
+// category management
+    Route::get('/categories', CategoryList::class)->name('categories');
 
 // profile
     Route::get('/user/profile', [UserProfileController::class, 'index'])->name('user.profile');

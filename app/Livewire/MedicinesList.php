@@ -5,6 +5,11 @@ namespace App\Livewire;
 use App\Models\Medicine;
 use App\Models\Category;
 use App\Models\Supplier;
+use Livewire\WithFileUploads;
+use Intervention\Image\Drivers\Gd\Driver;
+use Intervention\Image\ImageManager;
+use Illuminate\Support\Facades\Storage;
+use Livewire\Attributes\Validate;
 use DNS1D; // For 1D barcodes
 use DNS2D; // For 2D barcodes (QR codes)
 
@@ -12,8 +17,10 @@ use Livewire\Component;
 
 class MedicinesList extends Component
 {
-    public $medicineId, $categoryLists, $suppliers, $name, $generic_name, $supplier_name, $shelf, $description, $category_name, $search, $field_officers, $field_officer_team;
+    use WithFileUploads;
 
+    public $medicineId, $categoryLists, $suppliers, $barcode, $name, $generic_name, $supplier_name, $shelf, $description, $category_name, $search, $quantity, $supplier_price, $price, $vat, $image_url;
+    public  $status = 1;
     public function mount()
     {
         if(auth()->user()->hasRole('Super Admin')) {
@@ -38,33 +45,51 @@ class MedicinesList extends Component
     public function role()
     {
         return [
+            'barcode' => 'nullable|unique:your_table_name,barcode',
             'name' => 'required|string|max:255',
-            'generic_name' => ['required', 'generic_name', 'max:255',
-                function ($attribute, $value, $fail) {
-                    $users = Medicine::where('generic_name', $value)->where('id', '!=', $this->medicineId)->first();
-                    if ($users) {
-                        $fail('The generic_name description is already associated with a '.ucfirst($users->role).' list. Please use a different generic_name description');
-                    }
-                }
-            ],
-            'shelf' => 'required|numeric|digits:11',
-            'description' => 'required|string|max:255',
-            'category_name' => 'nullable|numeric',
-            'field_officer_team' => ['required','exists:users,id',
-                function ($attribute, $value, $fail) {
-                    $user = Medicine::find($value); // Retrieve the user once to avoid multiple queries
-                    if (!$user || (!$user->sales_manager_id && !$user->manager_id)) {
-                        $fail('This field officer team does not exist or not assigned to any manager and sales manager.');
-                    }
-                }
-            ],
+            'generic_name' => 'nullable|string|max:255',
+            'supplier_name' => 'required|string|max:255',
+            'shelf' => 'nullable|string|max:10',
+            'description' => 'nullable|string|max:255',
+            'category_name' => 'required|string|max:255',
+            'quantity' => 'required|numeric',
+            'status' => 'required|boolean',
+            'supplier_price' => 'required|numeric',
+            'price' => 'required|numeric',
+            'vat' => 'required|numeric',
+            'image_url' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ];
+    }
+
+
+    public function removePhoto(){
+        $this->image_url = Null;
+        $this->dispatch('showToast', 'Image Removed successfully!', 'warning');
     }
 
     public function submit()
     {
         $this->validate($this->role());
+
+        // Start a database transaction
+        DB::beginTransaction();
+
         try {
+           // Generate a unique filename and define the path
+            $filename = uniqid() . '.jpg';
+            $path = 'img/customer-images/' . $filename;
+
+            if ($this->image_url) {
+                $image_file =$this->image_url->getRealPath();
+                // create new manager instance with desired driver
+                $manager = new ImageManager(new Driver());
+                // read image from file system
+                $image = $manager->read($image_file);
+                // Image resize
+                $image->resize(300, 300);
+                // save modified image in new format
+                $image->save(public_path("$path"));
+            }
             $newmedicine = Medicine::updateOrCreate(
                 ['id' => $this->medicineId],
                 [
@@ -78,6 +103,7 @@ class MedicinesList extends Component
                     'field_officer_id' => $this->field_officer_team,
                     'sales_manager_id' => Medicine::where('id', $this->field_officer_team)->first()->sales_manager_id,
                     'manager_id' => Medicine::where('id', $this->field_officer_team)->first()->manager_id,
+                    'image_url' => $this->image_url ? $path : null,
                 ]
             );
 

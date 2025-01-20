@@ -44,6 +44,12 @@
             </a>
         </li>
         <li class="nav-item">
+            <a href="{{ route('categories') }}" class="nav-link link-body-emphasis {{ request()->routeIs('categories') ? 'active' : '' }}">
+                <i class="bi bi-capsule-pill me-2"></i>
+                <span class="sidebar-text">Categories</span>
+            </a>
+        </li>
+        <li class="nav-item">
             <a href="#" class="nav-link link-body-emphasis">
                 <i class="bi bi-capsule-pill me-2"></i>
                 <span class="sidebar-text">Order</span>
@@ -54,93 +60,59 @@
 
     <hr>
     <div class="dropdown">
-        <a href="#" class="d-flex align-items-center link-body-emphasis text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-            <img src="https://github.com/mdo.png" alt="" width="32" height="32" class="rounded-circle me-2">
-            <strong class="sidebar-text">mdo</strong>
+        {{-- <a href="#" class="d-flex align-items-center link-body-emphasis text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false"> --}}
+        <a href="#" class="d-flex align-items-center link-body-emphasis text-decoration-none">
+            <img src="{{ Auth::user()->profile_photo_url }}" alt="" width="32" height="32" class="rounded-circle me-2">
+            <strong class="sidebar-text">{{ Auth::user()->name }}</strong>
         </a>
-        <ul class="dropdown-menu text-small shadow sidebar-text">
+        {{-- <ul class="dropdown-menu text-small shadow sidebar-text">
             <li><a class="dropdown-item" href="#">New project...</a></li>
             <li><a class="dropdown-item" href="#">Settings</a></li>
             <li><a class="dropdown-item" href="#">Profile</a></li>
             <li><hr class="dropdown-divider"></li>
             <li><a class="dropdown-item" href="#">Sign out</a></li>
-        </ul>
+        </ul> --}}
     </div>
 </div>
 
 @push('scripts')
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            $(document).ready(function () {
-                $('#toggleSidebar').click(function () {
-                    let icon = $(this).find('i');
-                    // Toggle between left and right arrow classes
-                    if (icon.hasClass('bi-arrow-left-square')) {
-                        icon.removeClass('bi-arrow-left-square').addClass('bi-arrow-right-square');
-                    } else {
-                        icon.removeClass('bi-arrow-right-square').addClass('bi-arrow-left-square');
-                    }
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+      $(document).ready(function () {
+          const sidebar = $('#sidebar');
+          const content = $('#content');
+          const navbar = $('#navbar');
+          const toggleButton = $('#toggleSidebar');
+          const storageKey = 'sidebarCollapsed';
 
-                    // Toggle the collapsed class for sidebar, content, and navbar
-                    $('#sidebar').toggleClass('collapsed');
-                    $('#content').toggleClass('collapsed');
-                    $('#navbar').toggleClass('collapsed');
-                });
-            });
-        });
-    </script>
+          // Restore the state from localStorage
+          const isCollapsed = localStorage.getItem(storageKey) === 'true';
+          if (isCollapsed) {
+              sidebar.addClass('collapsed');
+              content.addClass('collapsed');
+              navbar.addClass('collapsed');
+              toggleButton.find('i').removeClass('bi-arrow-left-square').addClass('bi-arrow-right-square');
+          }
+
+          // Toggle sidebar and save state in localStorage
+          toggleButton.click(function () {
+              let icon = $(this).find('i');
+
+              if (icon.hasClass('bi-arrow-left-square')) {
+                  icon.removeClass('bi-arrow-left-square').addClass('bi-arrow-right-square');
+                  localStorage.setItem(storageKey, true); // Save collapsed state
+              } else {
+                  icon.removeClass('bi-arrow-right-square').addClass('bi-arrow-left-square');
+                  localStorage.setItem(storageKey, false); // Save expanded state
+              }
+
+              // Toggle classes
+              sidebar.toggleClass('collapsed');
+              content.toggleClass('collapsed');
+              navbar.toggleClass('collapsed');
+          });
+      });
+  });
+</script>
+
 @endpush
-
-{{-- <div class="d-flex flex-column flex-shrink-0 p-3 bg-body-tertiary" style="width: 280px;">
-    <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto link-body-emphasis text-decoration-none">
-      <svg class="bi pe-none me-2" width="40" height="32"><use xlink:href="#bootstrap"></use></svg>
-      <span class="fs-4">Sidebar</span>
-    </a>
-    <hr>
-    <ul class="nav nav-pills flex-column mb-auto">
-      <li class="nav-item">
-        <a href="#" class="nav-link active" aria-current="page">
-          <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="#home"></use></svg>
-          Home
-        </a>
-      </li>
-      <li>
-        <a href="#" class="nav-link link-body-emphasis">
-          <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="#speedometer2"></use></svg>
-          Dashboard
-        </a>
-      </li>
-      <li>
-        <a href="#" class="nav-link link-body-emphasis">
-          <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="#table"></use></svg>
-          Orders
-        </a>
-      </li>
-      <li>
-        <a href="#" class="nav-link link-body-emphasis">
-          <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="#grid"></use></svg>
-          Products
-        </a>
-      </li>
-      <li>
-        <a href="#" class="nav-link link-body-emphasis">
-          <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="#people-circle"></use></svg>
-          Customers
-        </a>
-      </li>
-    </ul>
-    <hr>
-    <div class="dropdown">
-      <a href="#" class="d-flex align-items-center link-body-emphasis text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-        <img src="https://github.com/mdo.png" alt="" width="32" height="32" class="rounded-circle me-2">
-        <strong>mdo</strong>
-      </a>
-      <ul class="dropdown-menu text-small shadow">
-        <li><a class="dropdown-item" href="#">New project...</a></li>
-        <li><a class="dropdown-item" href="#">Settings</a></li>
-        <li><a class="dropdown-item" href="#">Profile</a></li>
-        <li><hr class="dropdown-divider"></li>
-        <li><a class="dropdown-item" href="#">Sign out</a></li>
-      </ul>
-    </div>
-  </div> --}}
