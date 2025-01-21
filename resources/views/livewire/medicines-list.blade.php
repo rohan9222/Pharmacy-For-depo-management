@@ -99,18 +99,18 @@
                                         <div class="col-3">
                                             <div class="input-group">
                                                 <input type="text" name="vat" id="vat" placeholder="VAT" class="form-control" wire:model="vat">
-                                                <span class="input-group-text bg-info bg-opacity-10">৳</span>
+                                                <span class="input-group-text bg-info bg-opacity-10">%</span>
                                             </div>
                                             @error('vat') <span class="text-danger">{{ $message }}</span> @enderror
                                         </div>
-                                        <div class="col-3">
+                                        {{-- <div class="col-3">
                                             <input type="text" name="quantity" id="quantity" placeholder="Quantity" class="form-control" wire:model="quantity">
                                             @error('quantity') <span class="text-danger">{{ $message }}</span> @enderror
-                                        </div>
+                                        </div> --}}
                                         <div class="col-3">
                                             <select name="status" class="form-control" id="status" wire:model="status">
-                                                <option value="1" selected>Active</option>
-                                                <option value="0">Inactive</option>
+                                                <option value="1" selected>Available</option>
+                                                <option value="0">Not Available</option>
                                             </select>
                                             @error('status') <span class="text-danger">{{ $message }}</span> @enderror
                                         </div>
@@ -121,7 +121,7 @@
                                         <div class="col-3">
                                             @if ($image_url)
                                                 <label class="form-label" for="upload_image_url">Photo Preview:</label>
-                                                <img id="upload_image_url" src="{{ $image_url->temporaryUrl() }}" alt="Image Preview" class="img-fluid img-thumbnail" style="max-width: 200px; max-height: 200px;"><button type="button" class="btn btn-white btn-sm text-danger mx-2 fs-4" wire:click="removePhoto"><i class="bi bi-x-circle-fill"></i></button>
+                                                <img id="upload_image_url" src="{{ $medicineId ? asset($image_url) : $image_url->temporaryUrl() }}" alt="Image Preview" class="img-fluid img-thumbnail" style="max-width: 200px; max-height: 200px;"><button type="button" class="btn btn-white btn-sm text-danger mx-2 fs-4" wire:click="removePhoto"><i class="bi bi-x-circle-fill"></i></button>
                                             @endif
                                         </div>
                                     </div>
@@ -162,8 +162,8 @@
                         @foreach ($medicines as $medicine)
                             <tr>
                                 <td>{{ $loop->iteration }}</td>
-                                <td>{{ $medicine->image_url }}</td>
-                                <td>{{ $medicine->bar_code }}</td>
+                                <td><img src="{{ url($medicine->image_url ?? '') }}" alt="{{ $medicine->name }}" class="img-fluid img-thumbnail" style="max-width: 100px; max-height: 100px;" title="{{ $medicine->name }}"></td>
+                                <td class="text-center">{!! $medicine->barcode_html !!} <br> {{ $medicine->barcode }}</td>
                                 <td>{{ $medicine->name }}</td>
                                 <td>{{ $medicine->generic_name }}</td>
                                 <td>{{ $medicine->description }}</td>

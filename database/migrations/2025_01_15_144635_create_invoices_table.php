@@ -22,6 +22,7 @@ return new class extends Migration
             $table->decimal('subtotal', 11, 2)->default(0.00);
             $table->decimal('discount', 11, 2)->default(0.00)->nullable();
             $table->enum('discount_type', ['percentage', 'fixed'])->default('percentage')->nullable();
+            $table->decimal('dis_amount', 11, 2)->default(0.00)->nullable();
             $table->decimal('vat', 11, 2)->default(0.00)->nullable();
             $table->decimal('tax', 11, 2)->default(0.00)->nullable();
             $table->decimal('paid', 11, 2)->default(0.00)->nullable();

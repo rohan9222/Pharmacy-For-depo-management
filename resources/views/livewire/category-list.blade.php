@@ -35,8 +35,8 @@
                                         <div class="col-4">
                                             <select name="status" class="form-control" id="status" wire:model="status">
                                                 <option value="">Select Status</option>
-                                                <option value="1">Active</option>
-                                                <option value="0">Inactive</option>
+                                                <option value="1">Available</option>
+                                                <option value="0">Not Available</option>
                                             </select>
                                             @error('status') <span class="text-danger">{{ $message }}</span> @enderror
                                         </div>

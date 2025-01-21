@@ -24,6 +24,7 @@ return new class extends Migration
             $table->decimal('total', 11, 2)->default(0.00);
             $table->decimal('discount', 11, 2)->default(0.00);
             $table->enum('discount_type', ['percentage', 'fixed'])->default('percentage')->nullable();
+            $table->decimal('dis_amount', 11, 2)->default(0.00)->nullable();
             $table->timestamps();
         });
     }

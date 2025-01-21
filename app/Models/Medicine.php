@@ -10,6 +10,23 @@ class Medicine extends Model
 {
     use SoftDeletes;
 
+    protected $fillable = [
+        'barcode',
+        'name',
+        'generic_name',
+        'description',
+        'shelf',
+        'category_name',
+        'supplier',
+        'image_url',
+        'stock',
+        'price',
+        'supplier_price',
+        'vat',
+        'status',
+        'quantity',
+    ];
+
     protected static function boot()
     {
         parent::boot();
@@ -37,6 +54,6 @@ class Medicine extends Model
             ->orWhere('generic_name', 'like', '%' . $search . '%')
             ->orWhere('category_name', 'like', '%' . $search . '%')
             ->orWhere('supplier', 'like', '%' . $search . '%')
-            ->orWhere('bar_code', 'like', '%' . $search . '%');
+            ->orWhere('barcode', 'like', '%' . $search . '%');
     }
 }
