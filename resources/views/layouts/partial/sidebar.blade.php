@@ -44,6 +44,12 @@
             </a>
         </li>
         <li class="nav-item">
+            <a href="{{ route('stock-medicines') }}" class="nav-link link-body-emphasis {{ request()->routeIs('stock-medicines') ? 'active' : '' }}">
+                <i class="bi bi-capsule-pill me-2"></i>
+                <span class="sidebar-text">Stock IN</span>
+            </a>
+        </li>
+        <li class="nav-item">
             <a href="{{ route('categories') }}" class="nav-link link-body-emphasis {{ request()->routeIs('categories') ? 'active' : '' }}">
                 <i class="bi bi-capsule-pill me-2"></i>
                 <span class="sidebar-text">Categories</span>

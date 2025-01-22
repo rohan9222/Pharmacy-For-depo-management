@@ -162,7 +162,7 @@
                         @foreach ($medicines as $medicine)
                             <tr>
                                 <td>{{ $loop->iteration }}</td>
-                                <td><img src="{{ url($medicine->image_url ?? '') }}" alt="{{ $medicine->name }}" class="img-fluid img-thumbnail" style="max-width: 100px; max-height: 100px;" title="{{ $medicine->name }}"></td>
+                                <td><img src="{{ url($medicine->image_url ?? url('img/medicine-logo.png')) }}" alt="{{ $medicine->name }}" class="img-fluid img-thumbnail" style="max-width: 100px; max-height: 100px;" title="{{ $medicine->name }}"></td>
                                 <td class="text-center">{!! $medicine->barcode_html !!} <br> {{ $medicine->barcode }}</td>
                                 <td>{{ $medicine->name }}</td>
                                 <td>{{ $medicine->generic_name }}</td>
