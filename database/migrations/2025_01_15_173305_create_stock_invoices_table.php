@@ -13,16 +13,17 @@ return new class extends Migration
     {
         Schema::create('stock_invoices', function (Blueprint $table) {
             $table->id();
-            $table->string('invoice_no')->unique();
+            $table->string('invoice_no', 50)->unique();
             $table->timestamp('invoice_date')->default(now());
             $table->foreignId('supplier_id')->nullable()->constrained()->nullOnDelete()->cascadeOnUpdate()->comment('supplier list id');
-            $table->decimal('sub_total', 11, 2)->default(0.00)->nullable();
-            $table->decimal('discount', 11, 2)->default(0.00)->nullable();
-            $table->enum('discount_type', ['percentage', 'fixed'])->default('percentage')->nullable();
-            $table->decimal('dis_amount', 11, 2)->default(0.00)->nullable();
-            $table->decimal('total', 11, 2)->default(0.00)->nullable();
-            $table->decimal('paid', 11, 2)->default(0.00)->nullable();
-            $table->decimal('due', 11, 2)->default(0.00)->nullable();
+            $table->decimal('sub_total', 11, 3)->default(0.00)->nullable();
+            $table->decimal('discount', 11, 3)->default(0.00)->nullable();
+            $table->enum('dis_type', ['percentage', 'fixed'])->default('percentage')->nullable();
+            $table->decimal('dis_amount', 11, 3)->default(0.00)->nullable();
+            $table->decimal('vat', 11, 3)->default(0.00)->nullable();
+            $table->decimal('total', 11, 3)->default(0.00)->nullable();
+            $table->decimal('paid', 11, 3)->default(0.00)->nullable();
+            $table->decimal('due', 11, 3)->default(0.00)->nullable();
             $table->string('payment_method')->nullable();
             $table->timestamps();
         });

@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('medicines', function (Blueprint $table) {
             $table->id()->startingValue(10000);;
-            $table->string('barcode')->unique();
+            $table->string('barcode', 50)->unique();
             // $table->string('product_id')->unique();
             $table->string('name');
             $table->string('generic_name')->nullable();
@@ -22,12 +22,12 @@ return new class extends Migration
             $table->string('category_name')->nullable();
             $table->string('image_url')->nullable();
             $table->string('supplier')->nullable();
-            $table->decimal('supplier_price', 11, 2)->nullable()->default(0.00);
-            $table->decimal('price', 11, 2)->nullable()->default(0.00);
-            $table->decimal('discount', 11, 2)->nullable()->default(0.00);
+            $table->decimal('supplier_price', 11, 3)->nullable()->default(0.00);
+            $table->decimal('price', 11, 3)->nullable()->default(0.00);
+            $table->decimal('discount', 11, 3)->nullable()->default(0.00);
             $table->enum('discount_type', ['percentage', 'fixed'])->default('percentage')->nullable();
-            $table->decimal('dis_amount', 11, 2)->default(0.00)->nullable();
-            $table->decimal('vat', 11, 2)->nullable()->default(0.00);
+            $table->decimal('dis_amount', 11, 3)->default(0.00)->nullable();
+            $table->decimal('vat', 11, 3)->nullable()->default(0.00);
             $table->integer('quantity')->nullable()->default(0);
             $table->boolean('status')->default(1);
             $table->timestamps();

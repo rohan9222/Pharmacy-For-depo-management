@@ -27,7 +27,7 @@ class StockMedicines extends Component
     {
         $this->manufacturers = Supplier::all();
         $latestInvoiceNo = StockInvoice::orderByDesc('id')->value('invoice_no');
-        $nextNumber = ($latestInvoiceNo) ? ((int) filter_var($latestInvoiceNo, FILTER_SANITIZE_NUMBER_INT) + 1) : 1000;
+        $nextNumber = ($latestInvoiceNo) ? ((int) filter_var($latestInvoiceNo, FILTER_SANITIZE_NUMBER_INT) + 1000) : 1000;
         $this->invoice_no = "STOCKINV" . $nextNumber;
 
         return view('livewire.stock-medicines')->layout('layouts.app');
@@ -99,6 +99,81 @@ class StockMedicines extends Component
         }
     }
 
+    // public function calculateTotals()
+    // {
+    //     $this->total = 0;
+
+    //     // Calculate total for each item and overall total
+    //     foreach ($this->stockMedicines as $index => $medicine) {
+    //         $medicine['price'] = (float) number_format($medicine['price'] ?? 0, 2, '.', ''); // Ensure price is float
+    //         $medicine['total'] = (float) number_format($medicine['quantity'] * $medicine['price'], 2, '.', ''); // Ensure total is float
+    //         $this->stockMedicines[$index] = $medicine;
+    //         $this->total += $medicine['quantity'] * $medicine['price'];
+    //     }
+
+    //     // Ensure discount, paid_amount, and grand_total are floats before calculation
+    //     $this->total = (float) $this->total;
+    //     $this->discount = (float) $this->discount;
+    //     $this->grand_total = (float) ($this->total - $this->discount);
+    //     $this->paid_amount = (float) $this->paid_amount;
+    //     $this->due_amount = (float) ($this->grand_total - $this->paid_amount);
+    // }
+
+    // public function calculateTotals()
+    // {
+    //     $this->total = 0;
+
+    //     // Calculate total for each item and overall total
+    //     foreach ($this->stockMedicines as $index => $medicine) {
+    //         $quantity = (float) number_format($medicine['quantity'] ?? 0, 2, '.', ''); // Ensure quantity is a float
+    //         $price = (float) number_format($medicine['price'] ?? 0, 2, '.', ''); // Ensure price is a float
+
+    //         // Calculate and update the total for each medicine
+    //         $medicine['total'] = $quantity * $price;
+    //         $this->stockMedicines[$index] = $medicine;
+
+    //         // Add to the overall total
+    //         $this->total += $medicine['total'];
+    //     }
+
+    //     // Convert other fields to float and handle null values
+    //     $this->discount = (float) ($this->discount ?? 0);
+    //     $this->paid_amount = (float) ($this->paid_amount ?? 0);
+
+    //     // Calculate grand total and due amount
+    //     $this->grand_total = $this->total - $this->discount;
+    //     $this->due_amount = $this->grand_total - $this->paid_amount;
+    // }
+
+    public function calculateTotals()
+    {
+        $this->total = 0;
+
+        // Loop through each medicine and calculate totals
+        foreach ($this->stockMedicines as $index => $medicine) {
+            // Ensure both quantity and price are numeric (default to 0 if null or not set)
+            $quantity = isset($medicine['quantity']) ? (float) $medicine['quantity'] : 0;
+            $price = isset($medicine['price']) ? (float) $medicine['price'] : 0;
+
+            // Calculate total for the current medicine
+            $medicineTotal = $quantity * $price;
+
+            // Format the medicine total to 3 decimal places
+            $this->stockMedicines[$index]['total'] = round($medicineTotal, 3);
+
+            // Add to the overall total
+            $this->total += round($medicineTotal, 3); // Ensure total is rounded to 3 decimal places
+        }
+
+        // Handle null values for discount and paid amount, and format to 3 decimal places
+        $this->discount = (float) ($this->discount ?? 0);
+        $this->paid_amount = (float) ($this->paid_amount ?? 0);
+
+        // Calculate grand total and due amount, also rounded to 3 decimals
+        $this->grand_total = round(max($this->total - $this->discount, 0), 3); // Ensure grand total is not negative
+        $this->due_amount = round(max($this->grand_total - $this->paid_amount, 0), 3); // Ensure due amount is not negative
+    }
+
     public function updatedStockMedicines()
     {
         $this->calculateTotals();
@@ -108,26 +183,11 @@ class StockMedicines extends Component
     {
         $this->calculateTotals();
     }
-    public function calculateTotals()
+
+    public function updatedPaidAmount()
     {
-        $this->total = 0;
-
-        // Calculate total for each item and overall total
-        foreach ($this->stockMedicines as $index => $medicine) {
-            $medicine['price'] = (float) number_format($medicine['price'], 2, '.', ''); // Ensure price is float
-            $medicine['total'] = (float) number_format($medicine['quantity'] * $medicine['price'], 2, '.', ''); // Ensure total is float
-            $this->stockMedicines[$index] = $medicine;
-            $this->total += $medicine['quantity'] * $medicine['price'];
-        }
-
-        // Ensure discount, paid_amount, and grand_total are floats before calculation
-        $this->total = (float) $this->total;
-        $this->discount = (float) $this->discount;
-        $this->grand_total = (float) ($this->total - $this->discount);
-        $this->paid_amount = (float) $this->paid_amount;
-        $this->due_amount = (float) ($this->grand_total - $this->paid_amount);
+        $this->calculateTotals();
     }
-
 
     public function removeMedicine($index)
     {
@@ -155,9 +215,17 @@ class StockMedicines extends Component
             'invoice_no' => $this->invoice_no,
             'invoice_date' => $this->invoice_date,
             'supplier_id' => $this->manufacturer,
+            'sub_total' => $this->total,
+            'discount' => $this->discount,
+            'dis_type' => 'fixed',
+            'dis_amount' => $this->discount,
+            'total' => $this->grand_total,
+            'paid' => $this->paid_amount,
+            'due' => $this->due_amount,
         ]);
 
         foreach ($this->stockMedicines as $medicine) {
+            dd($medicine);
             $stockInvoice->medicines()->create([
                 'medicine_id' => $medicine['medicine_id'],
                 'batch' => $medicine['batch'],

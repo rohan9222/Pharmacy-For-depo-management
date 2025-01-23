@@ -18,15 +18,15 @@ return new class extends Migration
             $table->foreignId('sales_medicine_id')->nullable()->constrained()->nullOnDelete()->cascadeOnUpdate();
             $table->timestamp('return_date')->default(now());
             $table->string('medicine_name');
-            $table->string('batch_number')->nullable();
+            $table->string('batch_number', 50)->nullable();
             $table->timestamp('expiry_date')->nullable();
             $table->integer('quantity')->default(1);
-            $table->decimal('price', 11, 2)->default(0.00)->nullable();
-            $table->decimal('discount', 11, 2)->default(0.00)->nullable();
+            $table->decimal('price', 11, 3)->default(0.00)->nullable();
+            $table->decimal('discount', 11, 3)->default(0.00)->nullable();
             $table->enum('discount_type', ['percentage', 'fixed'])->default('percentage')->nullable();
-            $table->decimal('dis_amount', 11, 2)->default(0.00)->nullable();
-            $table->decimal('vat', 11, 2)->default(0.00);
-            $table->decimal('total', 11, 2)->default(0.00);
+            $table->decimal('dis_amount', 11, 3)->default(0.00)->nullable();
+            $table->decimal('vat', 11, 3)->default(0.00);
+            $table->decimal('total', 11, 3)->default(0.00);
             $table->timestamps();
         });
     }
