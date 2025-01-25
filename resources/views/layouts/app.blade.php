@@ -15,57 +15,7 @@
         @vite(['resources/css/app.css','resources/sass/app.scss', 'resources/js/app.js'])
 
         <!-- Styles -->
-        {{-- <style>
-            body {
-                min-height: 100vh;
-                overflow-x: hidden;
-            }
-            .sidebar {
-                height: 100vh;
-                width: 250px;
-                position: fixed;
-                top: 0;
-                left: 0;
-                padding-top: 1rem;
-                transition: width 0.3s;
-            }
-            .sidebar.collapsed {
-                width: 70px;
-            }
-            .sidebar a {
-                padding: 10px 15px;
-                display: block;
-                text-decoration: none;
-            }
-            .sidebar a:hover {
-                background: #495057;
-            }
-            .sidebar.collapsed a {
-                text-align: center;
-                padding: 10px 0;
-            }
-            .sidebar.collapsed .sidebar-text {
-                display: none;
-            }
-            .content {
-                margin-left: 250px;
-                padding: 20px;
-                transition: margin-left 0.3s;
-            }
-            .content.collapsed {
-                margin-left: 70px;
-            }
-            .navbar {
-                left: 250px;
-                transition: left 0.3s;
-            }
-            .navbar.collapsed {
-                left: 70px;
-            }
-            #sidebar, #navbar {
-                background-color: #fff !important;
-            }
-        </style> --}}
+
         <style>
             body {
                 min-height: 100vh;
@@ -114,7 +64,7 @@
                 transition: color 0.3s;
             }
 
-            .sidebar a:hover {
+            .nav .nav-link:hover, .nav .nav-link.active {
                 background: #228cf7;
             }
 
@@ -126,6 +76,10 @@
             .sidebar.collapsed:hover a {
                 text-align: left;
                 padding: 10px 15px;
+            }
+
+            .nav-item:hover .collapse:not(.show) {
+                display: block;
             }
 
             .sidebar.collapsed .sidebar-text {
@@ -157,7 +111,7 @@
             .navbar.collapsed {
                 left: 4.4rem; /* Align to the collapsed sidebar */
                 width: calc(100% - 4.4rem); /* Adjust width for collapsed state */
-}
+            }
             #sidebar,
             #navbar {
                 background-color: #fff !important;
@@ -171,6 +125,7 @@
             } */
 
         </style>
+        @stack('styles')
         @livewireStyles
     </head>
     <body class="font-sans antialiased">
@@ -204,7 +159,7 @@
             </div>
         </div> --}}
 
-        @include('layouts.partial.sidebar')
+        @include('layouts.partials.sidebar')
         @livewire('navigation-menu')
 
         <div id="content" class="content pt-5 mt-5">

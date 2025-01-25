@@ -13,10 +13,11 @@ return new class extends Migration
     {
         Schema::create('stock_lists', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('medicine_id')->nullable()->constrained()->nullOnDelete()->cascadeOnUpdate();
+            $table->foreignId('medicine_id')->nullable()->constrained()->restrictOnDelete()->cascadeOnUpdate();
             $table->foreignId('stock_invoice_id')->nullable()->constrained()->cascadeOnDelete()->cascadeOnUpdate();
             $table->string('batch_number', 50)->nullable();
             $table->timestamp('expiry_date')->nullable();
+            $table->integer('initial_quantity')->default(1)->comment('medicine initial quantity which is on stock invoice');
             $table->integer('quantity')->default(1);
             $table->decimal('price', 11, 3)->default(0.00);
             $table->decimal('buy_price', 11, 3)->default(0.00);

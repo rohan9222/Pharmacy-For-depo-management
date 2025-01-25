@@ -38,11 +38,12 @@ class Medicine extends Model
         });
     }
 
-    // Method to generate a unique barcode
+    // Method to generate a unique barcodeuse Illuminate\Support\Str;
     public static function generateUniqueBarcode()
     {
         do {
-            $barcode = Str::random(12); // Generates a random 12-character string
+            // Generate a random 12-digit numeric barcode
+            $barcode = str_pad(mt_rand(1, 999999999999), 12, '0', STR_PAD_LEFT);
         } while (self::where('barcode', $barcode)->exists());
 
         return $barcode;

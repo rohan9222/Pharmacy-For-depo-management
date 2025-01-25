@@ -89,11 +89,11 @@
                                             @error('discount') <span class="text-danger">{{ $message }}</span> @enderror
                                         </div>
                                         <div class="col-3">
-                                            <select name="discount_type" id="discount_type" class="form-control" wire:model="discount_type">
-                                                <option value="percentage" {{ ($discount_type ?? '') == 'percentage' ? 'selected' : '' }}>Percentage (%)</option>
-                                                <option value="fixed" {{ ($discount_type ?? '') == 'fixed' ? 'selected' : '' }}>Fixed</option>
+                                            <select name="dis_type" id="dis_type" class="form-control" wire:model="dis_type">
+                                                <option value="percentage" {{ ($dis_type ?? '') == 'percentage' ? 'selected' : '' }}>Percentage (%)</option>
+                                                <option value="fixed" {{ ($dis_type ?? '') == 'fixed' ? 'selected' : '' }}>Fixed</option>
                                             </select>
-                                            @error('discount_type') <span class="text-danger">{{ $message }}</span> @enderror
+                                            @error('dis_type') <span class="text-danger">{{ $message }}</span> @enderror
                                         </div>
                                          --}}
                                         <div class="col-3">

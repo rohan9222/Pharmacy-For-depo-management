@@ -1,5 +1,5 @@
 {{-- <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top"> --}}
-<nav x-data="{ open: false }" id="navbar" class="main-header navbar navbar-expand navbar-white navbar-light fixed-top">
+<nav x-data="{ open: false }" id="navbar" class="shadow-sm main-header navbar navbar-expand navbar-white navbar-light fixed-top">
     <div class="container-fluid">
         <!-- Hamburger Toggle for Mobile View -->
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">

@@ -37,18 +37,31 @@
                     id="medicine_list"
                 >
                 @if (!empty($medicines))
-                    <ul class="list-group position-absolute" style="z-index: 1000;">
-                        @foreach ($medicines as $index => $medicine)
-                            <li
-                                wire:click="addMedicine('{{ $medicine->id }}')"
-                                class="list-group-item {{ $index === $highlightedIndex ? 'active' : '' }}"
-                                style="cursor: pointer;"
-                                wire:key="medicine-{{ $medicine->id }}"
-                            >
-                                {{ $medicine->id }}, {{ $medicine->medicine_name }}
-                            </li>
-                        @endforeach
-                    </ul>
+                    <div class="card">
+                        <ul class="nav nav-pills flex-column mb-auto">
+                            @foreach ($medicines as $index => $medicine)
+                                <li
+                                    wire:click="addMedicine('{{ $medicine->id }}')"
+                                    class="w-100 nav-item {{ $index === $highlightedIndex ? 'active' : '' }}"
+                                    style="cursor: pointer;"
+                                    wire:key="medicine-{{ $medicine->id }}"
+                                >
+                                    <span class="nav-link text-dark row">
+                                        <div class="d-flex">
+                                            <span class="me-1" style="max-width: 50px; max-height: 50px;">
+                                                <img class="w-100 h-100 img-fluid img-thumbnail" src="{{ asset($medicine->image_url ?? 'img/medicine-logo.png') }}" alt="">
+                                            </span>
+                                            <span class="lh-sm fw-medium text-nowrap" title="{{ $medicine->name }}">
+                                                <span class="text-uppercase fw-bold">{{ $medicine->name }} (<span style="color: rgb(177, 55, 181)">{{ $medicine->price }} ৳</span>)</span>
+                                                <span class="d-block text-muted" style="font-size: 13px;">Generic name: {{ $medicine->generic_name }}</span>
+                                                <span class="d-block text-muted" style="font-size: 13px;">Manufacturers: {{$medicine->supplier}}</span>
+                                            </span>
+                                        </div>
+                                    </span>
+                                </li>
+                            @endforeach
+                        </ul>
+                    </div>
                 @endif
                 @error('medicine_list')
                     <span class="text-danger">{{ $message }}</span>
@@ -56,71 +69,6 @@
             </div>
         </div>
 
-        {{-- <div class="table-responsive row mt-3">
-            <table class="table table-bordered table-sm">
-                <thead>
-                    <tr>
-                        <th>SN</th>
-                        <th>Medicine</th>
-                        <th>Batch</th>
-                        <th>Expiry Date</th>
-                        <th>Quantity</th>
-                        <th>MRP/Selling Price</th>
-                        <th>Total</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach ($stockMedicines as $index => $medicine)
-                        <tr>
-                            <td>{{ $index + 1 }}</td>
-                            <td>
-                                <input type="hidden" wire:model.live.debounce.1000ms="stockMedicines.{{ $index }}.medicine_id">
-                                <img src="{{ asset($medicine['medicine_image'] ?? 'default.png') }}" alt="" width="50">
-
-                                {{ $stockMedicines[$index]['medicine_name'] }}
-                            </td>
-                            <td><input type="text" class="form-control" wire:model.live.debounce.1000ms="stockMedicines.{{ $index }}.batch"></td>
-                            <td><input type="date" class="form-control" wire:model.live.debounce.1000ms="stockMedicines.{{ $index }}.expiry_date"></td>
-                            <td><input type="number" class="form-control" wire:model.live.debounce.1000ms="stockMedicines.{{ $index }}.quantity"></td>
-                            <td><input type="number" class="form-control" wire:model.live.debounce.1000ms="stockMedicines.{{ $index }}.price"></td>
-                            <td>
-                                <input type="number" class="form-control"
-                                       wire:model.live.debounce.1000ms="stockMedicines.{{ $index }}.total"
-                                       value="{{ $stockMedicines[$index]['quantity'] * $stockMedicines[$index]['price'] }}"
-                                       readonly>
-                            </td>
-                            <td><button type="button" class="btn btn-danger" wire:click="removeMedicine({{ $index }})">Remove</button></td>
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
-        </div>
-
-        <div class="row">
-            <div class="col-12"></div>
-            <hr>
-            <div class="col-6">
-                <label for="total" class="form-label">Total</label>
-                <input type="text" class="form-control" wire:model.live.debounce.1000ms="total" readonly>
-            </div>
-            <div class="col-6">
-                <label for="total" class="form-label">Discount</label>
-                <input type="text" class="form-control" wire:model.live.debounce.1000ms="discount" readonly>
-            </div>
-            <div class="col-6">
-                <label for="total" class="form-label">Grand Total</label>
-                <input type="text" class="form-control" wire:model.live.debounce.1000ms="grand_total" readonly>
-            </div>
-            <div class="col-6">
-                <label for="total" class="form-label">Paid Amount</label>
-                <input type="text" class="form-control" wire:model.live.debounce.1000ms="paid_amount">
-            </div>
-            <div class="col-6">
-                <label for="total" class="form-label">Due Amount</label>
-                <input type="text" class="form-control" wire:model.live.debounce.1000ms="due_amount" readonly>
-            </div>
-        </div> --}}
         <div class="table-responsive row mt-3">
             <table class="table table-bordered table-sm">
                 <thead>
@@ -178,7 +126,7 @@
                 </tfoot>
             </table>
         </div>
-<hr>
+        <hr>
         <div class="row d-flex justify-content-end">
             <div class="col-4">
                 <table class="table table-sm">
@@ -227,5 +175,7 @@
             <div class="col-12">
                 <button type="submit" class="btn btn-primary float-end">Save</button>
             </div>
+        </div>
     </form>
 </div>
+

@@ -1,20 +1,14 @@
-// Fonts
+// Import SCSS dependencies first
+@use 'variables';
+
+// Bootstrap Core and Icons
+@use 'bootstrap/scss/bootstrap';
+@use 'bootstrap-icons/font/bootstrap-icons.css';
+
+// DataTables Integration
+@use "datatables.net-bs5/css/dataTables.bootstrap5.min.css";
+@use "datatables.net-buttons-bs5/css/buttons.bootstrap5.min.css";
+@use 'datatables.net-select-bs5/css/select.bootstrap5.css';
+
+// Font Import (place after @use rules)
 @import url('https://fonts.bunny.net/css?family=Nunito');
-
-// Variables
-@import 'variables';
-
-// Bootstrap
-@import 'bootstrap/scss/bootstrap';
-
-
-// Fonts
-@import url('https://fonts.bunny.net/css?family=Nunito');
-
-// Bootstrap Icons
-@import 'bootstrap-icons/font/bootstrap-icons.css';
-
-// DataTables
-@import "datatables.net-bs5/css/dataTables.bootstrap5.min.css";
-@import "datatables.net-buttons-bs5/css/buttons.bootstrap5.min.css";
-@import 'datatables.net-select-bs5/css/select.bootstrap5.css';

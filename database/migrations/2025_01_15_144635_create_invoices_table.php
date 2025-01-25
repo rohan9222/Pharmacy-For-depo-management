@@ -22,7 +22,7 @@ return new class extends Migration
             $table->foreignId('customer')->nullable()->constrained('users')->nullOnDelete()->cascadeOnUpdate()->comment('user id who has customer role');
             $table->decimal('subtotal', 11, 3)->default(0.00);
             $table->decimal('discount', 11, 3)->default(0.00)->nullable();
-            $table->enum('discount_type', ['percentage', 'fixed'])->default('percentage')->nullable();
+            $table->enum('dis_type', ['percentage', 'fixed'])->default('percentage')->nullable();
             $table->decimal('dis_amount', 11, 3)->default(0.00)->nullable();
             $table->decimal('vat', 11, 3)->default(0.00)->nullable();
             $table->decimal('tax', 11, 3)->default(0.00)->nullable();

@@ -3,10 +3,16 @@
 namespace App\Livewire;
 
 use App\Models\Supplier;
+
+use Livewire\WithoutUrlPagination;
+use Livewire\WithPagination;
+
 use Livewire\Component;
 
 class SupplierList extends Component
 {
+    use WithPagination, WithoutUrlPagination;
+
     public $supplierId, $name, $email, $mobile, $address, $balance, $supplier_type, $search;
 
     public function mount()

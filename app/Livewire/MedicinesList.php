@@ -11,6 +11,10 @@ use Intervention\Image\ImageManager;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Attributes\Validate;
 use Illuminate\Validation\Rule;
+
+use Livewire\WithoutUrlPagination;
+use Livewire\WithPagination;
+
 use Illuminate\Support\Facades\DB; // Add this at the top of your class
 
 use DNS1D; // For 1D barcodes
@@ -20,7 +24,7 @@ use Livewire\Component;
 
 class MedicinesList extends Component
 {
-    use WithFileUploads;
+    use WithFileUploads, WithPagination, WithoutUrlPagination;
 
     public $medicineId, $categoryLists, $suppliers, $barcode, $name, $generic_name, $supplier_name, $shelf, $description, $category_name, $search, $supplier_price, $price,  $image_url;
     public $vat = 17.4;

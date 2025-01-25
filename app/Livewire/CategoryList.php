@@ -2,12 +2,17 @@
 
 namespace App\Livewire;
 
+use Livewire\WithoutUrlPagination;
+use Livewire\WithPagination;
+
 use App\Models\Category;
 
 use Livewire\Component;
 
 class CategoryList extends Component
 {
+    use WithPagination, WithoutUrlPagination;
+    
     public $categoryId, $name, $description, $status, $address, $balance, $category_type, $search;
 
     public function mount()

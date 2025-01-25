@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('return_medicines', function (Blueprint $table) {
             $table->id();
             $table->foreignId('invoice_id')->constrained()->cascadeOnDelete()->cascadeOnUpdate();
-            $table->foreignId('medicine_id')->nullable()->constrained()->nullOnDelete()->cascadeOnUpdate();
+            $table->foreignId('medicine_id')->nullable()->constrained()->restrictOnDelete()->cascadeOnUpdate();
             $table->foreignId('sales_medicine_id')->nullable()->constrained()->nullOnDelete()->cascadeOnUpdate();
             $table->timestamp('return_date')->default(now());
             $table->string('medicine_name');
@@ -23,7 +23,7 @@ return new class extends Migration
             $table->integer('quantity')->default(1);
             $table->decimal('price', 11, 3)->default(0.00)->nullable();
             $table->decimal('discount', 11, 3)->default(0.00)->nullable();
-            $table->enum('discount_type', ['percentage', 'fixed'])->default('percentage')->nullable();
+            $table->enum('dis_type', ['percentage', 'fixed'])->default('percentage')->nullable();
             $table->decimal('dis_amount', 11, 3)->default(0.00)->nullable();
             $table->decimal('vat', 11, 3)->default(0.00);
             $table->decimal('total', 11, 3)->default(0.00);

@@ -4,10 +4,16 @@ namespace App\Livewire;
 
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
+
+use Livewire\WithoutUrlPagination;
+use Livewire\WithPagination;
+
 use Livewire\Component;
 
 class DeliveryManList extends Component
 {
+    use WithPagination, WithoutUrlPagination;
+
     public $customerId, $name, $email, $mobile, $address, $balance, $supplier_type, $search;
 
     public function mount()

@@ -3,9 +3,9 @@
 namespace App\Livewire;
 
 use App\Models\Medicine;
-use App\Models\StockInvoice;
+use App\Models\Invoice;
 use App\Models\StockList;
-use App\Models\Supplier;
+use App\Models\user;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
@@ -14,11 +14,11 @@ use Livewire\WithoutUrlPagination;
 
 use Livewire\Component;
 
-class StockMedicines extends Component
+class SalesInvoice extends Component
 {
     use WithPagination, WithoutUrlPagination;
 
-    public $medicine_list, $medicines, $manufacturers, $invoice_no, $invoice_date, $manufacturer;
+    public $search, $medicines, $customers, $invoice_no, $invoice_date, $manufacturer;
     public $highlightedIndex = 0;
     public $stockMedicines = []; // Medicine stock data
     public $total = 0;
@@ -30,12 +30,23 @@ class StockMedicines extends Component
     public function render()
     {
         $this->invoice_date = Carbon::now()->toDateString();
-        $this->manufacturers = Supplier::all();
-        $latestInvoiceNo = StockInvoice::orderByDesc('id')->value('invoice_no');
+        $customers = User::where('role', 'customer');
+        if(auth()->user()->role == 'Field Officer'){
+            $customers = $customers->where('field_officer_id', auth()->user()->id);
+        }
+        $this->customers = $customers->get();
+        $latestInvoiceNo = Invoice::orderByDesc('id')->value('invoice_number');
         $nextNumber = ($latestInvoiceNo) ? ((int) filter_var($latestInvoiceNo, FILTER_SANITIZE_NUMBER_INT) + 1) : 1000;
-        $this->invoice_no = "STOCKINV" . $nextNumber;
+        $this->invoice_no = "INV" . $nextNumber;
 
-        return view('livewire.stock-medicines')->layout('layouts.app');
+        $this->medicines = Medicine::search($this->search)->get();
+        return view('livewire.sales-invoice')->layout('layouts.app');
+    }
+
+    public function refreshCustomer()
+    {
+        $this->customers = User::where('role', 'customer')->get();
+        flash()->info('Customer list refreshed!');
     }
 
     public function updatedMedicineList()
@@ -47,12 +58,10 @@ class StockMedicines extends Component
     {
         if ($this->medicine_list) {
             // Fetch filtered medicines based on search term
-            $this->medicines = Medicine::where('medicine_name', 'like', '%' . $this->medicine_list . '%')
-                ->take(10)
-                ->get();
+            $this->medicines = StockList::where('medicine_name', 'like', '%' . $this->medicine_list . '%')->with('medicine')->take(10)->get();
         } else {
             // Show first 10 medicines when input is empty or focused
-            $this->medicines = Medicine::take(10)->get();
+            $this->medicines = StockList::with('medicine')->take(10)->get();
         }
 
         $this->highlightedIndex = 0;

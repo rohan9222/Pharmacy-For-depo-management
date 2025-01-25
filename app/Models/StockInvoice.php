@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Models\StockList;
+
 use Illuminate\Database\Eloquent\Model;
 
 class StockInvoice extends Model
@@ -20,4 +22,15 @@ class StockInvoice extends Model
         'due',
         'payment_method',
     ];
+
+    public function stockLists()
+    {
+        return $this->hasMany(StockList::class);
+    }
+
+    public function supplier()
+    {
+        return $this->belongsTo(Supplier::class);
+    }
+
 }
