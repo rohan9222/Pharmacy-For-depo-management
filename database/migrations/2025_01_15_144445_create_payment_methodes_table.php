@@ -11,10 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('payment_methodes', function (Blueprint $table) {
+        Schema::create('payment_methods', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->decimal('balance', 11, 2)->default(0.00);
+            $table->decimal('balance', 11, 3)->default(0.00);
             $table->string('description')->nullable();
             $table->timestamps();
         });

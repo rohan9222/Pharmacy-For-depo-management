@@ -11,11 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('category_lists', function (Blueprint $table) {
+        Schema::create('invoice_pays', function (Blueprint $table) {
             $table->id();
-            $table->string('name')->unique();
-            $table->string('description')->nullable();
-            $table->boolean('status')->default(1);
+            $table->foreignId('invoice_id')->constrained()->cascadeOnDelete()->cascadeOnUpdate();
+            $table->decimal('amount', 11, 3)->default(0.00);
+            $table->timestamp('date')->default(now());
+            $table->string('payment_method')->nullable();
             $table->timestamps();
         });
     }
@@ -25,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('category_lists');
+        Schema::dropIfExists('invoice_pays');
     }
 };

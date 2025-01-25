@@ -25,6 +25,12 @@ class RoleSeeder extends Seeder
         ]);
 
         $depo->givePermissionTo([
+            'create-medicine',
+            'edit-medicine',
+            'delete-medicine',
+            'create-medicine-stock',
+            'edit-medicine-stock',
+            'delete-medicine-stock',
             'create-delivery-man',
             'edit-delivery-man',
             'delete-delivery-man',

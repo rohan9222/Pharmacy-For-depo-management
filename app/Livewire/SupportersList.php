@@ -5,12 +5,16 @@ namespace App\Livewire;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
 use Livewire\Component;
+
+use Livewire\WithoutUrlPagination;
 use Livewire\WithPagination;
+
 use Illuminate\Validation\Rule;
 
 class SupportersList extends Component
 {
-    use WithPagination;
+    use WithPagination, WithoutUrlPagination;
+    
     public $customer, $customerId, $name, $email, $mobile, $address, $balance, $search, $field_officers, $field_officer_team;
 
     public function mount($customer)

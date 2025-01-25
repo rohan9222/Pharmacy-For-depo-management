@@ -13,20 +13,22 @@ return new class extends Migration
     {
         Schema::create('invoices', function (Blueprint $table) {
             $table->id();
-            $table->string('invoice_number')->unique()->comment('invoice must be unique');
+            $table->string('invoice_number', 50)->unique()->comment('invoice must be unique');
             // $table->foreignId('user_id')->constrained()->cascadeOnDelete()->cascadeOnUpdate()->comment('customer list id');
+            $table->timestamp('invoice_date')->default(now());
             $table->foreignId('manager')->nullable()->constrained('users')->nullOnDelete()->cascadeOnUpdate()->comment('user id who has manager role');
             $table->foreignId('sales_manager')->nullable()->constrained('users')->nullOnDelete()->cascadeOnUpdate()->comment('user id who has sales manager role');
             $table->foreignId('field_officer')->nullable()->constrained('users')->nullOnDelete()->cascadeOnUpdate()->comment('user id who has field officer role');
             $table->foreignId('customer')->nullable()->constrained('users')->nullOnDelete()->cascadeOnUpdate()->comment('user id who has customer role');
-            $table->decimal('subtotal', 11, 2)->default(0.00);
-            $table->decimal('discount', 11, 2)->default(0.00)->nullable();
-            $table->enum('discount_type', ['percentage', 'fixed'])->default('percentage')->nullable();
-            $table->decimal('vat', 11, 2)->default(0.00)->nullable();
-            $table->decimal('tax', 11, 2)->default(0.00)->nullable();
-            $table->decimal('paid', 11, 2)->default(0.00)->nullable();
-            $table->decimal('due', 11, 2)->default(0.00);
-            $table->decimal('grand_total', 11, 2)->default(0.00);
+            $table->decimal('subtotal', 11, 3)->default(0.00);
+            $table->decimal('discount', 11, 3)->default(0.00)->nullable();
+            $table->enum('dis_type', ['percentage', 'fixed'])->default('percentage')->nullable();
+            $table->decimal('dis_amount', 11, 3)->default(0.00)->nullable();
+            $table->decimal('vat', 11, 3)->default(0.00)->nullable();
+            $table->decimal('tax', 11, 3)->default(0.00)->nullable();
+            $table->decimal('paid', 11, 3)->default(0.00)->nullable();
+            $table->decimal('due', 11, 3)->default(0.00);
+            $table->decimal('grand_total', 11, 3)->default(0.00);
             $table->timestamps();
         });
     }

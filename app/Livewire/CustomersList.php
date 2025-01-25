@@ -4,10 +4,16 @@ namespace App\Livewire;
 
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
+
+use Livewire\WithoutUrlPagination;
+use Livewire\WithPagination;
+
 use Livewire\Component;
 
 class CustomersList extends Component
 {
+    use WithPagination, WithoutUrlPagination;
+    
     public $customerId, $name, $email, $mobile, $address, $balance, $supplier_type, $search, $field_officers, $field_officer_team;
 
     public function mount()
@@ -45,7 +51,14 @@ class CustomersList extends Component
             'mobile' => 'required|numeric|digits:11',
             'address' => 'required|string|max:255',
             'balance' => 'nullable|numeric',
-            'field_officer_team' => 'required',
+            'field_officer_team' => ['required','exists:users,id',
+                function ($attribute, $value, $fail) {
+                    $user = User::find($value); // Retrieve the user once to avoid multiple queries
+                    if (!$user || (!$user->sales_manager_id && !$user->manager_id)) {
+                        $fail('This field officer team does not exist or not assigned to any manager and sales manager.');
+                    }
+                }
+            ],
         ];
     }
 
