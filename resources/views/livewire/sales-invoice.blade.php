@@ -1,11 +1,11 @@
 <div class="row">
-    <div class="col-6 card">
+    <div class="col-md-6 card z-2">
         <div class="row g-2 nav">
             @if (!empty($medicines))
                 @foreach ($medicines as  $medicine)
                         {{-- @dump($medicine) --}}
-                    <div class="col-lg-3 col col-xl-3">
-                        <div wire:click="addMedicine('{{ $medicine->id }}')" class="w-100 nav-item btn border border-0 {{ $medicine->quantity > 0 ? '' : 'disabled' }}" style="cursor: pointer;" wire:key="medicine-{{ $medicine->id }}">
+                    <div class="col-lg-2 col-lg-3 col-md-4 col-6 col-xl-2">
+                        <div wire:click="addMedicine('{{ $medicine->id }}')" class="p-1 w-100 nav-item btn border border-0 {{ $medicine->quantity > 0 ? '' : 'disabled' }}" style="cursor: pointer;" wire:key="medicine-{{ $medicine->id }}">
                             <div class="card shadow-sm position-relative nav-link p-0">
                                 <div class="position-relative p-1">
                                     <div class="card-header p-3">
@@ -16,7 +16,7 @@
                                 </div>
                                 <div class="position-relative p-0">
                                     <div class="card-body p-1 text-center">
-                                        <h5 class="product-title1 text-dark font-weight-bold m-0">
+                                        <h5 class="fs-4 text-dark m-0">
                                             {{ $medicine->name }}
                                         </h5>
                                         {{-- <span class="text-muted fs-6">(Batch : {{ $medicine->batch_number }})</span> --}}
@@ -41,7 +41,7 @@
             <span class="text-danger">{{ $message }}</span>
         @enderror
     </div>
-    <div class="col-6 card">
+    <div class="col-md-6 card">
         <form wire:submit.prevent="submit">
             <div class="row g-2">
                 <div class="col-4">
@@ -75,10 +75,11 @@
                         <tr>
                             <th>SN</th>
                             <th>Medicine</th>
-                            <th>Batch</th>
-                            <th>Expiry Date</th>
+                            <th>Category</th>
                             <th>Quantity</th>
                             <th>MRP/Selling Price</th>
+                            <th>Sub Total</th>
+                            <th>Vat (%)</th>
                             <th>Total</th>
                             <th>Action</th>
                         </tr>
@@ -91,23 +92,25 @@
                                     <input type="hidden" wire:model.live.debounce.1000ms="stockMedicines.{{ $index }}.medicine_id">
                                     {{ $medicine['medicine_name'] }}
                                 </td>
+                                <td>{{ $medicine['category_name'] }}</td>
                                 <td>
-                                    <input type="text" class="form-control" wire:model.live.debounce.1000ms="stockMedicines.{{ $index }}.batch">
-                                    @error("stockMedicines.{$index}.batch") <span class="text-danger">{{ $message }}</span> @enderror
-                                </td>
-                                <td>
-                                    <input type="date" class="form-control" wire:model.live.debounce.1000ms="stockMedicines.{{ $index }}.expiry_date">
-                                    @error("stockMedicines.{$index}.expiry_date") <span class="text-danger">{{ $message }}</span> @enderror
-                                </td>
-                                <td>
-                                    <input type="number" class="form-control" wire:model.live.debounce.1000ms="stockMedicines.{{ $index }}.quantity">
+                                    <div class="input-group mb-3 w-50">
+                                        <span class="input-group-text btn btn-sm btn-outline-danger" wire:click="decreaseQuantity({{ $index }})"><i class="bi bi-dash-lg"></i></span>
+                                        <input type="number" class="form-control form-control-sm text-center p-0" wire:model.live.debounce.1000ms="stockMedicines.{{ $index }}.quantity">
+                                        <span class="input-group-text btn btn-sm btn-outline-success" wire:click="increaseQuantity({{ $index }})"><i class="bi bi-plus-lg"></i></span>
+                                    </div>
                                     @error("stockMedicines.{$index}.quantity") <span class="text-danger">{{ $message }}</span> @enderror
                                 </td>
                                 <td>
-                                    <input type="text" class="form-control" wire:model.live.debounce.1000ms="stockMedicines.{{ $index }}.price" >
+                                    <input type="text" class="form-control form-control-sm" wire:model.live.debounce.1000ms="stockMedicines.{{ $index }}.price" >
                                     @error("stockMedicines.{$index}.price") <span class="text-danger">{{ $message }}</span> @enderror
                                 </td>
-                                <td><input type="text" class="form-control" wire:model.live.debounce.1000ms="stockMedicines.{{ $index }}.total" readonly></td>
+                                <td><input type="text" class="form-control form-control-sm" wire:model.live.debounce.1000ms="stockMedicines.{{ $index }}.sub_total" readonly></td>
+                                <td>
+                                    <input type="text" class="form-control form-control-sm" wire:model.live.debounce.1000ms="stockMedicines.{{ $index }}.vat" >
+                                    @error("stockMedicines.{$index}.vat") <span class="text-danger">{{ $message }}</span> @enderror
+                                </td>
+                                <td><input type="text" class="form-control form-control-sm" wire:model.live.debounce.1000ms="stockMedicines.{{ $index }}.total" readonly></td>
                                 <td><button type="button" class="btn btn-sm btn-outline-danger" wire:click="removeMedicine({{ $index }})"><i class="bi bi-x"></i></button></td>
                             </tr>
                         @endforeach

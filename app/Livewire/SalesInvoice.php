@@ -48,70 +48,114 @@ class SalesInvoice extends Component
         $this->customers = User::where('role', 'customer')->get();
         flash()->info('Customer list refreshed!');
     }
+    // public function addMedicine($index)
+    // {
+    //     $medicine = Medicine::find($index);
 
-    public function updatedMedicineList()
-    {
-        $this->fetchMedicines();
-    }
+    //     if ($medicine) {
+    //         // Check if the medicine already exists in the stockMedicines array
+    //         $existingIndex = collect($this->stockMedicines)->search(function ($item) use ($medicine) {
+    //             return $item['medicine_id'] === $medicine->id;
+    //         });
 
-    public function fetchMedicines()
-    {
-        if ($this->medicine_list) {
-            // Fetch filtered medicines based on search term
-            $this->medicines = StockList::where('medicine_name', 'like', '%' . $this->medicine_list . '%')->with('medicine')->take(10)->get();
-        } else {
-            // Show first 10 medicines when input is empty or focused
-            $this->medicines = StockList::with('medicine')->take(10)->get();
-        }
-
-        $this->highlightedIndex = 0;
-    }
-
-    public function clearMedicines()
-    {
-        $this->medicines = [];
-    }
-
-    public function incrementHighlight()
-    {
-        if ($this->highlightedIndex < count($this->medicines) - 1) {
-            $this->highlightedIndex++;
-        }
-    }
-
-    public function decrementHighlight()
-    {
-        if ($this->highlightedIndex > 0) {
-            $this->highlightedIndex--;
-        }
-    }
-
-    public function selectHighlightedMedicine()
-    {
-        if (isset($this->medicines[$this->highlightedIndex])) {
-            $selectedmedicine = $this->medicines[$this->highlightedIndex];
-            $this->addMedicine($selectedmedicine->id);
-            $this->clearMedicines(); // Optional to clear medicine list after selection
-        }
-    }
-
+    //         if ($existingIndex !== false) {
+    //             // If the medicine exists, increase the quantity
+    //             $this->stockMedicines[$existingIndex]['quantity'] += 1;
+    //             $this->stockMedicines[$existingIndex]['total'] = $this->stockMedicines[$existingIndex]['quantity'] * $this->stockMedicines[$existingIndex]['price'];
+    //         } else {
+    //             // If the medicine does not exist, add it to the list
+    //             $this->stockMedicines[] = [
+    //                 'medicine_id' => $medicine->id,
+    //                 'medicine_image' => $medicine->image_url,
+    //                 'medicine_name' => $medicine->name,
+    //                 'category_name' => $medicine->category_name,
+    //                 'quantity' => 1, // Start with a quantity of 1
+    //                 'price' => $medicine->price,
+    //                 'sub_total' => $medicine->price,
+    //                 'vat' => $medicine->vat,
+    //                 'total' => $medicine->price + ($medicine->price * $medicine->vat / 100), // Calculate initial total
+    //             ];
+    //         }
+    //         // Recalculate totals
+    //         $this->calculateTotals();
+    //     }
+    // }
 
     public function addMedicine($index)
     {
         $medicine = Medicine::find($index);
+
         if ($medicine) {
-            $this->stockMedicines[] = [
-                'medicine_id' => $medicine->id,
-                'medicine_image' => $medicine->image_url,
-                'medicine_name' => $medicine->name,
-                'batch' => '',
-                'expiry_date' => '',
-                'quantity' => 0,
-                'price' => $medicine->price,
-                'total' => 0.00,
-            ];
+            // Check if the medicine already exists in the stockMedicines array
+            $existingIndex = collect($this->stockMedicines)->search(function ($item) use ($medicine) {
+                return $item['medicine_id'] === $medicine->id;
+            });
+
+            if ($existingIndex !== false) {
+                // If the medicine exists, increase the quantity
+                $this->stockMedicines[$existingIndex]['quantity'] += 1;
+                $this->stockMedicines[$existingIndex]['total'] =
+                    $this->stockMedicines[$existingIndex]['quantity'] *
+                    $this->stockMedicines[$existingIndex]['price'] *
+                    (1 + $this->stockMedicines[$existingIndex]['vat'] / 100);
+            } else {
+                // If the medicine does not exist, add it to the list
+                $this->stockMedicines[] = [
+                    'medicine_id' => $medicine->id,
+                    'medicine_image' => $medicine->image_url,
+                    'medicine_name' => $medicine->name,
+                    'category_name' => $medicine->category_name,
+                    'quantity' => 1, // Start with a quantity of 1
+                    'price' => $medicine->price,
+                    'sub_total' => $medicine->price,
+                    'vat' => $medicine->vat ?? 0, // Default to 0 if VAT is not set
+                    'total' => $medicine->price * (1 + ($medicine->vat ?? 0) / 100),
+                ];
+            }
+
+            // Recalculate totals
+            $this->calculateTotals();
+        } else {
+            flash()->error('Medicine not found!'); // Flash message if no medicine is found
         }
     }
+
+    public function removeMedicine($index)
+    {
+        unset($this->stockMedicines[$index]);
+        $this->stockMedicines = array_values($this->stockMedicines);
+        $this->calculateTotals();
+    }
+
+    public function increaseQuantity($index, $quantity = 1)
+    {
+        $medicineQty = Medicine::find($this->stockMedicines[$index]['medicine_id']);
+        if ($medicineQty->quantity < $this->stockMedicines[$index]['quantity'] + $quantity) {
+            flash()->error('Not enough stock available!');
+            return;
+        }
+        $this->stockMedicines[$index]['quantity'] += $quantity;
+        $this->stockMedicines[$index]['total'] = $this->stockMedicines[$index]['quantity'] * $this->stockMedicines[$index]['price'];
+        $this->calculateTotals();
+    }
+
+    public function decreaseQuantity($index, $quantity = 1)
+    {
+        // Check if quantity is less than the requested decrement amount
+        if ($this->stockMedicines[$index]['quantity'] <= $quantity) {
+            flash()->error('Quantity cannot be less than 1!'); // Flash error
+            $this->stockMedicines[$index]['quantity'] = 1; // Reset quantity to 1
+            return;
+        }
+
+        // Decrease the quantity
+        $this->stockMedicines[$index]['quantity'] -= $quantity;
+        $this->stockMedicines[$index]['total'] = $this->stockMedicines[$index]['quantity'] * $this->stockMedicines[$index]['price'];
+
+        // Recalculate totals
+        $this->calculateTotals();
+    }
+
 
     public function calculateTotals()
     {
@@ -157,12 +201,6 @@ class SalesInvoice extends Component
         $this->calculateTotals();
     }
 
-    public function removeMedicine($index)
-    {
-        unset($this->stockMedicines[$index]);
-        $this->stockMedicines = array_values($this->stockMedicines); // Re-index array
-        $this->calculateTotals();
-    }
 
     public function submit()
     {
@@ -171,8 +209,7 @@ class SalesInvoice extends Component
             'manufacturer' => 'required|exists:suppliers,id',
             'stockMedicines' => 'required|array|min:1',
             'stockMedicines.*.medicine_id' => 'required|exists:medicines,id',
-            'stockMedicines.*.batch' => 'required|string|max:50',
-            'stockMedicines.*.expiry_date' => 'required|date',
+            'stockMedicines.*.category_name' => 'required|string|max:50',
             'stockMedicines.*.quantity' => 'required|numeric|min:1',
             'stockMedicines.*.price' => 'required|numeric|min:0',
             'stockMedicines.*.total' => 'required|numeric|min:0',

@@ -78,7 +78,7 @@
                         <th>Batch</th>
                         <th>Expiry Date</th>
                         <th>Quantity</th>
-                        <th>MRP/Selling Price</th>
+                        <th>MRP/Buying Price</th>
                         <th>Total</th>
                         <th>Action</th>
                     </tr>
@@ -105,8 +105,8 @@
                                 @error("stockMedicines.{$index}.quantity") <span class="text-danger">{{ $message }}</span> @enderror
                             </td>
                             <td>
-                                <input type="text" class="form-control" wire:model.live.debounce.1000ms="stockMedicines.{{ $index }}.price" >
-                                @error("stockMedicines.{$index}.price") <span class="text-danger">{{ $message }}</span> @enderror
+                                <input type="text" class="form-control" wire:model.live.debounce.1000ms="stockMedicines.{{ $index }}.buy_price" >
+                                @error("stockMedicines.{$index}.buy_price") <span class="text-danger">{{ $message }}</span> @enderror
                             </td>
                             <td><input type="text" class="form-control" wire:model.live.debounce.1000ms="stockMedicines.{{ $index }}.total" readonly></td>
                             <td><button type="button" class="btn btn-sm btn-outline-danger" wire:click="removeMedicine({{ $index }})"><i class="bi bi-x"></i></button></td>

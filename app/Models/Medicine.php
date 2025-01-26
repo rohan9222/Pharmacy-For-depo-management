@@ -57,4 +57,5 @@ class Medicine extends Model
             ->orWhere('supplier', 'like', '%' . $search . '%')
             ->orWhere('barcode', 'like', '%' . $search . '%');
     }
+
 }

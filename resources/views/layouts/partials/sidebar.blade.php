@@ -1,4 +1,4 @@
-<div id="sidebar" class="sidebar shadow-sm d-flex flex-column p-3 bg-body-tertiary">
+<div id="sidebar" class="z-3 sidebar shadow-sm d-flex flex-column p-3 bg-body-tertiary">
     <a href="/" class="navbar-brand d-flex align-items-center mb-md-0 me-md-auto link-body-emphasis text-decoration-none">
         <!-- Logo -->
         <x-application-mark class="block h-9 w-auto" />

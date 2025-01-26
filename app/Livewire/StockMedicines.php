@@ -98,7 +98,7 @@ class StockMedicines extends Component
                 'batch' => '',
                 'expiry_date' => '',
                 'quantity' => 0,
-                'price' => $medicine->price,
+                'buy_price' => $medicine->price,
                 'total' => 0.00,
             ];
         }
@@ -110,12 +110,12 @@ class StockMedicines extends Component
 
         // Loop through each medicine and calculate totals
         foreach ($this->stockMedicines as $index => $medicine) {
-            // Ensure both quantity and price are numeric (default to 0 if null or not set)
+            // Ensure both quantity and buy_price are numeric (default to 0 if null or not set)
             $quantity = isset($medicine['quantity']) ? (float) $medicine['quantity'] : 0;
-            $price = isset($medicine['price']) ? (float) $medicine['price'] : 0;
+            $buy_price = isset($medicine['buy_price']) ? (float) $medicine['buy_price'] : 0;
 
             // Calculate total for the current medicine
-            $medicineTotal = $quantity * $price;
+            $medicineTotal = $quantity * $buy_price;
 
             // Format the medicine total to 3 decimal places
             $this->stockMedicines[$index]['total'] = round($medicineTotal, 3);
@@ -165,7 +165,7 @@ class StockMedicines extends Component
             'stockMedicines.*.batch' => 'required|string|max:50',
             'stockMedicines.*.expiry_date' => 'required|date',
             'stockMedicines.*.quantity' => 'required|numeric|min:1',
-            'stockMedicines.*.price' => 'required|numeric|min:0',
+            'stockMedicines.*.buy_price' => 'required|numeric|min:0',
             'stockMedicines.*.total' => 'required|numeric|min:0',
         ]);
 
@@ -195,7 +195,7 @@ class StockMedicines extends Component
                     'expiry_date' => $medicine['expiry_date'],
                     'initial_quantity' => $medicine['quantity'],
                     'quantity' => $medicine['quantity'],
-                    'price' => $medicine['price'],
+                    'buy_price' => $medicine['buy_price'],
                     'total' => $medicine['total'],
                 ]);
 
