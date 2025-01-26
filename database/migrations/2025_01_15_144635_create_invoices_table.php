@@ -20,15 +20,18 @@ return new class extends Migration
             $table->foreignId('sales_manager')->nullable()->constrained('users')->nullOnDelete()->cascadeOnUpdate()->comment('user id who has sales manager role');
             $table->foreignId('field_officer')->nullable()->constrained('users')->nullOnDelete()->cascadeOnUpdate()->comment('user id who has field officer role');
             $table->foreignId('customer')->nullable()->constrained('users')->nullOnDelete()->cascadeOnUpdate()->comment('user id who has customer role');
-            $table->decimal('subtotal', 11, 3)->default(0.00);
-            $table->decimal('discount', 11, 3)->default(0.00)->nullable();
+            $table->decimal('subtotal', 11, 2)->default(0.00);
+            $table->decimal('discount', 11, 2)->default(0.00)->nullable();
             $table->enum('dis_type', ['percentage', 'fixed'])->default('percentage')->nullable();
-            $table->decimal('dis_amount', 11, 3)->default(0.00)->nullable();
-            $table->decimal('vat', 11, 3)->default(0.00)->nullable();
-            $table->decimal('tax', 11, 3)->default(0.00)->nullable();
-            $table->decimal('paid', 11, 3)->default(0.00)->nullable();
-            $table->decimal('due', 11, 3)->default(0.00);
-            $table->decimal('grand_total', 11, 3)->default(0.00);
+            $table->decimal('dis_amount', 11, 2)->default(0.00)->nullable();
+            $table->decimal('spl_discount', 11, 2)->default(0.00)->nullable();
+            $table->enum('spl_dis_type', ['percentage', 'fixed'])->default('percentage')->nullable();
+            $table->decimal('spl_dis_amount', 11, 2)->default(0.00)->nullable();
+            $table->decimal('vat', 11, 2)->default(0.00)->nullable();
+            $table->decimal('tax', 11, 2)->default(0.00)->nullable();
+            $table->decimal('paid', 11, 2)->default(0.00)->nullable();
+            $table->decimal('due', 11, 2)->default(0.00);
+            $table->decimal('grand_total', 11, 2)->default(0.00);
             $table->timestamps();
         });
     }

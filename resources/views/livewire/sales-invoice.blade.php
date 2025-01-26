@@ -1,6 +1,6 @@
 <div class="row">
-    <div class="col-md-6 card z-2">
-        <div class="row g-2 nav">
+    <div class="col-md-5 card z-2">
+        <div class="row g-1 nav">
             @if (!empty($medicines))
                 @foreach ($medicines as  $medicine)
                         {{-- @dump($medicine) --}}
@@ -8,7 +8,7 @@
                         <div wire:click="addMedicine('{{ $medicine->id }}')" class="p-1 w-100 nav-item btn border border-0 {{ $medicine->quantity > 0 ? '' : 'disabled' }}" style="cursor: pointer;" wire:key="medicine-{{ $medicine->id }}">
                             <div class="card shadow-sm position-relative nav-link p-0">
                                 <div class="position-relative p-1">
-                                    <div class="card-header p-3">
+                                    <div class="card-header p-2">
                                         <div class="d-flex align-items-center justify-content-center d-block w-100" style="height: 75px;">
                                             <img class="w-100 h-100 img-fluid img-thumbnail" src="{{ asset($medicine->image_url ?? 'img/medicine-logo.png') }}" alt="">
                                         </div>
@@ -16,9 +16,9 @@
                                 </div>
                                 <div class="position-relative p-0">
                                     <div class="card-body p-1 text-center">
-                                        <h5 class="fs-4 text-dark m-0">
+                                        <h6 class="fs-6 text-dark m-0">
                                             {{ $medicine->name }}
-                                        </h5>
+                                        </h6>
                                         {{-- <span class="text-muted fs-6">(Batch : {{ $medicine->batch_number }})</span> --}}
                                     </div>
                                 </div>
@@ -41,7 +41,7 @@
             <span class="text-danger">{{ $message }}</span>
         @enderror
     </div>
-    <div class="col-md-6 card">
+    <div class="col-md-7 card">
         <form wire:submit.prevent="submit">
             <div class="row g-2">
                 <div class="col-4">
@@ -69,10 +69,10 @@
                 </div>
             </div>
 
-            <div class="table-responsive row mt-3">
+            <div class="table-responsive row mt-3 p-2">
                 <table class="table table-bordered table-sm">
                     <thead>
-                        <tr>
+                        <tr class="text-center">
                             <th>SN</th>
                             <th>Medicine</th>
                             <th>Category</th>
@@ -94,10 +94,10 @@
                                 </td>
                                 <td>{{ $medicine['category_name'] }}</td>
                                 <td>
-                                    <div class="input-group mb-3 w-50">
-                                        <span class="input-group-text btn btn-sm btn-outline-danger" wire:click="decreaseQuantity({{ $index }})"><i class="bi bi-dash-lg"></i></span>
-                                        <input type="number" class="form-control form-control-sm text-center p-0" wire:model.live.debounce.1000ms="stockMedicines.{{ $index }}.quantity">
-                                        <span class="input-group-text btn btn-sm btn-outline-success" wire:click="increaseQuantity({{ $index }})"><i class="bi bi-plus-lg"></i></span>
+                                    <div class="d-flex">
+                                        <a class="btn btn-sm btn-outline-danger" wire:click="decreaseQuantity({{ $index }})"><i class="bi bi-dash-lg"></i></a>
+                                        <input type="number" class="form-control form-control-sm  text-center p-0" wire:model.live.debounce.1000ms="stockMedicines.{{ $index }}.quantity">
+                                        <a class="btn btn-sm btn-outline-success" wire:click="increaseQuantity({{ $index }})"><i class="bi bi-plus-lg"></i></a>
                                     </div>
                                     @error("stockMedicines.{$index}.quantity") <span class="text-danger">{{ $message }}</span> @enderror
                                 </td>
@@ -135,7 +135,12 @@
                         <tr>
                             <th>Sub Total</th>
                             <th>:</th>
-                            <td>{{$total}} ৳</td>
+                            <td>{{$sub_total}} ৳</td>
+                        </tr>
+                        <tr>
+                            <th>Vat(%)</th>
+                            <th>:</th>
+                            <td>{{$vat}} ৳</td>
                         </tr>
                         <tr>
                             <th>Discount</th>
@@ -182,3 +187,14 @@
     </div>
 </div>
 
+@push('styles')
+<style>
+    .quantity {
+    display: flex
+;
+    align-items: center;
+    background: #fff;
+    border-radius: 4px;
+}
+</style>
+@endpush

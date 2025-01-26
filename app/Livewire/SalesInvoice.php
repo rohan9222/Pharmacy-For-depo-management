@@ -21,7 +21,9 @@ class SalesInvoice extends Component
     public $search, $medicines, $customers, $invoice_no, $invoice_date, $manufacturer;
     public $highlightedIndex = 0;
     public $stockMedicines = []; // Medicine stock data
+    public $sub_total = 0;
     public $total = 0;
+    public $vat = 0;
     public $discount = 0;
     public $grand_total = 0;
     public $paid_amount = 0;
@@ -48,38 +50,43 @@ class SalesInvoice extends Component
         $this->customers = User::where('role', 'customer')->get();
         flash()->info('Customer list refreshed!');
     }
-    // public function addMedicine($index)
-    // {
-    //     $medicine = Medicine::find($index);
 
-    //     if ($medicine) {
-    //         // Check if the medicine already exists in the stockMedicines array
-    //         $existingIndex = collect($this->stockMedicines)->search(function ($item) use ($medicine) {
-    //             return $item['medicine_id'] === $medicine->id;
-    //         });
+    public function calculateTotals()
+    {
+        $this->total = 0;
+        $this->sub_total = 0;
 
-    //         if ($existingIndex !== false) {
-    //             // If the medicine exists, increase the quantity
-    //             $this->stockMedicines[$existingIndex]['quantity'] += 1;
-    //             $this->stockMedicines[$existingIndex]['total'] = $this->stockMedicines[$existingIndex]['quantity'] * $this->stockMedicines[$existingIndex]['price'];
-    //         } else {
-    //             // If the medicine does not exist, add it to the list
-    //             $this->stockMedicines[] = [
-    //                 'medicine_id' => $medicine->id,
-    //                 'medicine_image' => $medicine->image_url,
-    //                 'medicine_name' => $medicine->name,
-    //                 'category_name' => $medicine->category_name,
-    //                 'quantity' => 1, // Start with a quantity of 1
-    //                 'price' => $medicine->price,
-    //                 'sub_total' => $medicine->price,
-    //                 'vat' => $medicine->vat,
-    //                 'total' => $medicine->price + ($medicine->price * $medicine->vat / 100), // Calculate initial total
-    //             ];
-    //         }
-    //         // Recalculate totals
-    //         $this->calculateTotals();
-    //     }
-    // }
+        // Loop through each medicine and calculate totals
+        foreach ($this->stockMedicines as $index => $medicine) {
+            // Ensure both quantity and price are numeric (default to 0 if null or not set)
+            $quantity = isset($medicine['quantity']) && is_numeric($medicine['quantity']) ? (float) $medicine['quantity'] : 0;
+            $price = isset($medicine['price']) && is_numeric($medicine['price']) ? (float) $medicine['price'] : 0;
+            $vat = isset($medicine['vat']) && is_numeric($medicine['vat']) ? (float) $medicine['vat'] : 0;
+
+            // Calculate total for the current medicine with VAT
+            $medicineTotal = $quantity * $price * (1 + $vat / 100);
+
+            // Format the medicine total to 2 decimal places
+            $this->stockMedicines[$index]['sub_total'] = round($quantity * $price, 2);
+            // $this->stockMedicines[$index]['vat'] = round($medicineTotal * $vat / 100, 2);
+            $this->stockMedicines[$index]['total'] = round($medicineTotal, 2);
+
+            // Add to the overall total
+            $this->sub_total += round($quantity * $price, 2);
+            $this->total += round($medicineTotal, 2);
+
+            // Calculate VAT for the current medicine
+            $this->vat += round($medicineTotal * $vat / 100, 2);
+        }
+
+        // Handle null values for discount and paid amount safely, defaulting to 0
+        $this->discount = isset($this->discount) && is_numeric($this->discount) ? (float) $this->discount : 0;
+        $this->paid_amount = isset($this->paid_amount) && is_numeric($this->paid_amount) ? (float) $this->paid_amount : 0;
+
+        // Calculate grand total and due amount, rounded to 2 decimals and ensuring they aren't negative
+        $this->grand_total = round(max($this->total - $this->discount, 0), 2);
+        $this->due_amount = round(max($this->grand_total - $this->paid_amount, 0), 2);
+    }
 
     public function addMedicine($index)
     {
@@ -87,38 +94,42 @@ class SalesInvoice extends Component
 
         if ($medicine) {
             // Check if the medicine already exists in the stockMedicines array
-            $existingIndex = collect($this->stockMedicines)->search(function ($item) use ($medicine) {
-                return $item['medicine_id'] === $medicine->id;
-            });
+            $existingIndex = collect($this->stockMedicines)->search(fn($item) => $item['medicine_id'] === $medicine->id);
 
             if ($existingIndex !== false) {
                 // If the medicine exists, increase the quantity
                 $this->stockMedicines[$existingIndex]['quantity'] += 1;
-                $this->stockMedicines[$existingIndex]['total'] =
+                $this->stockMedicines[$existingIndex]['total'] = round(
                     $this->stockMedicines[$existingIndex]['quantity'] *
                     $this->stockMedicines[$existingIndex]['price'] *
-                    (1 + $this->stockMedicines[$existingIndex]['vat'] / 100);
+                    (1 + ($this->stockMedicines[$existingIndex]['vat'] ?? 0) / 100),
+                    2
+                );
             } else {
                 // If the medicine does not exist, add it to the list
                 $this->stockMedicines[] = [
                     'medicine_id' => $medicine->id,
-                    'medicine_image' => $medicine->image_url,
-                    'medicine_name' => $medicine->name,
-                    'category_name' => $medicine->category_name,
+                    'medicine_image' => $medicine->image_url ?? null,
+                    'medicine_name' => $medicine->name ?? 'Unknown',
+                    'category_name' => $medicine->category_name ?? 'Uncategorized',
                     'quantity' => 1, // Start with a quantity of 1
-                    'price' => $medicine->price,
-                    'sub_total' => $medicine->price,
-                    'vat' => $medicine->vat ?? 0, // Default to 0 if VAT is not set
-                    'total' => $medicine->price * (1 + ($medicine->vat ?? 0) / 100),
+                    'price' => (float) $medicine->price ?? 0.0,
+                    'sub_total' => (float) $medicine->price ?? 0.0,
+                    'vat' => (float) ($medicine->vat ?? 0), // Default VAT to 0 if not set
+                    'total' => round(
+                        ($medicine->price ?? 0.0) * (1 + ($medicine->vat ?? 0) / 100),
+                        2
+                    ),
                 ];
             }
 
             // Recalculate totals
             $this->calculateTotals();
         } else {
-            flash()->error('Medicine not found!'); // Flash message if no medicine is found
+            session()->flash('error', 'Medicine not found!'); // Flash message if no medicine is found
         }
     }
+
 
     public function removeMedicine($index)
     {
@@ -131,6 +142,7 @@ class SalesInvoice extends Component
     {
         $medicineQty = Medicine::find($this->stockMedicines[$index]['medicine_id']);
         if ($medicineQty->quantity < $this->stockMedicines[$index]['quantity'] + $quantity) {
+            $this->stockMedicines[$index]['quantity'] = $medicineQty->quantity;
             flash()->error('Not enough stock available!');
             return;
         }
@@ -156,40 +168,34 @@ class SalesInvoice extends Component
         $this->calculateTotals();
     }
 
-
-    public function calculateTotals()
+    public function updatedStockMedicines($value, $key)
     {
-        $this->total = 0;
+        // Extract index and field from the key (e.g., "2.quantity" => $index = 2, $field = 'quantity')
+        [$index, $field] = explode('.', $key);
 
-        // Loop through each medicine and calculate totals
-        foreach ($this->stockMedicines as $index => $medicine) {
-            // Ensure both quantity and price are numeric (default to 0 if null or not set)
-            $quantity = isset($medicine['quantity']) ? (float) $medicine['quantity'] : 0;
-            $price = isset($medicine['price']) ? (float) $medicine['price'] : 0;
-
-            // Calculate total for the current medicine
-            $medicineTotal = $quantity * $price;
-
-            // Format the medicine total to 3 decimal places
-            $this->stockMedicines[$index]['total'] = round($medicineTotal, 3);
-
-            // Add to the overall total
-            $this->total += round($medicineTotal, 3); // Ensure total is rounded to 3 decimal places
+        // Ensure index is numeric
+        if (!is_numeric($index)) {
+            return;
+        }
+        if($field === 'quantity' && $value > 1){
+            $this->increaseQuantity($index);
+        }
+        // If quantity is updated and less than 1, reset it to 1
+        if ($field === 'quantity' && $value < 1) {
+            $this->stockMedicines[$index]['quantity'] = 1;
+            flash()->error('Quantity cannot be less than 1!');
         }
 
-        // Handle null values for discount and paid amount, and format to 3 decimal places
-        $this->discount = (float) ($this->discount ?? 0);
-        $this->paid_amount = (float) ($this->paid_amount ?? 0);
+        // If price is updated and less than 0, reset it to 0
+        if ($field === 'price' && $value < 0) {
+            $this->stockMedicines[$index]['price'] = 0;
+            flash()->error('Price cannot be negative!');
+        }
 
-        // Calculate grand total and due amount, also rounded to 3 decimals
-        $this->grand_total = round(max($this->total - $this->discount, 0), 3); // Ensure grand total is not negative
-        $this->due_amount = round(max($this->grand_total - $this->paid_amount, 0), 3); // Ensure due amount is not negative
-    }
-
-    public function updatedStockMedicines()
-    {
+        // Recalculate totals
         $this->calculateTotals();
     }
+
 
     public function updatedDiscount()
     {

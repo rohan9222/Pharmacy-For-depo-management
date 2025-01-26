@@ -117,20 +117,20 @@ class StockMedicines extends Component
             // Calculate total for the current medicine
             $medicineTotal = $quantity * $buy_price;
 
-            // Format the medicine total to 3 decimal places
-            $this->stockMedicines[$index]['total'] = round($medicineTotal, 3);
+            // Format the medicine total to 2 decimal places
+            $this->stockMedicines[$index]['total'] = round($medicineTotal, 2);
 
             // Add to the overall total
-            $this->total += round($medicineTotal, 3); // Ensure total is rounded to 3 decimal places
+            $this->total += round($medicineTotal, 2); // Ensure total is rounded to 2 decimal places
         }
 
-        // Handle null values for discount and paid amount, and format to 3 decimal places
+        // Handle null values for discount and paid amount, and format to 2 decimal places
         $this->discount = (float) ($this->discount ?? 0);
         $this->paid_amount = (float) ($this->paid_amount ?? 0);
 
-        // Calculate grand total and due amount, also rounded to 3 decimals
-        $this->grand_total = round(max($this->total - $this->discount, 0), 3); // Ensure grand total is not negative
-        $this->due_amount = round(max($this->grand_total - $this->paid_amount, 0), 3); // Ensure due amount is not negative
+        // Calculate grand total and due amount, also rounded to 2 decimals
+        $this->grand_total = round(max($this->total - $this->discount, 0), 2); // Ensure grand total is not negative
+        $this->due_amount = round(max($this->grand_total - $this->paid_amount, 0), 2); // Ensure due amount is not negative
     }
 
     public function updatedStockMedicines()
