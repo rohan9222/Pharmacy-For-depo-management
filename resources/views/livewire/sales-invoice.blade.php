@@ -143,14 +143,14 @@
                             <td>{{$vat}} ৳</td>
                         </tr>
                         <tr>
-                            <th>Discount</th>
+                            <th>Spacial Discount</th>
                             <th>:</th>
                             <td>
                                 <div class="input-group w-75 ">
-                                    <input type="text" placeholder="Discount Price" class="form-control form-control-sm" wire:model.live.debounce.1000ms="discount" >
+                                    <input type="text" placeholder="Spacial Discount Price" class="form-control form-control-sm" wire:model.live.debounce.1000ms="spl_discount" >
                                     <span class="input-group-text bg-info bg-opacity-10">৳</span>
                                 </div>
-                                @error('discount') <span class="text-danger">{{ $message }}</span> @enderror
+                                @error('spl_discount') <span class="text-danger">{{ $message }}</span> @enderror
                             </td>
                         </tr>
                         <tr>
@@ -186,15 +186,3 @@
         </form>
     </div>
 </div>
-
-@push('styles')
-<style>
-    .quantity {
-    display: flex
-;
-    align-items: center;
-    background: #fff;
-    border-radius: 4px;
-}
-</style>
-@endpush

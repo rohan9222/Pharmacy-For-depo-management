@@ -3,7 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\{DashboardController,UserProfileController};
 use App\Http\Controllers\Admin\{RoleController,UserController};
-use App\Livewire\{CustomersList,DeliveryManList,SupplierList,MedicinesList,CategoryList,StockMedicines,StockMedicinesList,SalesInvoice};
+use App\Livewire\{CustomersList,DeliveryManList,SupplierList,MedicinesList,CategoryList,StockMedicines,StockMedicinesList,SalesInvoice,InvoiceHistory};
 
 
 Route::get('/', function () {
@@ -31,8 +31,8 @@ Route::middleware([
 
 // pos
     Route::get('/pos', SalesInvoice::class)->name('pos');
-    Route::get('/sales-medicines', SalesInvoice::class)->name('sales-medicines');
-    Route::get('/sales-medicines-list', SalesInvoice::class)->name('sales-medicines-list');
+    Route::get('/sales-medicines', InvoiceHistory::class)->name('sales-medicines');
+    Route::get('/sales-medicines-list', InvoiceHistory::class)->name('sales-medicines-list');
 
 // category management
     Route::get('/categories', CategoryList::class)->name('categories');

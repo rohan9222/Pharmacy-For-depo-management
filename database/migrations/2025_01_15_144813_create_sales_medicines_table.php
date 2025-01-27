@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('invoice_id')->constrained()->cascadeOnDelete()->cascadeOnUpdate();
             $table->foreignId('medicine_id')->nullable()->constrained()->restrictOnDelete()->cascadeOnUpdate();
-            $table->string('medicine_name');
+            // $table->string('medicine_name');
             $table->string('batch_number', 50)->nullable();
             $table->timestamp('expiry_date')->nullable();
             $table->integer('initial_quantity')->default(1)->comment('sales medicine initial quantity which is on sales invoice');
