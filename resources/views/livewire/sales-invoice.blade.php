@@ -1,14 +1,14 @@
 <div class="row">
-    <div class="col-6 card">
-        <div class="row g-2 nav">
+    <div class="col-md-5 card z-2">
+        <div class="row g-1 nav">
             @if (!empty($medicines))
                 @foreach ($medicines as  $medicine)
                         {{-- @dump($medicine) --}}
-                    <div class="col-lg-3 col col-xl-3">
-                        <div wire:click="addMedicine('{{ $medicine->id }}')" class="w-100 nav-item btn border border-0 {{ $medicine->quantity > 0 ? '' : 'disabled' }}" style="cursor: pointer;" wire:key="medicine-{{ $medicine->id }}">
+                    <div class="col-lg-2 col-lg-3 col-md-4 col-6 col-xl-2">
+                        <div wire:click="addMedicine('{{ $medicine->id }}')" class="p-1 w-100 nav-item btn border border-0 {{ $medicine->quantity > 0 ? '' : 'disabled' }}" style="cursor: pointer;" wire:key="medicine-{{ $medicine->id }}">
                             <div class="card shadow-sm position-relative nav-link p-0">
                                 <div class="position-relative p-1">
-                                    <div class="card-header p-3">
+                                    <div class="card-header p-2">
                                         <div class="d-flex align-items-center justify-content-center d-block w-100" style="height: 75px;">
                                             <img class="w-100 h-100 img-fluid img-thumbnail" src="{{ asset($medicine->image_url ?? 'img/medicine-logo.png') }}" alt="">
                                         </div>
@@ -16,9 +16,9 @@
                                 </div>
                                 <div class="position-relative p-0">
                                     <div class="card-body p-1 text-center">
-                                        <h5 class="product-title1 text-dark font-weight-bold m-0">
+                                        <h6 class="fs-6 text-dark m-0">
                                             {{ $medicine->name }}
-                                        </h5>
+                                        </h6>
                                         {{-- <span class="text-muted fs-6">(Batch : {{ $medicine->batch_number }})</span> --}}
                                     </div>
                                 </div>
@@ -41,7 +41,7 @@
             <span class="text-danger">{{ $message }}</span>
         @enderror
     </div>
-    <div class="col-6 card">
+    <div class="col-md-7 card">
         <form wire:submit.prevent="submit">
             <div class="row g-2">
                 <div class="col-4">
@@ -49,10 +49,10 @@
                     <input type="date" class="form-control" wire:model.live.debounce.1000ms="invoice_date">
                     @error('invoice_date') <span class="text-danger">{{ $message }}</span> @enderror
                 </div>
-                <div class="col-4">
+                {{-- <div class="col-4">
                     <label for="invoice_no" class="form-label">Invoice No</label>
                     <input type="text" class="form-control" wire:model.live.debounce.1000ms="invoice_no" readonly>
-                </div>
+                </div> --}}
                 <div class="col-4">
                     <label for="customer" class="form-label">Customer</label>
                     <div class="input-group mb-3">
@@ -69,16 +69,17 @@
                 </div>
             </div>
 
-            <div class="table-responsive row mt-3">
+            <div class="table-responsive row mt-3 p-2">
                 <table class="table table-bordered table-sm">
                     <thead>
-                        <tr>
+                        <tr class="text-center">
                             <th>SN</th>
                             <th>Medicine</th>
-                            <th>Batch</th>
-                            <th>Expiry Date</th>
+                            <th>Category</th>
                             <th>Quantity</th>
                             <th>MRP/Selling Price</th>
+                            <th>Sub Total</th>
+                            <th>Vat (%)</th>
                             <th>Total</th>
                             <th>Action</th>
                         </tr>
@@ -91,23 +92,25 @@
                                     <input type="hidden" wire:model.live.debounce.1000ms="stockMedicines.{{ $index }}.medicine_id">
                                     {{ $medicine['medicine_name'] }}
                                 </td>
+                                <td>{{ $medicine['category_name'] }}</td>
                                 <td>
-                                    <input type="text" class="form-control" wire:model.live.debounce.1000ms="stockMedicines.{{ $index }}.batch">
-                                    @error("stockMedicines.{$index}.batch") <span class="text-danger">{{ $message }}</span> @enderror
-                                </td>
-                                <td>
-                                    <input type="date" class="form-control" wire:model.live.debounce.1000ms="stockMedicines.{{ $index }}.expiry_date">
-                                    @error("stockMedicines.{$index}.expiry_date") <span class="text-danger">{{ $message }}</span> @enderror
-                                </td>
-                                <td>
-                                    <input type="number" class="form-control" wire:model.live.debounce.1000ms="stockMedicines.{{ $index }}.quantity">
+                                    <div class="d-flex">
+                                        <a class="btn btn-sm btn-outline-danger" wire:click="decreaseQuantity({{ $index }})"><i class="bi bi-dash-lg"></i></a>
+                                        <input type="number" class="form-control form-control-sm  text-center p-0" wire:model.live.debounce.1000ms="stockMedicines.{{ $index }}.quantity">
+                                        <a class="btn btn-sm btn-outline-success" wire:click="increaseQuantity({{ $index }})"><i class="bi bi-plus-lg"></i></a>
+                                    </div>
                                     @error("stockMedicines.{$index}.quantity") <span class="text-danger">{{ $message }}</span> @enderror
                                 </td>
                                 <td>
-                                    <input type="text" class="form-control" wire:model.live.debounce.1000ms="stockMedicines.{{ $index }}.price" >
+                                    <input type="text" class="form-control form-control-sm" wire:model.live.debounce.1000ms="stockMedicines.{{ $index }}.price" >
                                     @error("stockMedicines.{$index}.price") <span class="text-danger">{{ $message }}</span> @enderror
                                 </td>
-                                <td><input type="text" class="form-control" wire:model.live.debounce.1000ms="stockMedicines.{{ $index }}.total" readonly></td>
+                                <td><input type="text" class="form-control form-control-sm" wire:model.live.debounce.1000ms="stockMedicines.{{ $index }}.sub_total" readonly></td>
+                                <td>
+                                    <input type="text" class="form-control form-control-sm" wire:model.live.debounce.1000ms="stockMedicines.{{ $index }}.vat" >
+                                    @error("stockMedicines.{$index}.vat") <span class="text-danger">{{ $message }}</span> @enderror
+                                </td>
+                                <td><input type="text" class="form-control form-control-sm" wire:model.live.debounce.1000ms="stockMedicines.{{ $index }}.total" readonly></td>
                                 <td><button type="button" class="btn btn-sm btn-outline-danger" wire:click="removeMedicine({{ $index }})"><i class="bi bi-x"></i></button></td>
                             </tr>
                         @endforeach
@@ -132,17 +135,22 @@
                         <tr>
                             <th>Sub Total</th>
                             <th>:</th>
-                            <td>{{$total}} ৳</td>
+                            <td>{{$sub_total}} ৳</td>
                         </tr>
                         <tr>
-                            <th>Discount</th>
+                            <th>Vat(%)</th>
+                            <th>:</th>
+                            <td>{{$vat}} ৳</td>
+                        </tr>
+                        <tr>
+                            <th>Spacial Discount</th>
                             <th>:</th>
                             <td>
                                 <div class="input-group w-75 ">
-                                    <input type="text" placeholder="Discount Price" class="form-control form-control-sm" wire:model.live.debounce.1000ms="discount" >
+                                    <input type="text" placeholder="Spacial Discount Price" class="form-control form-control-sm" wire:model.live.debounce.1000ms="spl_discount" >
                                     <span class="input-group-text bg-info bg-opacity-10">৳</span>
                                 </div>
-                                @error('discount') <span class="text-danger">{{ $message }}</span> @enderror
+                                @error('spl_discount') <span class="text-danger">{{ $message }}</span> @enderror
                             </td>
                         </tr>
                         <tr>
@@ -178,4 +186,3 @@
         </form>
     </div>
 </div>
-

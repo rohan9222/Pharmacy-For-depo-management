@@ -3,11 +3,11 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\{DashboardController,UserProfileController};
 use App\Http\Controllers\Admin\{RoleController,UserController};
-use App\Livewire\{CustomersList,DeliveryManList,SupplierList,MedicinesList,CategoryList,StockMedicines,StockMedicinesList,SalesInvoice};
+use App\Livewire\{CustomersList,DeliveryManList,SupplierList,MedicinesList,CategoryList, PackSizeList, StockMedicines,StockMedicinesList,SalesInvoice,InvoiceHistory,SiteSettings};
 
 
 Route::get('/', function () {
-    return view('welcome');
+    return redirect()->route('login');
 });
 
 Route::middleware([
@@ -24,6 +24,10 @@ Route::middleware([
 // supplier management
     Route::get('/suppliers', SupplierList::class)->name('suppliers');
 
+// category management
+    Route::get('/categories', CategoryList::class)->name('categories');
+    Route::get('/pack-size', PackSizeList::class)->name('pack-size');
+
 // medicine management
     Route::get('/medicines', MedicinesList::class)->name('medicines');
     Route::get('/stock-medicines', StockMedicines::class)->name('stock-medicines');
@@ -31,11 +35,11 @@ Route::middleware([
 
 // pos
     Route::get('/pos', SalesInvoice::class)->name('pos');
-    Route::get('/sales-medicines', SalesInvoice::class)->name('sales-medicines');
-    Route::get('/sales-medicines-list', SalesInvoice::class)->name('sales-medicines-list');
+    Route::get('/sales-medicines', InvoiceHistory::class)->name('sales-medicines');
+    Route::get('/sales-medicines-list', InvoiceHistory::class)->name('sales-medicines-list');
 
-// category management
-    Route::get('/categories', CategoryList::class)->name('categories');
+// site settings
+    Route::get('/site-settings', SiteSettings::class)->name('site-settings');
 
 // profile
     Route::get('/user/profile', [UserProfileController::class, 'index'])->name('user.profile');

@@ -47,7 +47,7 @@ class StockMedicines extends Component
     {
         if ($this->medicine_list) {
             // Fetch filtered medicines based on search term
-            $this->medicines = Medicine::where('medicine_name', 'like', '%' . $this->medicine_list . '%')
+            $this->medicines = Medicine::where('name', 'like', '%' . $this->medicine_list . '%')
                 ->take(10)
                 ->get();
         } else {
@@ -97,8 +97,8 @@ class StockMedicines extends Component
                 'medicine_name' => $medicine->name,
                 'batch' => '',
                 'expiry_date' => '',
-                'quantity' => 0,
-                'price' => $medicine->price,
+                'quantity' => 1,
+                'buy_price' => $medicine->supplier_price,
                 'total' => 0.00,
             ];
         }
@@ -110,27 +110,27 @@ class StockMedicines extends Component
 
         // Loop through each medicine and calculate totals
         foreach ($this->stockMedicines as $index => $medicine) {
-            // Ensure both quantity and price are numeric (default to 0 if null or not set)
+            // Ensure both quantity and buy_price are numeric (default to 0 if null or not set)
             $quantity = isset($medicine['quantity']) ? (float) $medicine['quantity'] : 0;
-            $price = isset($medicine['price']) ? (float) $medicine['price'] : 0;
+            $buy_price = isset($medicine['buy_price']) ? (float) $medicine['buy_price'] : 0;
 
             // Calculate total for the current medicine
-            $medicineTotal = $quantity * $price;
+            $medicineTotal = $quantity * $buy_price;
 
-            // Format the medicine total to 3 decimal places
-            $this->stockMedicines[$index]['total'] = round($medicineTotal, 3);
+            // Format the medicine total to 2 decimal places
+            $this->stockMedicines[$index]['total'] = round($medicineTotal, 2);
 
             // Add to the overall total
-            $this->total += round($medicineTotal, 3); // Ensure total is rounded to 3 decimal places
+            $this->total += round($medicineTotal, 2); // Ensure total is rounded to 2 decimal places
         }
 
-        // Handle null values for discount and paid amount, and format to 3 decimal places
+        // Handle null values for discount and paid amount, and format to 2 decimal places
         $this->discount = (float) ($this->discount ?? 0);
         $this->paid_amount = (float) ($this->paid_amount ?? 0);
 
-        // Calculate grand total and due amount, also rounded to 3 decimals
-        $this->grand_total = round(max($this->total - $this->discount, 0), 3); // Ensure grand total is not negative
-        $this->due_amount = round(max($this->grand_total - $this->paid_amount, 0), 3); // Ensure due amount is not negative
+        // Calculate grand total and due amount, also rounded to 2 decimals
+        $this->grand_total = round(max($this->total - $this->discount, 0), 2); // Ensure grand total is not negative
+        $this->due_amount = round(max($this->grand_total - $this->paid_amount, 0), 2); // Ensure due amount is not negative
     }
 
     public function updatedStockMedicines()
@@ -165,7 +165,7 @@ class StockMedicines extends Component
             'stockMedicines.*.batch' => 'required|string|max:50',
             'stockMedicines.*.expiry_date' => 'required|date',
             'stockMedicines.*.quantity' => 'required|numeric|min:1',
-            'stockMedicines.*.price' => 'required|numeric|min:0',
+            'stockMedicines.*.buy_price' => 'required|numeric|min:0',
             'stockMedicines.*.total' => 'required|numeric|min:0',
         ]);
 
@@ -195,7 +195,7 @@ class StockMedicines extends Component
                     'expiry_date' => $medicine['expiry_date'],
                     'initial_quantity' => $medicine['quantity'],
                     'quantity' => $medicine['quantity'],
-                    'price' => $medicine['price'],
+                    'buy_price' => $medicine['buy_price'],
                     'total' => $medicine['total'],
                 ]);
 

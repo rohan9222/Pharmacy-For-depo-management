@@ -5,6 +5,8 @@ namespace App\Livewire;
 use App\Models\Medicine;
 use App\Models\Invoice;
 use App\Models\StockList;
+use App\Models\SalesMedicine;
+use App\Models\SiteSetting;
 use App\Models\user;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -18,11 +20,13 @@ class SalesInvoice extends Component
 {
     use WithPagination, WithoutUrlPagination;
 
-    public $search, $medicines, $customers, $invoice_no, $invoice_date, $manufacturer;
+    public $search, $medicines, $customers, $invoice_date, $customer;
     public $highlightedIndex = 0;
     public $stockMedicines = []; // Medicine stock data
+    public $sub_total = 0;
     public $total = 0;
-    public $discount = 0;
+    public $vat = 0;
+    public $spl_discount = 0;
     public $grand_total = 0;
     public $paid_amount = 0;
     public $due_amount = 0;
@@ -35,10 +39,6 @@ class SalesInvoice extends Component
             $customers = $customers->where('field_officer_id', auth()->user()->id);
         }
         $this->customers = $customers->get();
-        $latestInvoiceNo = Invoice::orderByDesc('id')->value('invoice_number');
-        $nextNumber = ($latestInvoiceNo) ? ((int) filter_var($latestInvoiceNo, FILTER_SANITIZE_NUMBER_INT) + 1) : 1000;
-        $this->invoice_no = "INV" . $nextNumber;
-
         $this->medicines = Medicine::search($this->search)->get();
         return view('livewire.sales-invoice')->layout('layouts.app');
     }
@@ -49,105 +49,154 @@ class SalesInvoice extends Component
         flash()->info('Customer list refreshed!');
     }
 
-    public function updatedMedicineList()
-    {
-        $this->fetchMedicines();
-    }
-
-    public function fetchMedicines()
-    {
-        if ($this->medicine_list) {
-            // Fetch filtered medicines based on search term
-            $this->medicines = StockList::where('medicine_name', 'like', '%' . $this->medicine_list . '%')->with('medicine')->take(10)->get();
-        } else {
-            // Show first 10 medicines when input is empty or focused
-            $this->medicines = StockList::with('medicine')->take(10)->get();
-        }
-
-        $this->highlightedIndex = 0;
-    }
-
-    public function clearMedicines()
-    {
-        $this->medicines = [];
-    }
-
-    public function incrementHighlight()
-    {
-        if ($this->highlightedIndex < count($this->medicines) - 1) {
-            $this->highlightedIndex++;
-        }
-    }
-
-    public function decrementHighlight()
-    {
-        if ($this->highlightedIndex > 0) {
-            $this->highlightedIndex--;
-        }
-    }
-
-    public function selectHighlightedMedicine()
-    {
-        if (isset($this->medicines[$this->highlightedIndex])) {
-            $selectedmedicine = $this->medicines[$this->highlightedIndex];
-            $this->addMedicine($selectedmedicine->id);
-            $this->clearMedicines(); // Optional to clear medicine list after selection
-        }
-    }
-
-
-    public function addMedicine($index)
-    {
-        $medicine = Medicine::find($index);
-        if ($medicine) {
-            $this->stockMedicines[] = [
-                'medicine_id' => $medicine->id,
-                'medicine_image' => $medicine->image_url,
-                'medicine_name' => $medicine->name,
-                'batch' => '',
-                'expiry_date' => '',
-                'quantity' => 0,
-                'price' => $medicine->price,
-                'total' => 0.00,
-            ];
-        }
-    }
-
     public function calculateTotals()
     {
         $this->total = 0;
+        $this->sub_total = 0;
+        $this->vat = 0;
 
         // Loop through each medicine and calculate totals
         foreach ($this->stockMedicines as $index => $medicine) {
             // Ensure both quantity and price are numeric (default to 0 if null or not set)
-            $quantity = isset($medicine['quantity']) ? (float) $medicine['quantity'] : 0;
-            $price = isset($medicine['price']) ? (float) $medicine['price'] : 0;
+            $quantity = isset($medicine['quantity']) && is_numeric($medicine['quantity']) ? (float) $medicine['quantity'] : 0;
+            $price = isset($medicine['price']) && is_numeric($medicine['price']) ? (float) $medicine['price'] : 0;
+            $vat = isset($medicine['vat']) && is_numeric($medicine['vat']) ? (float) $medicine['vat'] : 0;
 
-            // Calculate total for the current medicine
-            $medicineTotal = $quantity * $price;
+            // Calculate total for the current medicine with VAT
+            $medicineTotal = $quantity * $price * (1 + $vat / 100);
 
-            // Format the medicine total to 3 decimal places
-            $this->stockMedicines[$index]['total'] = round($medicineTotal, 3);
+            // Format the medicine total to 2 decimal places
+            $this->stockMedicines[$index]['sub_total'] = round($quantity * $price, 2);
+            // $this->stockMedicines[$index]['vat'] = round($medicineTotal * $vat / 100, 2);
+            $this->stockMedicines[$index]['total'] = round($medicineTotal, 2);
 
             // Add to the overall total
-            $this->total += round($medicineTotal, 3); // Ensure total is rounded to 3 decimal places
+            $this->sub_total += round($quantity * $price, 2);
+            $this->total += round($medicineTotal, 2);
+
+            // Calculate VAT for the current medicine
+            $this->vat += round($quantity * $price * $vat / 100, 2);
         }
 
-        // Handle null values for discount and paid amount, and format to 3 decimal places
-        $this->discount = (float) ($this->discount ?? 0);
-        $this->paid_amount = (float) ($this->paid_amount ?? 0);
+        // Handle null values for spacial discount and paid amount safely, defaulting to 0
+        $this->spl_discount = isset($this->spl_discount) && is_numeric($this->spl_discount) ? (float) $this->spl_discount : 0;
+        $this->paid_amount = isset($this->paid_amount) && is_numeric($this->paid_amount) ? (float) $this->paid_amount : 0;
 
-        // Calculate grand total and due amount, also rounded to 3 decimals
-        $this->grand_total = round(max($this->total - $this->discount, 0), 3); // Ensure grand total is not negative
-        $this->due_amount = round(max($this->grand_total - $this->paid_amount, 0), 3); // Ensure due amount is not negative
+        // Calculate grand total and due amount, rounded to 2 decimals and ensuring they aren't negative
+        $this->grand_total = round(max($this->total - $this->spl_discount, 0), 2);
+        $this->due_amount = round(max($this->grand_total - $this->paid_amount, 0), 2);
     }
 
-    public function updatedStockMedicines()
+    public function addMedicine($index)
     {
+        $medicine = Medicine::find($index);
+
+        if ($medicine) {
+            // Check if the medicine already exists in the stockMedicines array
+            $existingIndex = collect($this->stockMedicines)->search(fn($item) => $item['medicine_id'] === $medicine->id);
+
+            if ($existingIndex !== false) {
+                // If the medicine exists, increase the quantity
+                $this->stockMedicines[$existingIndex]['quantity'] += 1;
+                $this->stockMedicines[$existingIndex]['total'] = round(
+                    $this->stockMedicines[$existingIndex]['quantity'] *
+                    $this->stockMedicines[$existingIndex]['price'] *
+                    (1 + ($this->stockMedicines[$existingIndex]['vat'] ?? 0) / 100),
+                    2
+                );
+            } else {
+                // If the medicine does not exist, add it to the list
+                $this->stockMedicines[] = [
+                    'medicine_id' => $medicine->id,
+                    'medicine_image' => $medicine->image_url ?? null,
+                    'medicine_name' => $medicine->name ?? 'Unknown',
+                    'category_name' => $medicine->category_name ?? 'Uncategorized',
+                    'quantity' => 1, // Start with a quantity of 1
+                    'price' => (float) $medicine->price ?? 0.0,
+                    'sub_total' => (float) $medicine->price ?? 0.0,
+                    'vat' => (float) ($medicine->vat ?? 0), // Default VAT to 0 if not set
+                    'total' => round(($medicine->price ?? 0.0) * (1 + ($medicine->vat ?? 0) / 100), 2),
+                ];
+            }
+
+            // Recalculate totals
+            $this->calculateTotals();
+        } else {
+            session()->flash('error', 'Medicine not found!'); // Flash message if no medicine is found
+        }
+    }
+
+    public function removeMedicine($index)
+    {
+        unset($this->stockMedicines[$index]);
+        $this->stockMedicines = array_values($this->stockMedicines);
         $this->calculateTotals();
     }
 
-    public function updatedDiscount()
+    public function increaseQuantity($index, $quantity = 1)
+    {
+        $medicineQty = Medicine::find($this->stockMedicines[$index]['medicine_id']);
+        if ($medicineQty->quantity < $this->stockMedicines[$index]['quantity'] + $quantity) {
+            $this->stockMedicines[$index]['quantity'] = $medicineQty->quantity;
+            flash()->error('Not enough stock available!');
+            return;
+        }
+        $this->stockMedicines[$index]['quantity'] += $quantity;
+        $this->stockMedicines[$index]['total'] = $this->stockMedicines[$index]['quantity'] * $this->stockMedicines[$index]['price'];
+        $this->calculateTotals();
+    }
+
+    public function decreaseQuantity($index, $quantity = 1)
+    {
+        // Check if quantity is less than the requested decrement amount
+        if ($this->stockMedicines[$index]['quantity'] <= $quantity) {
+            flash()->error('Quantity cannot be less than 1!'); // Flash error
+            $this->stockMedicines[$index]['quantity'] = 1; // Reset quantity to 1
+            return;
+        }
+
+        // Decrease the quantity
+        $this->stockMedicines[$index]['quantity'] -= $quantity;
+        $this->stockMedicines[$index]['total'] = $this->stockMedicines[$index]['quantity'] * $this->stockMedicines[$index]['price'];
+
+        // Recalculate totals
+        $this->calculateTotals();
+    }
+
+    public function updatedStockMedicines($value, $key)
+    {
+        // Extract index and field from the key (e.g., "2.quantity" => $index = 2, $field = 'quantity')
+        [$index, $field] = explode('.', $key);
+
+        // Ensure index is numeric
+        if (!is_numeric($index)) {
+            return;
+        }
+        if($field === 'quantity' && $value > 1){
+            $medicineQty = Medicine::find($this->stockMedicines[$index]['medicine_id']);
+            if ($medicineQty->quantity < $this->stockMedicines[$index]['quantity'] + $value) {
+                $this->stockMedicines[$index]['quantity'] = $medicineQty->quantity;
+                flash()->error('Not enough stock available!');
+                return;
+            }
+        }
+        // If quantity is updated and less than 1, reset it to 1
+        if ($field === 'quantity' && $value < 1) {
+            $this->stockMedicines[$index]['quantity'] = 1;
+            flash()->error('Quantity cannot be less than 1!');
+        }
+
+        // If price is updated and less than 0, reset it to 0
+        if ($field === 'price' && $value < 0) {
+            $this->stockMedicines[$index]['price'] = 0;
+            flash()->error('Price cannot be negative!');
+        }
+
+        // Recalculate totals
+        $this->calculateTotals();
+    }
+
+    public function updatedSplDiscount()
     {
         $this->calculateTotals();
     }
@@ -157,22 +206,14 @@ class SalesInvoice extends Component
         $this->calculateTotals();
     }
 
-    public function removeMedicine($index)
-    {
-        unset($this->stockMedicines[$index]);
-        $this->stockMedicines = array_values($this->stockMedicines); // Re-index array
-        $this->calculateTotals();
-    }
 
     public function submit()
     {
         $this->validate([
             'invoice_date' => 'required|date',
-            'manufacturer' => 'required|exists:suppliers,id',
+            'customer' => 'required|exists:users,id',
             'stockMedicines' => 'required|array|min:1',
             'stockMedicines.*.medicine_id' => 'required|exists:medicines,id',
-            'stockMedicines.*.batch' => 'required|string|max:50',
-            'stockMedicines.*.expiry_date' => 'required|date',
             'stockMedicines.*.quantity' => 'required|numeric|min:1',
             'stockMedicines.*.price' => 'required|numeric|min:0',
             'stockMedicines.*.total' => 'required|numeric|min:0',
@@ -182,35 +223,48 @@ class SalesInvoice extends Component
         DB::beginTransaction();
 
         try {
-            // Save logic for StockInvoice and related medicines
-            $stockInvoice = StockInvoice::create([
-                'invoice_no' => $this->invoice_no,
+            $userRoles = User::where('id', $this->customer)->first();
+
+            $latestInvoiceNo = Invoice::orderByDesc('id')->value('invoice_no');
+            $invoice_no = ($latestInvoiceNo) ? ((int) filter_var($latestInvoiceNo, FILTER_SANITIZE_NUMBER_INT) + 1) : 1000;
+            // Save logic for invoice and related medicines
+            $invoice = Invoice::create([
+                'invoice_no' => $invoice_no,
                 'invoice_date' => $this->invoice_date,
-                'supplier_id' => $this->manufacturer,
-                'sub_total' => $this->total,
-                'discount' => $this->discount,
-                'dis_type' => 'fixed',
-                'dis_amount' => $this->discount,
-                'total' => $this->grand_total,
+                'customer' => $this->customer,
+                'field_officer' => $userRoles->field_officer_id,
+                'sales_manager' => $userRoles->sales_manager_id,
+                'manager' => $userRoles->manager_id,
+                'sub_total' => $this->sub_total,
+                'vat' => $this->vat,
+                'spl_discount' => $this->spl_discount,
+                'spl_dis_type' => 'fixed',
+                'spl_dis_amount' => $this->spl_discount,
+                'grand_total' => $this->grand_total,
                 'paid' => $this->paid_amount,
                 'due' => $this->due_amount,
             ]);
 
             foreach ($this->stockMedicines as $medicine) {
-                StockList::create([
+                SalesMedicine::create([
+                    'invoice_id' => $invoice->id,
                     'medicine_id' => $medicine['medicine_id'],
-                    'stock_invoice_id' => $stockInvoice->id,
-                    'batch_number' => $medicine['batch'],
-                    'expiry_date' => $medicine['expiry_date'],
                     'initial_quantity' => $medicine['quantity'],
                     'quantity' => $medicine['quantity'],
                     'price' => $medicine['price'],
+                    'vat' => $medicine['vat'],
                     'total' => $medicine['total'],
                 ]);
 
                 $medicineQuantity = Medicine::find($medicine['medicine_id']);
-                $medicineQuantity->quantity += $medicine['quantity'];
+                $medicineQuantity->quantity -= $medicine['quantity'];
                 $medicineQuantity->save();
+
+                $stockList = StockList::where('medicine_id', $medicine['medicine_id'])->where('quantity', '>=', $medicine['quantity'])->orderBy('expiry_date', 'asc')->first();
+                if ($stockList) {
+                    $stockList->quantity -= $medicine['quantity'];
+                    $stockList->save();
+                }
             }
 
             DB::commit();

@@ -13,7 +13,6 @@ return new class extends Migration
     {
         Schema::create('target_reports', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('team_id');
             $table->foreignId('user_id');
             $table->string('role')->nullable();
             $table->foreignId('manager')->nullable()->constrained('users')->nullOnDelete()->cascadeOnUpdate()->comment('user id who has manager role');
@@ -26,8 +25,6 @@ return new class extends Migration
             $table->boolean('sales_target_achieve')->nullable();
             $table->string('target_month');
             $table->timestamps();
-
-            $table->unique(['team_id', 'user_id']);
         });
     }
 

@@ -19,13 +19,13 @@ return new class extends Migration
             $table->timestamp('expiry_date')->nullable();
             $table->integer('initial_quantity')->default(1)->comment('medicine initial quantity which is on stock invoice');
             $table->integer('quantity')->default(1);
-            $table->decimal('price', 11, 3)->default(0.00);
-            $table->decimal('buy_price', 11, 3)->default(0.00);
-            $table->decimal('vat', 11, 3)->default(0.00);
-            $table->decimal('total', 11, 3)->default(0.00);
-            $table->decimal('discount', 11, 3)->default(0.00);
+            $table->decimal('price', 11, 2)->default(0.00);
+            $table->decimal('buy_price', 11, 2)->default(0.00);
+            $table->decimal('vat', 11, 2)->default(0.00);
+            $table->decimal('total', 11, 2)->default(0.00);
+            $table->decimal('discount', 11, 2)->default(0.00);
             $table->enum('dis_type', ['percentage', 'fixed'])->default('percentage')->nullable();
-            $table->decimal('dis_amount', 11, 3)->default(0.00)->nullable();
+            $table->decimal('dis_amount', 11, 2)->default(0.00)->nullable();
             $table->timestamps();
         });
     }

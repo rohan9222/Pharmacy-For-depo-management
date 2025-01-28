@@ -11,10 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('field_officer_teams', function (Blueprint $table) {
+        Schema::create('discount_values', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('sales_manager_team_id')->index()->nullOnDelete()->cascadeOnUpdate()->comment('user id who has manager role');
-            $table->foreignId('user_id')->constrained()->cascadeOnDelete()->cascadeOnUpdate()->comment('user id who has field officer role');
+            $table->string('amount');
+            $table->string('discount');
             $table->timestamps();
         });
     }
@@ -24,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('field_officer_teams');
+        Schema::dropIfExists('discount_values');
     }
 };

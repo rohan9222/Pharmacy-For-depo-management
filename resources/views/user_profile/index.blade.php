@@ -30,7 +30,7 @@
                             <div class="card">
                               <div class="card-body profile-card pt-4 d-flex flex-column align-items-center">
 
-                                <img src="{{ $imageUrl }}" style="max-width: 10rem; min-width: 10rem;" alt="Profile Image" class="profileImagePreview rounded-circle">
+                                <img src="" style="max-width: 10rem; min-width: 10rem;" alt="Profile Image" class="profileImagePreview rounded-circle">
 
                                 <h3>{{ $user->name }}</h3>
                                 @if($user->roles->isNotEmpty())
@@ -115,7 +115,7 @@
                                         <div class="row mb-3">
                                             <label for="" class="col-md-4 col-lg-3 col-form-label">Profile Image</label>
                                             <div class="col-md-8 col-lg-9">
-                                                <img  class="profileImagePreview img-thumbnail" src="{{ $imageUrl }}" style="max-width: 5rem; min-width: 4rem;" alt="Profile">
+                                                <img  class="profileImagePreview img-thumbnail" src="" style="max-width: 5rem; min-width: 4rem;" alt="Profile">
                                                 <div class="pt-2">
                                                     <label for="image" class="btn btn-primary btn-sm">
                                                         <i class="fa-solid fa-upload"></i>
@@ -134,14 +134,6 @@
                                             <div class="col-md-8 col-lg-9">
                                                 <input name="name" type="text" class="form-control" id="name" value="{{ $user->name }}">
                                                 <span class="text-danger">{{ $errors->first('name') }}</span>
-                                            </div>
-                                        </div>
-
-                                        <div class="row mb-3">
-                                            <label for="rank" class="col-md-4 col-lg-3 col-form-label">Rank</label>
-                                            <div class="col-md-8 col-lg-9">
-                                                <input name="rank" type="text" class="form-control" id="rank" value="{{ $user->rank }}">
-                                                <span class="text-danger">{{ $errors->first('rank') }}</span>
                                             </div>
                                         </div>
 

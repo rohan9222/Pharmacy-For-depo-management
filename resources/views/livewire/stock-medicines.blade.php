@@ -52,7 +52,7 @@
                                                 <img class="w-100 h-100 img-fluid img-thumbnail" src="{{ asset($medicine->image_url ?? 'img/medicine-logo.png') }}" alt="">
                                             </span>
                                             <span class="lh-sm fw-medium text-nowrap" title="{{ $medicine->name }}">
-                                                <span class="text-uppercase fw-bold">{{ $medicine->name }} (<span style="color: rgb(177, 55, 181)">{{ $medicine->price }} ৳</span>)</span>
+                                                <span class="text-uppercase fw-bold">{{ $medicine->name }} (<span style="color: rgb(177, 55, 181)">{{ $medicine->supplier_price }} ৳</span>)</span>
                                                 <span class="d-block text-muted" style="font-size: 13px;">Generic name: {{ $medicine->generic_name }}</span>
                                                 <span class="d-block text-muted" style="font-size: 13px;">Manufacturers: {{$medicine->supplier}}</span>
                                             </span>
@@ -78,7 +78,7 @@
                         <th>Batch</th>
                         <th>Expiry Date</th>
                         <th>Quantity</th>
-                        <th>MRP/Selling Price</th>
+                        <th>MRP/Buying Price</th>
                         <th>Total</th>
                         <th>Action</th>
                     </tr>
@@ -105,8 +105,8 @@
                                 @error("stockMedicines.{$index}.quantity") <span class="text-danger">{{ $message }}</span> @enderror
                             </td>
                             <td>
-                                <input type="text" class="form-control" wire:model.live.debounce.1000ms="stockMedicines.{{ $index }}.price" >
-                                @error("stockMedicines.{$index}.price") <span class="text-danger">{{ $message }}</span> @enderror
+                                <input type="text" class="form-control" wire:model.live.debounce.1000ms="stockMedicines.{{ $index }}.buy_price" >
+                                @error("stockMedicines.{$index}.buy_price") <span class="text-danger">{{ $message }}</span> @enderror
                             </td>
                             <td><input type="text" class="form-control" wire:model.live.debounce.1000ms="stockMedicines.{{ $index }}.total" readonly></td>
                             <td><button type="button" class="btn btn-sm btn-outline-danger" wire:click="removeMedicine({{ $index }})"><i class="bi bi-x"></i></button></td>
