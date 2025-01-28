@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Models\Medicine;
 use App\Models\Category;
 use App\Models\Supplier;
+use App\Models\SiteSetting;
 
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -17,12 +18,12 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        User::factory(20)->withPersonalTeam()->create();
+        // User::factory(20)->withPersonalTeam()->create();
 
-        User::factory()->withPersonalTeam()->create([
-            'name' => 'Test User',
-            'email' => 'test@gmail.com',
-        ]);
+        // User::factory()->withPersonalTeam()->create([
+        //     'name' => 'Test User',
+        //     'email' => 'test@gmail.com',
+        // ]);
 
         $this->call([
             // PersonnelInfosSeeder::class,
@@ -41,6 +42,11 @@ class DatabaseSeeder extends Seeder
 
         Category::create([
             'name' => 'ACME',
+        ]);
+
+        SiteSetting::create([
+            'site_name' => 'IMPEXPHARMABD',
+            'site_title' => 'IMPEXPHARMABD',
         ]);
 
         Medicine::insert([

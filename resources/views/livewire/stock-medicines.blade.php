@@ -52,7 +52,7 @@
                                                 <img class="w-100 h-100 img-fluid img-thumbnail" src="{{ asset($medicine->image_url ?? 'img/medicine-logo.png') }}" alt="">
                                             </span>
                                             <span class="lh-sm fw-medium text-nowrap" title="{{ $medicine->name }}">
-                                                <span class="text-uppercase fw-bold">{{ $medicine->name }} (<span style="color: rgb(177, 55, 181)">{{ $medicine->price }} ৳</span>)</span>
+                                                <span class="text-uppercase fw-bold">{{ $medicine->name }} (<span style="color: rgb(177, 55, 181)">{{ $medicine->supplier_price }} ৳</span>)</span>
                                                 <span class="d-block text-muted" style="font-size: 13px;">Generic name: {{ $medicine->generic_name }}</span>
                                                 <span class="d-block text-muted" style="font-size: 13px;">Manufacturers: {{$medicine->supplier}}</span>
                                             </span>

@@ -133,65 +133,67 @@
                 </div>
             @endif
 
-            <div class="row mt-3">
-                <div class="row justify-content-end mb-1">
-                    <div class="col-3">
-                        <input id="search" class="form-control" type="search" wire:model.live="search" placeholder="Search By Name" aria-label="Search By Name">
+            @can('view-medicine')
+                <div class="row mt-3">
+                    <div class="row justify-content-end mb-1">
+                        <div class="col-3">
+                            <input id="search" class="form-control" type="search" wire:model.live="search" placeholder="Search By Name" aria-label="Search By Name">
+                        </div>
                     </div>
-                </div>
-                <table class="table table-bordered table-sm table-responsive">
-                    <thead>
-                        <tr>
-                            <th>SN</th>
-                            <th>Image</th>
-                            <th>Bar Code</th>
-                            <th>Medicine Name</th>
-                            <th>Generic Name</th>
-                            <th>Description</th>
-                            <th>Shelf No</th>
-                            <th>Category Name</th>
-                            <th>Supplier Name</th>
-                            <th>Supplier Price</th>
-                            <th>Price</th>
-                            <th>Quantity</th>
-                            <th>Status</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach ($medicines as $medicine)
+                    <table class="table table-bordered table-sm table-responsive">
+                        <thead>
                             <tr>
-                                <td>{{ $loop->iteration }}</td>
-                                <td><img src="{{ url($medicine->image_url ?? url('img/medicine-logo.png')) }}" alt="{{ $medicine->name }}" class="img-fluid img-thumbnail" style="max-width: 100px; max-height: 100px;" title="{{ $medicine->name }}"></td>
-                                <td class="text-center">{!! $medicine->barcode_html !!} <br> {{ $medicine->barcode }}</td>
-                                <td>{{ $medicine->name }}</td>
-                                <td>{{ $medicine->generic_name }}</td>
-                                <td>{{ $medicine->description }}</td>
-                                <td>{{ $medicine->shelf }}</td>
-                                <td>{{ $medicine->category_name }}</td>
-                                <td>{{ $medicine->supplier }}</td>
-                                <td>{{ $medicine->supplier_price }}</td>
-                                <td>{{ $medicine->price }}</td>
-                                <td>{{ $medicine->quantity }}</td>
-                                <td>{{ ($medicine->deleted_at != null) ? 'Deleted' : (($medicine->status == 'active') ? 'Active' : 'Inactive') }}</td>
-                                <td>
-                                    @can('edit-medicine')
-                                        <button class="btn btn-sm btn-info" wire:click="edit({{ $medicine->id }})" @click="isOpen = true"><i class="bi bi-pencil-square"></i></button>
-                                    @endcan
-
-                                    @can('delete-medicine')
-                                        <button class="btn btn-sm btn-danger" wire:click="delete({{ $medicine->id }})"><i class="bi bi-trash"></i></button>
-                                    @endcan
-                                </td>
+                                <th>SN</th>
+                                <th>Image</th>
+                                <th>Bar Code</th>
+                                <th>Medicine Name</th>
+                                <th>Generic Name</th>
+                                <th>Description</th>
+                                <th>Shelf No</th>
+                                <th>Category Name</th>
+                                <th>Supplier Name</th>
+                                <th>Supplier Price</th>
+                                <th>Price</th>
+                                <th>Quantity</th>
+                                <th>Status</th>
+                                <th>Action</th>
                             </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            </div>
+                        </thead>
+                        <tbody>
+                            @foreach ($medicines as $medicine)
+                                <tr>
+                                    <td>{{ $loop->iteration }}</td>
+                                    <td><img src="{{ url($medicine->image_url ?? url('img/medicine-logo.png')) }}" alt="{{ $medicine->name }}" class="img-fluid img-thumbnail" style="max-width: 100px; max-height: 100px;" title="{{ $medicine->name }}"></td>
+                                    <td class="text-center">{!! $medicine->barcode_html !!} <br> {{ $medicine->barcode }}</td>
+                                    <td>{{ $medicine->name }}</td>
+                                    <td>{{ $medicine->generic_name }}</td>
+                                    <td>{{ $medicine->description }}</td>
+                                    <td>{{ $medicine->shelf }}</td>
+                                    <td>{{ $medicine->category_name }}</td>
+                                    <td>{{ $medicine->supplier }}</td>
+                                    <td>{{ $medicine->supplier_price }}</td>
+                                    <td>{{ $medicine->price }}</td>
+                                    <td>{{ $medicine->quantity }}</td>
+                                    <td>{{ ($medicine->deleted_at != null) ? 'Deleted' : (($medicine->status == '1') ? 'Available' : 'Not Available') }}</td>
+                                    <td>
+                                        @can('edit-medicine')
+                                            <button class="btn btn-sm btn-info" wire:click="edit({{ $medicine->id }})" @click="isOpen = true"><i class="bi bi-pencil-square"></i></button>
+                                        @endcan
 
-            <div class="pagination">
-                {{ $medicines->links() }}
-            </div>
+                                        @can('delete-medicine')
+                                            <button class="btn btn-sm btn-danger" wire:click="delete({{ $medicine->id }})"><i class="bi bi-trash"></i></button>
+                                        @endcan
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="pagination">
+                    {{ $medicines->links() }}
+                </div>
+            @endcan
         </div>
     </div>
 </div>

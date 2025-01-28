@@ -49,10 +49,10 @@
                     <input type="date" class="form-control" wire:model.live.debounce.1000ms="invoice_date">
                     @error('invoice_date') <span class="text-danger">{{ $message }}</span> @enderror
                 </div>
-                <div class="col-4">
+                {{-- <div class="col-4">
                     <label for="invoice_no" class="form-label">Invoice No</label>
                     <input type="text" class="form-control" wire:model.live.debounce.1000ms="invoice_no" readonly>
-                </div>
+                </div> --}}
                 <div class="col-4">
                     <label for="customer" class="form-label">Customer</label>
                     <div class="input-group mb-3">

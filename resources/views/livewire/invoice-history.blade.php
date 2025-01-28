@@ -38,8 +38,15 @@
                                             <td>{{ $invoice->paid }}</td>
                                             <td>{{ $invoice->due }}</td>
                                             <td>
-                                                @can('edit-customer')
-                                                    <button class="btn btn-sm btn-info" wire:click="invoiceView({{ $invoice->id }})" @click="isTableData = false, isInvoiceData = true">view invoice</button>
+                                                @can('invoice')
+                                                    <button class="btn btn-sm btn-success" wire:click="invoiceView({{ $invoice->id }})" @click="isTableData = false, isInvoiceData = true">
+                                                        <i class="bi bi-eye"></i>
+                                                    </button>
+                                                @endcan
+                                                @can('return-medicine')
+                                                    <button class="btn btn-sm btn-warning" wire:click="returnMedicine({{ $invoice->id }})">
+                                                        <i class="bi bi-arrow-counterclockwise"></i>
+                                                    </button>
                                                 @endcan
                                             </td>
                                         </tr>

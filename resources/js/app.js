@@ -6,6 +6,8 @@ window.$ = window.jQuery = jquery;
 
 import ApexCharts from 'apexcharts'
 window.ApexCharts = ApexCharts
+import ApexTree from 'apextree'
+window.ApexTree = ApexTree
 
 import JSZip from 'jszip';
 window.JSZip = JSZip;

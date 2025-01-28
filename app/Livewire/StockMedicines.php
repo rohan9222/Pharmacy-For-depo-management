@@ -47,7 +47,7 @@ class StockMedicines extends Component
     {
         if ($this->medicine_list) {
             // Fetch filtered medicines based on search term
-            $this->medicines = Medicine::where('medicine_name', 'like', '%' . $this->medicine_list . '%')
+            $this->medicines = Medicine::where('name', 'like', '%' . $this->medicine_list . '%')
                 ->take(10)
                 ->get();
         } else {
@@ -97,8 +97,8 @@ class StockMedicines extends Component
                 'medicine_name' => $medicine->name,
                 'batch' => '',
                 'expiry_date' => '',
-                'quantity' => 0,
-                'buy_price' => $medicine->price,
+                'quantity' => 1,
+                'buy_price' => $medicine->supplier_price,
                 'total' => 0.00,
             ];
         }

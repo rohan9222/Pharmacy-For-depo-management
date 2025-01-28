@@ -11,10 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('manager_teams', function (Blueprint $table) {
+        Schema::create('pack_sizes', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('team_id')->nullOnDelete()->cascadeOnUpdate()->index()->comment('user id who has manager role');
-            $table->foreignId('user_id')->index()->nullOnDelete()->cascadeOnUpdate()->comment('user id who has Sales manager role');
+            $table->string('pack_name')->unique();
+            $table->string('pack_size');
+            $table->string('pack_description')->nullable();
             $table->timestamps();
         });
     }
@@ -24,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('manager_teams');
+        Schema::dropIfExists('pack_sizes');
     }
 };

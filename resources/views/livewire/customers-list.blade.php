@@ -58,6 +58,10 @@
                                             </select>
                                             @error('field_officer_team') <span class="text-danger">{{ $message }}</span> @enderror
                                         </div>
+                                        <div class="col-3">
+                                            <input type="text" class="form-control" id="route" wire:model="route" placeholder="Route" aria-label="Route">
+                                            @error('route') <span class="text-danger">{{ $message }}</span> @enderror
+                                        </div>
                                     </div>
                                     <button class="btn btn-primary mt-2" type="submit">Submit</button>
                                 </form>
@@ -83,6 +87,7 @@
                             {{-- <th>Balance</th> --}}
                             <th>Address</th>
                             <th>Field Officer</th>
+                            <th>Route</th>
                             <th>Action</th>
                         </tr>
                     </thead>
@@ -96,7 +101,11 @@
                                 {{-- <td>{{ $customer->balance }}</td> --}}
                                 <td>{{ $customer->address }}</td>
                                 <td>{{ $customer->fieldOfficer->name ?? 'N/A' }}</td>
+                                <td>{{ $customer->route ?? 'N/A' }}</td>
                                 <td>
+                                    @can('view-customer')
+                                        <button class="btn btn-sm btn-primary" ><i class="bi bi-eye"></i></button>
+                                    @endcan
                                     @can('edit-customer')
                                         <button class="btn btn-sm btn-info" wire:click="edit({{ $customer->id }})" @click="isOpen = true"><i class="bi bi-pencil-square"></i></button>
                                     @endcan

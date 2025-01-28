@@ -21,7 +21,7 @@ class Invoice extends Model
         'spl_dis_type',
         'spl_dis_amount',
         'grand_total',
-        'pain',
+        'paid',
         'due'
     ];
 
@@ -59,5 +59,5 @@ class Invoice extends Model
     {
         return $this->belongsTo(Supplier::class);
     }
-    
+
 }

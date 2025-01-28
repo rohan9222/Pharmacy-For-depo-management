@@ -6,6 +6,7 @@ use App\Models\Medicine;
 use App\Models\Invoice;
 use App\Models\StockList;
 use App\Models\SalesMedicine;
+use App\Models\SiteSetting;
 use App\Models\user;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -19,7 +20,7 @@ class SalesInvoice extends Component
 {
     use WithPagination, WithoutUrlPagination;
 
-    public $search, $medicines, $customers, $invoice_no, $invoice_date, $customer;
+    public $search, $medicines, $customers, $invoice_date, $customer;
     public $highlightedIndex = 0;
     public $stockMedicines = []; // Medicine stock data
     public $sub_total = 0;
@@ -38,10 +39,6 @@ class SalesInvoice extends Component
             $customers = $customers->where('field_officer_id', auth()->user()->id);
         }
         $this->customers = $customers->get();
-        $latestInvoiceNo = Invoice::orderByDesc('id')->value('invoice_no');
-        $nextNumber = ($latestInvoiceNo) ? ((int) filter_var($latestInvoiceNo, FILTER_SANITIZE_NUMBER_INT) + 1) : 1000;
-        $this->invoice_no = "INV" . $nextNumber;
-
         $this->medicines = Medicine::search($this->search)->get();
         return view('livewire.sales-invoice')->layout('layouts.app');
     }
@@ -227,9 +224,12 @@ class SalesInvoice extends Component
 
         try {
             $userRoles = User::where('id', $this->customer)->first();
+
+            $latestInvoiceNo = Invoice::orderByDesc('id')->value('invoice_no');
+            $invoice_no = ($latestInvoiceNo) ? ((int) filter_var($latestInvoiceNo, FILTER_SANITIZE_NUMBER_INT) + 1) : 1000;
             // Save logic for invoice and related medicines
             $invoice = Invoice::create([
-                'invoice_no' => $this->invoice_no,
+                'invoice_no' => $invoice_no,
                 'invoice_date' => $this->invoice_date,
                 'customer' => $this->customer,
                 'field_officer' => $userRoles->field_officer_id,

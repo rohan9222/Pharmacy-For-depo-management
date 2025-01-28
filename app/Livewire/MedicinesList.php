@@ -26,7 +26,7 @@ class MedicinesList extends Component
 {
     use WithFileUploads, WithPagination, WithoutUrlPagination;
 
-    public $medicineId, $categoryLists, $suppliers, $barcode, $name, $generic_name, $supplier_name, $shelf, $description, $category_name, $search, $supplier_price, $price,  $image_url;
+    public $categoryLists, $suppliers, $barcode, $name, $generic_name, $supplier_name, $shelf, $description, $category_name, $search, $supplier_price, $price, $image_url;
     public $vat = 17.4;
     public  $status = 1;
 
@@ -35,7 +35,7 @@ class MedicinesList extends Component
         if(auth()->user()->hasRole('Super Admin')) {
             return true;
         }
-        if (!auth()->user()->hasAnyPermission(['create-medicine', 'edit-medicine', 'delete-medicine','create-medicine-stock', 'edit-medicine-stock', 'delete-medicine-stock']) || auth()->user()->hasRole('Super Admin')) {
+        if (!auth()->user()->hasAnyPermission(['create-medicine', 'edit-medicine', 'delete-medicine','view-medicine','create-medicine-stock', 'edit-medicine-stock', 'delete-medicine-stock']) || auth()->user()->hasRole('Super Admin')) {
             abort(403, 'Unauthorized action.');
         }
         return true;
@@ -106,6 +106,7 @@ class MedicinesList extends Component
                 // save modified image in new format
                 $image->save(public_path("$path"));
             }
+
             $newmedicine = Medicine::updateOrCreate(
                 ['id' => $this->medicineId],
                 [

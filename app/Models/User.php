@@ -35,12 +35,15 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $fillable = [
+        'user_id',
         'name',
         'email',
         'mobile',
         'address',
         'balance',
         'role',
+        'route',
+        'category',
         'password',
         'product_target',
         'sales_target',
@@ -107,6 +110,13 @@ class User extends Authenticatable
     public function fieldOfficer()
     {
         return $this->belongsTo(User::class, 'field_officer_id');
+    }
+
+    public function customers()
+    {
+        return $this->hasMany(User::class, 'manager_id')
+            ->orWhere('sales_manager_id', $this->id)
+            ->orWhere('field_officer_id', $this->id);
     }
 
 }

@@ -13,12 +13,15 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
+            $table->string('user_id')->unique();
             $table->string('name');
             $table->string('email')->unique();
             $table->string('mobile')->nullable();
             $table->string('address')->nullable();
             $table->decimal('balance', 11, 2)->default('0.00')->nullable();
             $table->string('role')->default('user');
+            $table->string('route')->nullable();
+            $table->string('category')->nullable();
 
             $table->foreignId('manager_id')->nullable()->constrained('users')->nullOnDelete()->cascadeOnUpdate()->comment('user id who has manager role');
             $table->foreignId('sales_manager_id')->nullable()->constrained('users')->nullOnDelete()->cascadeOnUpdate()->comment('user id who has sales manager role');

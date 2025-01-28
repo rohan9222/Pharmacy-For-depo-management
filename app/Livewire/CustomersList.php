@@ -13,7 +13,7 @@ use Livewire\Component;
 class CustomersList extends Component
 {
     use WithPagination, WithoutUrlPagination;
-    
+
     public $customerId, $name, $email, $mobile, $address, $balance, $supplier_type, $search, $field_officers, $field_officer_team;
 
     public function mount()
@@ -29,7 +29,15 @@ class CustomersList extends Component
 
     public function render()
     {
-        $this->field_officers = User::select('id', 'name')->role('Field Officer')->get(); // Pre-fetch Field Officers
+        $field_officers = User::select('id', 'name')->role('Field Officer');
+        if (auth()->user()->hasRole('Manager')) {
+            $field_officers = $field_officers->where('manager_id', auth()->user()->id);
+        } elseif (auth()->user()->hasRole('Sales Manager')) {
+            $field_officers = $field_officers->where('sales_manager_id', auth()->user()->id);
+        } elseif (auth()->user()->hasRole('Field Officer')) {
+            $field_officers = $field_officers->where('id', auth()->user()->id);
+        }
+        $this->field_officers = $field_officers->get();
         $customers = User::search($this->search)->with('fieldOfficer')->where('role', 'Customer')->paginate(10);
 
         return view('livewire.customers-list', ['customers' => $customers])->layout('layouts.app');
@@ -66,9 +74,13 @@ class CustomersList extends Component
     {
         $this->validate($this->role());
         try {
+
+            $latestInvoiceNo = user::orderByDesc('user_id')->value('user_id');
+            $user_id = ($latestInvoiceNo) ? ((int) filter_var($latestInvoiceNo, FILTER_SANITIZE_NUMBER_INT) + 1) : 010500;
             $newCustomer = User::updateOrCreate(
                 ['id' => $this->customerId],
                 [
+                    'user_id' => $user_id,
                     'name' => $this->name,
                     'email' => $this->email,
                     'password' => Hash::make($this->email.$this->mobile.$this->name),

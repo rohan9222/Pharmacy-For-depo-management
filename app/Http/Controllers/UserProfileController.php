@@ -34,16 +34,16 @@ class UserProfileController extends Controller
     public function index()
     {
         $user = auth()->user(); // Fetch user details
-        $imagePath = 'images/' . $user->id . '.gif';
-        $imageUrl = Storage::disk('public')->exists($imagePath)
-            ? Storage::url($imagePath)
-            : Storage::url('images/demo.gif');
+        // $imagePath = 'images/' . $user->id . '.gif';
+        // $imageUrl = Storage::disk('public')->exists($imagePath)
+        //     ? Storage::url($imagePath)
+        //     : Storage::url('images/demo.gif');
 
         $user = User::with('roles')->findOrFail($user->id); // Fetch user with roles
         $roles = Role::all(); // Fetch all available roles
         $permissions = Permission::all(); // Fetch all available permissions
 
-        return view('user_profile.index', compact('user', 'imageUrl', 'roles', 'permissions'));
+        return view('user_profile.index', compact('user', 'roles', 'permissions'));
     }
 
     public function uploadFile(Request $request)
@@ -75,14 +75,12 @@ class UserProfileController extends Controller
             'name' => 'required|min:3|max:255',
             'email' => 'required|email',
             'mobile' => 'required',
-            'rank' => 'required',
         ]);
 
         $user = auth()->user();
         $user->name = $request->name;
         $user->email = $request->email;
         $user->mobile = $request->mobile;
-        $user->rank = $request->rank;
         $user->save();
 
         return redirect()->back()->withSuccess('Updated Successfully');

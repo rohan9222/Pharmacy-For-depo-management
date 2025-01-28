@@ -24,24 +24,30 @@
 
             <div class="collapse" id="supporter-collapse">
                 <ul class="ms-4 btn-toggle-nav list-unstyled fw-normal pb-1 small">
-                    <li>
-                        <a href="{{ route('customers') }}" class="nav-link link-body-emphasis {{ request()->routeIs('customers') ? 'active' : '' }}">
-                            <i class="bi bi-caret-right-fill me-2"></i>
-                            <span class="sidebar-text">Customers</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{{ route('suppliers') }}" class="nav-list nav-link link-body-emphasis {{ request()->routeIs('suppliers') ? 'active' : '' }}">
-                            <i class="bi bi-caret-right-fill me-2"></i>
-                            <span class="sidebar-text">Suppliers/Manufacturer</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{{ route('delivery-man') }}" class="nav-link link-body-emphasis {{ request()->routeIs('delivery-man') ? 'active' : '' }}">
-                            <i class="bi bi-caret-right-fill me-2"></i>
-                            <span class="sidebar-text">Delivery Man</span>
-                        </a>
-                    </li>
+                    @canany(['create-customer', 'edit-customer'])
+                        <li>
+                            <a href="{{ route('customers') }}" class="nav-link link-body-emphasis {{ request()->routeIs('customers') ? 'active' : '' }}">
+                                <i class="bi bi-caret-right-fill me-2"></i>
+                                <span class="sidebar-text">Customers</span>
+                            </a>
+                        </li>
+                    @endcanany
+                    @canany(['create-supplier', 'edit-supplier'])
+                        <li>
+                            <a href="{{ route('suppliers') }}" class="nav-list nav-link link-body-emphasis {{ request()->routeIs('suppliers') ? 'active' : '' }}">
+                                <i class="bi bi-caret-right-fill me-2"></i>
+                                <span class="sidebar-text">Suppliers/Manufacturer</span>
+                            </a>
+                        </li>
+                    @endcanany
+                    @canany(['create-delivery-man', 'edit-delivery-man'])
+                        <li>
+                            <a href="{{ route('delivery-man') }}" class="nav-link link-body-emphasis {{ request()->routeIs('delivery-man') ? 'active' : '' }}">
+                                <i class="bi bi-caret-right-fill me-2"></i>
+                                <span class="sidebar-text">Delivery Man</span>
+                            </a>
+                        </li>
+                    @endcanany
                 </ul>
             </div>
         </li>
@@ -56,18 +62,29 @@
 
             <div class="collapse" id="medicines-collapse">
                 <ul class="ms-4 btn-toggle-nav list-unstyled fw-normal pb-1 small">
-                    <li class="nav-item">
-                        <a href="{{ route('categories') }}" class="nav-link link-body-emphasis {{ request()->routeIs('categories') ? 'active' : '' }}">
-                            <i class="bi bi-caret-right-fill me-2"></i>
-                            <span class="sidebar-text">Categories</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="{{ route('medicines') }}" class="nav-link link-body-emphasis {{ request()->routeIs('medicines') ? 'active' : '' }}">
-                            <i class="bi bi-caret-right-fill me-2"></i>
-                            <span class="sidebar-text">Medicine List</span>
-                        </a>
-                    </li>
+                    @canany(['create-category', 'edit-category'])
+                        <li class="nav-item">
+                            <a href="{{ route('categories') }}" class="nav-link link-body-emphasis {{ request()->routeIs('categories') ? 'active' : '' }}">
+                                <i class="bi bi-caret-right-fill me-2"></i>
+                                <span class="sidebar-text">Categories</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('pack-size') }}" class="nav-link link-body-emphasis {{ request()->routeIs('pack-size') ? 'active' : '' }}">
+                                <i class="bi bi-caret-right-fill me-2"></i>
+                                <span class="sidebar-text">Pack Size</span>
+                            </a>
+                        </li>
+
+                    @endcanany
+                    @canany(['create-medicine', 'edit-medicine', 'view-medicine'])
+                        <li class="nav-item">
+                            <a href="{{ route('medicines') }}" class="nav-link link-body-emphasis {{ request()->routeIs('medicines') ? 'active' : '' }}">
+                                <i class="bi bi-caret-right-fill me-2"></i>
+                                <span class="sidebar-text">Medicine List</span>
+                            </a>
+                        </li>
+                    @endcanany
                 </ul>
             </div>
         </li>
@@ -82,18 +99,22 @@
 
             <div class="collapse" id="stock-medicines-collapse">
                 <ul class="ms-4 btn-toggle-nav list-unstyled fw-normal pb-1 small">
-                    <li class="nav-item">
-                        <a href="{{ route('stock-medicines') }}" class="nav-link link-body-emphasis {{ request()->routeIs('stock-medicines') ? 'active' : '' }}">
-                            <i class="bi bi-caret-right-fill me-2"></i>
-                            <span class="sidebar-text">Stock IN</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="{{ route('stock-medicines-list') }}" class="nav-link link-body-emphasis {{ request()->routeIs('stock-medicines-list') ? 'active' : '' }}">
-                            <i class="bi bi-caret-right-fill me-2"></i>
-                            <span class="sidebar-text">Stock List</span>
-                        </a>
-                    </li>
+                    @canany(['create-medicine-stock', 'edit-medicine-stock'])
+                        <li class="nav-item">
+                            <a href="{{ route('stock-medicines') }}" class="nav-link link-body-emphasis {{ request()->routeIs('stock-medicines') ? 'active' : '' }}">
+                                <i class="bi bi-caret-right-fill me-2"></i>
+                                <span class="sidebar-text">Stock IN</span>
+                            </a>
+                        </li>
+                    @endcanany
+                    @canany(['view-medicine-stock'])
+                        <li class="nav-item">
+                            <a href="{{ route('stock-medicines-list') }}" class="nav-link link-body-emphasis {{ request()->routeIs('stock-medicines-list') ? 'active' : '' }}">
+                                <i class="bi bi-caret-right-fill me-2"></i>
+                                <span class="sidebar-text">Stock List</span>
+                            </a>
+                        </li>
+                    @endcanany
                 </ul>
             </div>
         </li>
@@ -108,21 +129,35 @@
 
             <div class="collapse" id="pos-collapse">
                 <ul class="ms-4 btn-toggle-nav list-unstyled fw-normal pb-1 small">
-                    <li class="nav-item">
-                        <a href="{{ route('pos') }}" class="nav-link link-body-emphasis {{ request()->routeIs('pos') ? 'active' : '' }}">
-                            <i class="bi bi-caret-right-fill me-2"></i>
-                            <span class="sidebar-text">New Sales</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="{{ route('sales-medicines-list') }}" class="nav-link link-body-emphasis {{ request()->routeIs('sales-medicines-list') ? 'active' : '' }}">
-                            <i class="bi bi-caret-right-fill me-2"></i>
-                            <span class="sidebar-text">Sales List</span>
-                        </a>
-                    </li>
+                    @canany('invoice')
+                        <li class="nav-item">
+                            <a href="{{ route('pos') }}" class="nav-link link-body-emphasis {{ request()->routeIs('pos') ? 'active' : '' }}">
+                                <i class="bi bi-caret-right-fill me-2"></i>
+                                <span class="sidebar-text">New Sales</span>
+                            </a>
+                        </li>
+                    @endcanany
+
+                    @canany('view-invoice')
+                        <li class="nav-item">
+                            <a href="{{ route('sales-medicines-list') }}" class="nav-link link-body-emphasis {{ request()->routeIs('sales-medicines-list') ? 'active' : '' }}">
+                                <i class="bi bi-caret-right-fill me-2"></i>
+                                <span class="sidebar-text">Sales List</span>
+                            </a>
+                        </li>
+                    @endcanany
                 </ul>
             </div>
         </li>
+{{-- site-settings --}}
+        @if (Auth::user()->hasRole('Super Admin'))
+            <li class="nav-item">
+                <a href="{{ route('site-settings') }}" class="nav-link link-body-emphasis">
+                    <i class="bi bi-gear me-2"></i>
+                    <span class="sidebar-text">Site Settings</span>
+                </a>
+            </li>
+        @endif
 
         <li class="nav-item">
             <a href="#" class="nav-link link-body-emphasis">
