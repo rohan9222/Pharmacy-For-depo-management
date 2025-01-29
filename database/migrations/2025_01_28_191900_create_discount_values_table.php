@@ -13,7 +13,8 @@ return new class extends Migration
     {
         Schema::create('discount_values', function (Blueprint $table) {
             $table->id();
-            $table->string('amount');
+            $table->string('start_amount');
+            $table->string('end_amount');
             $table->string('discount');
             $table->timestamps();
         });

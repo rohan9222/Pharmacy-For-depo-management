@@ -62,6 +62,14 @@
                                             <input type="text" class="form-control" id="route" wire:model="route" placeholder="Route" aria-label="Route">
                                             @error('route') <span class="text-danger">{{ $message }}</span> @enderror
                                         </div>
+                                        <div class="col-3">
+                                            <select name="category" id="category" wire:model="category" class="form-control">
+                                                <option value="">Select Category</option>
+                                                <option value="Institution">Institution</option>
+                                                <option value="CASH">CASH</option>
+                                            </select>
+                                            @error('category') <span class="text-danger">{{ $message }}</span> @enderror
+                                        </div>
                                     </div>
                                     <button class="btn btn-primary mt-2" type="submit">Submit</button>
                                 </form>
@@ -88,6 +96,7 @@
                             <th>Address</th>
                             <th>Field Officer</th>
                             <th>Route</th>
+                            <th>Category</th>
                             <th>Action</th>
                         </tr>
                     </thead>
@@ -102,6 +111,7 @@
                                 <td>{{ $customer->address }}</td>
                                 <td>{{ $customer->fieldOfficer->name ?? 'N/A' }}</td>
                                 <td>{{ $customer->route ?? 'N/A' }}</td>
+                                <td>{{ $customer->category ?? 'N/A' }}</td>
                                 <td>
                                     @can('view-customer')
                                         <button class="btn btn-sm btn-primary" ><i class="bi bi-eye"></i></button>

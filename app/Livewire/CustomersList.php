@@ -14,7 +14,7 @@ class CustomersList extends Component
 {
     use WithPagination, WithoutUrlPagination;
 
-    public $customerId, $name, $email, $mobile, $address, $balance, $supplier_type, $search, $field_officers, $field_officer_team;
+    public $customerId, $name, $email, $mobile, $address, $balance, $supplier_type, $route, $category, $search, $field_officers, $field_officer_team;
 
     public function mount()
     {
@@ -59,6 +59,8 @@ class CustomersList extends Component
             'mobile' => 'required|numeric|digits:11',
             'address' => 'required|string|max:255',
             'balance' => 'nullable|numeric',
+            'route' => 'required|string|max:255',
+            'category' => 'required|string|max:255',
             'field_officer_team' => ['required','exists:users,id',
                 function ($attribute, $value, $fail) {
                     $user = User::find($value); // Retrieve the user once to avoid multiple queries
@@ -75,7 +77,7 @@ class CustomersList extends Component
         $this->validate($this->role());
         try {
 
-            $latestInvoiceNo = user::orderByDesc('user_id')->value('user_id');
+            $latestInvoiceNo = User::orderByDesc('user_id')->value('user_id');
             $user_id = ($latestInvoiceNo) ? ((int) filter_var($latestInvoiceNo, FILTER_SANITIZE_NUMBER_INT) + 1) : 010500;
             $newCustomer = User::updateOrCreate(
                 ['id' => $this->customerId],
@@ -88,6 +90,8 @@ class CustomersList extends Component
                     'address' => $this->address,
                     'balance' => $this->balance ?? 0.00,
                     'role' => 'Customer',
+                    'route' => $this->route,
+                    'category' => $this->category,
                     'field_officer_id' => $this->field_officer_team,
                     'sales_manager_id' => User::where('id', $this->field_officer_team)->first()->sales_manager_id,
                     'manager_id' => User::where('id', $this->field_officer_team)->first()->manager_id,

@@ -75,7 +75,6 @@
                                 <span class="sidebar-text">Pack Size</span>
                             </a>
                         </li>
-
                     @endcanany
                     @canany(['create-medicine', 'edit-medicine', 'view-medicine'])
                         <li class="nav-item">

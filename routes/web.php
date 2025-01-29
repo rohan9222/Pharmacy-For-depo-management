@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\{DashboardController,UserProfileController};
 use App\Http\Controllers\Admin\{RoleController,UserController};
+use App\Http\Controllers\makepdf\MakepdfController;
 use App\Livewire\{CustomersList,DeliveryManList,SupplierList,MedicinesList,CategoryList, PackSizeList, StockMedicines,StockMedicinesList,SalesInvoice,InvoiceHistory,SiteSettings};
 
 
@@ -15,7 +16,6 @@ Route::middleware([
     config('jetstream.auth_session'),
     'verified',
 ])->group(function () {
-
 // Supporters management
     Route::get('/customers', CustomersList::class)->name('customers');
     Route::get('/delivery-man', DeliveryManList::class)->name('delivery-man');
@@ -46,6 +46,7 @@ Route::middleware([
     Route::post('/user/profile/upload', [UserProfileController::class, 'uploadFile'])->name('user.profile.upload');
     Route::get('/user/profile/update', [UserProfileController::class, 'update'])->name('user.profile.update');
     Route::get('/user/password/update', [UserProfileController::class, 'updatePassword'])->name('user.password.update');
+
 // user and role management
     Route::get('/users/sales-managers', [UserController::class, 'salesManagers'])->name('users.sales-managers');
     Route::resources([
@@ -53,4 +54,7 @@ Route::middleware([
         'roles' => RoleController::class,
         'users' => UserController::class,
     ]);
+
+// invoice
+    Route::get('/bio-data/handle-bio-data/{invoice}', [MakepdfController::class,'biolinkPDF']);
 });

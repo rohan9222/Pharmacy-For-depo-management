@@ -13,8 +13,8 @@
                                 <div class="row">
                                     <div class="col-md-6 col-12">
                                         <div class="mb-1">
-                                            <label class="form-label" for="first-name-column">Site Name</label>
-                                            <input type="text" id="first-name-column" class="form-control" placeholder="Name" wire:model='site_name' name="name">
+                                            <label class="form-label" for="site_name">Site Name</label>
+                                            <input type="text" id="site_name" class="form-control" placeholder="Name" wire:model='site_name' name="name">
                                             @error('site_name')
                                                 <span class="text-danger">{{ $message }}</span>
                                             @enderror
@@ -22,8 +22,8 @@
                                     </div>
                                     <div class="col-md-6 col-12">
                                         <div class="mb-1">
-                                            <label class="form-label" for="first-name-column">Site title</label>
-                                            <input type="text" id="first-name-column" class="form-control" placeholder="Site title" wire:model='site_title' name="site_title">
+                                            <label class="form-label" for="site_title">Site title</label>
+                                            <input type="text" id="site_title" class="form-control" placeholder="Site title" wire:model='site_title' name="site_title">
                                             @error('site_title')
                                                 <span class="text-danger">{{ $message }}</span>
                                             @enderror
@@ -49,8 +49,8 @@
                                     </div>
                                     <div class="col-md-6 col-12">
                                         <div class="mb-1">
-                                            <label class="form-label" for="first-name-column">Site Logo</label>
-                                            <input type="file" id="first-name-column" class="form-control" wire:model='site_logo' name="site_logo">
+                                            <label class="form-label" for="site_logo">Site Logo</label>
+                                            <input type="file" id="site_logo" class="form-control" wire:model='site_logo' name="site_logo">
                                             @error('site_logo')
                                                 <span class="text-danger">{{ $message }}</span>
                                             @enderror
@@ -68,8 +68,8 @@
                                     </div>
                                     <div class="col-md-6 col-12">
                                         <div class="mb-1">
-                                            <label class="form-label" for="first-name-column">Site Favicon</label>
-                                            <input type="file" id="first-name-column" class="form-control" wire:model='site_favicon' name="favicon">
+                                            <label class="form-label" for="favicon">Site Favicon</label>
+                                            <input type="file" id="favicon" class="form-control" wire:model='site_favicon' name="favicon">
                                             @error('site_favicon')
                                                 <span class="text-danger">{{ $message }}</span>
                                             @enderror
@@ -145,20 +145,72 @@
                         </div>
                     </div>
                 </div>
+
                 <div class="col-4">
                     <div class="card">
                         <div class="card-header">
-                            <table class="table table-striped table-bordered">
+                            <table class="table table-striped table-bordered" x-data="{ isOpen: false }">
                                 <thead>
-                                    <tr class="text-center"><th colspan="3"><h3>Bonuses for refills</h3></th><th><button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#addBonusModal">Add Bonus</button></th></tr>
+                                    <tr class="text-center"><th colspan="4"><h3>Bonuses for refills</h3></th></tr>
+                                    <tr class="text-start">
+                                        <th colspan="4">
+                                            <div class="p-1">
+                                                <!-- Toggle Button -->
+                                                <button
+                                                    @click="isOpen = !isOpen; if (!isOpen) { $wire.set('start_amount', ''); $wire.set('end_amount', ''); $wire.set('discount', ''); $wire.set('discountId', ''); }"
+                                                    class="btn btn-sm btn-primary"
+                                                    type="button">
+                                                    <span x-text="isOpen ? 'Hide This' : 'Add Discount'"></span>
+                                                </button>
+                                            </div>
+
+                                            <!-- Collapse Section -->
+                                            <div x-show="isOpen" x-transition x-cloak>
+                                                <div class="card card-body">
+                                                    <form wire:submit.prevent="addDiscountValue">
+                                                        <div class="row g-2">
+                                                            <div class="col-8">
+                                                                <div class="input-group mb-3">
+                                                                    <input class="form-control" type="text" id="start_amount" wire:model="start_amount" placeholder="Start Amount" aria-label="start_amount">
+                                                                    <span class="input-group-text">To</span>
+                                                                    <input class="form-control" type="text" id="end_amount" wire:model="end_amount" placeholder="End Amount" aria-label="end_amount">
+                                                                  </div>
+                                                                @error('start_amount') <span class="text-danger">{{ $message }}</span> @enderror
+                                                                @error('end_amount') <span class="text-danger">{{ $message }}</span> @enderror
+                                                            </div>
+                                                            <div class="col-4">
+                                                                <div class="input-group mb-3">
+                                                                    <input class="form-control" type="text" id="discount" wire:model="discount" placeholder="Discount" aria-label="discount">
+                                                                    <span class="input-group-text" id="basic-addon2">%</span>
+                                                                </div>
+                                                                @error('discount') <span class="text-danger">{{ $message }}</span> @enderror
+                                                            </div>
+                                                        </div>
+                                                        <button class="btn btn-primary mt-2" type="submit">Submit</button>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </th>
+                                    </tr>
                                     <tr>
                                         <th>Id</th>
                                         <th>Amount</th>
-                                        <th>Bonus Value</th>
+                                        <th>Discount Value</th>
                                         <th>Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
+                                    @foreach ($discount_values as $discount_value)
+                                        <tr class="text-center">
+                                            <td>{{ $loop->iteration }}</td>
+                                            <td>{{ $discount_value->start_amount }} - {{ $discount_value->end_amount }}</td>
+                                            <td>{{ $discount_value->discount }}</td>
+                                            <td>
+                                                <button class="btn btn-primary btn-sm" wire:click="editDiscountValue({{ $discount_value->id }})" @click="isOpen = true"><i class="bi bi-pencil-square"></i></button>
+                                                <button class="btn btn-danger btn-sm" wire:click="deleteDiscountValue({{ $discount_value->id }})"><i class="bi bi-trash"></i></button>
+                                            </td>
+                                        </tr>
+                                    @endforeach
                                 </tbody>
                             </table>
                         </div>
