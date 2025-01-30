@@ -56,5 +56,5 @@ Route::middleware([
     ]);
 
 // invoice
-    Route::get('/bio-data/handle-bio-data/{invoice}', [MakepdfController::class,'biolinkPDF']);
+    Route::get('/invoice/{invoice}', [MakepdfController::class,'invoicePDF'])->name('invoice');
 });

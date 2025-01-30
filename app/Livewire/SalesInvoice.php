@@ -7,6 +7,7 @@ use App\Models\Invoice;
 use App\Models\StockList;
 use App\Models\SalesMedicine;
 use App\Models\SiteSetting;
+use App\Models\DiscountValue;
 use App\Models\user;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -27,6 +28,9 @@ class SalesInvoice extends Component
     public $total = 0;
     public $vat = 0;
     public $spl_discount = 0;
+    public $spl_discount_amount = 0;
+    public $discount = 0;
+    public $discount_amount = 0;
     public $grand_total = 0;
     public $paid_amount = 0;
     public $due_amount = 0;
@@ -80,10 +84,21 @@ class SalesInvoice extends Component
 
         // Handle null values for spacial discount and paid amount safely, defaulting to 0
         $this->spl_discount = isset($this->spl_discount) && is_numeric($this->spl_discount) ? (float) $this->spl_discount : 0;
+        $this->spl_discount_amount = isset($this->spl_discount_amount) && is_numeric($this->spl_discount_amount) ? (float) $this->spl_discount_amount : 0;
+        $this->spl_discount_amount = round($this->spl_discount * $this->sub_total / 100, 2);
+
+        $disValue = DiscountValue::where('start_amount', '<=', $this->sub_total)->where('end_amount', '>=', $this->sub_total)->first();
+        $this->discount = $disValue ? $disValue->discount : 0;
+        $this->discount_amount = round($disValue ? $this->sub_total * $disValue->discount / 100 : 0 , 2);
+
+        // $this->discount = isset($this->discount) && is_numeric($this->discount) ? (float) $this->discount : 0;
+        // $this->discount_amount = isset($this->discount_amount) && is_numeric($this->discount_amount) ? (float) $this->discount_amount : 0;
+        // $this->discount_amount = $disValue ? $disValue->discount : 0;
+
         $this->paid_amount = isset($this->paid_amount) && is_numeric($this->paid_amount) ? (float) $this->paid_amount : 0;
 
         // Calculate grand total and due amount, rounded to 2 decimals and ensuring they aren't negative
-        $this->grand_total = round(max($this->total - $this->spl_discount, 0), 2);
+        $this->grand_total = round(max($this->total - ($this->spl_discount_amount + $this->discount_amount), 0), 2);
         $this->due_amount = round(max($this->grand_total - $this->paid_amount, 0), 2);
     }
 
@@ -237,9 +252,12 @@ class SalesInvoice extends Component
                 'manager' => $userRoles->manager_id,
                 'sub_total' => $this->sub_total,
                 'vat' => $this->vat,
+                'discount' => $this->discount,
+                'dis_type' => 'percentage',
+                'dis_amount' => $this->discount_amount,
                 'spl_discount' => $this->spl_discount,
-                'spl_dis_type' => 'fixed',
-                'spl_dis_amount' => $this->spl_discount,
+                'spl_dis_type' => 'percentage',
+                'spl_dis_amount' => $this->spl_discount_amount,
                 'grand_total' => $this->grand_total,
                 'paid' => $this->paid_amount,
                 'due' => $this->due_amount,
