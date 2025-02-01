@@ -149,7 +149,7 @@ class SiteSettings extends Component
                 'discount' => $this->discount,
             ]
         );
-        $this->start_amount = $this->end_amount = $this->discount = '';
+        $this->start_amount = $this->end_amount = $this->discount = $this->discountId = null;
         flash()->success('Discount value added successfully!');
     }
 

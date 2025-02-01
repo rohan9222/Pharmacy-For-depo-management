@@ -4,6 +4,9 @@ namespace App\Livewire;
 
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
+use App\Models\Invoice;
+use App\Models\PaymentHistory;
+use App\Models\SiteSetting;
 
 use Livewire\WithoutUrlPagination;
 use Livewire\WithPagination;
@@ -14,14 +17,19 @@ class CustomersList extends Component
 {
     use WithPagination, WithoutUrlPagination;
 
-    public $customerId, $name, $email, $mobile, $address, $balance, $supplier_type, $route, $category, $search, $field_officers, $field_officer_team;
+    public $site_settings, $customerId, $name, $email, $mobile, $address, $balance, $supplier_type, $route, $category, $search, $field_officers, $field_officer_team, $customerData, $invoices, $invoiceDue;
+    // public $invoices;
+    public $selectedInvoice;
+    public $amount;
 
+    // protected $listeners = ['openModal' => 'setInvoice'];
     public function mount()
     {
-        if(auth()->user()->hasRole('Super Admin')) {
+        if (auth()->user()->hasRole('Super Admin')) {
             return true;
         }
-        if (!auth()->user()->hasAnyPermission(['create-customer', 'edit-customer', 'delete-customer']) || auth()->user()->hasRole('Super Admin')) {
+
+        if (!auth()->user()->hasAnyPermission(['create-customer', 'edit-customer', 'delete-customer'])) {
             abort(403, 'Unauthorized action.');
         }
         return true;
@@ -39,6 +47,7 @@ class CustomersList extends Component
         }
         $this->field_officers = $field_officers->get();
         $customers = User::search($this->search)->with('fieldOfficer')->where('role', 'Customer')->paginate(10);
+        $this->site_settings = SiteSetting::first();
 
         return view('livewire.customers-list', ['customers' => $customers])->layout('layouts.app');
     }
@@ -116,6 +125,9 @@ class CustomersList extends Component
             $this->mobile = $customer->mobile;
             $this->address = $customer->address;
             $this->balance = $customer->balance;
+            $this->route = $customer->route;
+            $this->category = $customer->category;
+            $this->field_officer_team = $customer->field_officer_id;
         }else {
             flash()->error('Something went wrong!');
         }
@@ -131,4 +143,53 @@ class CustomersList extends Component
             flash()->error('Something went wrong!');
         }
     }
+
+    public function view($id = null){
+        $customerData = User::find($id);
+        $invoices = Invoice::where('customer_id', $customerData->id)->get();
+        $paymentHistory = PaymentHistory::whereIn('invoice_id', $invoices->pluck('id'))->get();
+        $customerData->total_buy = $invoices->sum('grand_total');
+        $customerData->total_due = $invoices->sum('due');
+        $customerData->total_invoice = $invoices->count();
+        $customerData->total_transaction = $paymentHistory->count();
+        $customerData->total_paid = $paymentHistory->sum('amount');
+
+        $this->customerData = $customerData;
+        $this->invoices = $invoices;
+    }
+
+    public function setInvoice($invoiceId, $customerId)
+    {
+        $this->view($customerId);
+        $this->selectedInvoice = Invoice::find($invoiceId);
+        $this->amount = '';
+    }
+
+    public function payDue()
+    {
+        $this->validate([
+            'amount' => 'required|numeric|min:1',
+        ]);
+
+        if ($this->selectedInvoice) {
+            $this->selectedInvoice->paid += $this->amount;
+            $this->selectedInvoice->due -= $this->amount;
+            $this->selectedInvoice->save();
+
+            PaymentHistory::create([
+                'invoice_id' => $this->selectedInvoice->id,
+                'amount' => $this->amount,
+                'date' => now()
+            ]);
+
+            $this->amount = '';
+
+            flash()->success('Amount paid successfully.');
+            // $this->dispatch('closeModal');
+
+        }else {
+            flash()->error('Something went wrong!');
+        }
+    }
+
 }

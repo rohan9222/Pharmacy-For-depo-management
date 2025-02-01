@@ -1,7 +1,6 @@
 <?php
 
 namespace App\Http\Controllers\makepdf;
-
 use App\Models\User;
 use App\Models\SiteSetting;
 use App\Models\Invoice;
@@ -9,6 +8,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Redirect,Response;
 use PDF;
+use Illuminate\Support\Number;
 
 class MakepdfController extends Controller
 {
@@ -18,25 +18,24 @@ class MakepdfController extends Controller
     * @return \Illuminate\Http\Response
     */
 
-
-    // personnel biolink pdf creator
     public function invoicePDF(Request $request){
-        $invoice_data = Invoice::where('invoice_no',$request->invoice)->first();
+        $invoice_data = Invoice::where('invoice_no', $request->invoice)
+            ->with('salesMedicines', 'customer', 'fieldOfficer', 'salesManager', 'manager')
+            ->first();
 
         $site_data = SiteSetting::first();
         $data = [
-            'date' => date('m/d/y'),
+            'date' => date('m/d/Y'), // Fixed date format
             'pdf_title' => $site_data->site_name,
             'pdf_logo' => url($site_data->site_logo),
-            'users' => $invoice_data,
-            'sitedata' => $site_data
+            'invoice_data' => $invoice_data,
+            'grand_total_words' =>  Number::spell($invoice_data->grand_total, locale: 'en'), // Corrected
+            'site_data' => $site_data
         ];
 
-
-        $pdf = PDF::loadview('make_pdf.invoice', $data);
-        // $pdf->setPaper('a4');
-        // $mpdf->WriteHTML('This copy is XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX');
-        // $stylesheet = file_get_contents('css/bootstrap.min.css');
-        return $pdf->stream($site_data->site_invoice_prefix.'-'.$$request->invoice.'('.date('m/D/y').').pdf');
+        $pdf = PDF::loadView('make_pdf.invoice', $data);
+        $pdf->setPaper('a4');
+        $pdf->AutoPrint(true);
+        return $pdf->stream($site_data->site_invoice_prefix . '-' . $request->invoice . '(' . date('m-d-Y') . ').pdf'); // Fixed string interpolation
     }
 }

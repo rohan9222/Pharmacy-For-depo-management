@@ -9,6 +9,7 @@ class SalesMedicine extends Model
     protected $fillable = [
         'invoice_id',
         'medicine_id',
+        'initial_quantity',
         'quantity',
         'price',
         'vat',

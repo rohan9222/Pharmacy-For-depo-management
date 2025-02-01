@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('payment_options', function (Blueprint $table) {
+        Schema::create('payment_histories', function (Blueprint $table) {
             $table->id();
             $table->foreignId('invoice_id')->constrained()->cascadeOnDelete()->cascadeOnUpdate();
             $table->foreignId('payment_methods_id')->nullable()->constrained()->nullOnDelete()->cascadeOnUpdate();
@@ -26,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('payment_options');
+        Schema::dropIfExists('payment_histories');
     }
 };

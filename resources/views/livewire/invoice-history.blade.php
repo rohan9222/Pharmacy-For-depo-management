@@ -1,6 +1,5 @@
-<div x-data="{ isTableData: true, isInvoiceData: false  }">
+<div x-data="{ isTableData: true, isInvoiceData: false, isReturnData: false  }">
     <div x-show="isTableData" x-transition x-cloak>
-
         <div class="row">
             <div class="col">
                 <div class="" id="multiCollapseExample2">
@@ -13,7 +12,7 @@
                                     </h3> --}}
                                 </div>
                                 <div class="col-3">
-                                    <input id="search" class="form-control" type="search" wire:model.live="search" placeholder="Search By Name" aria-label="Search By Name">
+                                    <input id="search" class="form-control" type="search" wire:model.live="search" placeholder="Search" aria-label="Search">
                                 </div>
                             </div>
                             <table class="table">
@@ -34,17 +33,17 @@
                                             <td>{{ $loop->iteration }}</td>
                                             <td>{{ $invoice->invoice_no }}</td>
                                             <td>{{ \Carbon\Carbon::parse($invoice->invoice_date)->format('d M Y') }}</td>
-                                            <td>{{ $invoice->total }}</td>
+                                            <td>{{ $invoice->grand_total }}</td>
                                             <td>{{ $invoice->paid }}</td>
                                             <td>{{ $invoice->due }}</td>
                                             <td>
                                                 @can('invoice')
-                                                    <button class="btn btn-sm btn-success" wire:click="invoiceView({{ $invoice->id }})" @click="isTableData = false, isInvoiceData = true">
+                                                    <button class="btn btn-sm btn-success" wire:click="invoiceView({{ $invoice->id }})" @click="isTableData = false, isInvoiceData = true, isReturnData = false">
                                                         <i class="bi bi-eye"></i>
                                                     </button>
                                                 @endcan
                                                 @can('return-medicine')
-                                                    <button class="btn btn-sm btn-warning" wire:click="returnMedicine({{ $invoice->id }})">
+                                                    <button class="btn btn-sm btn-warning" wire:click="returnMedicine({{ $invoice->id }})" @click="isTableData = false, isInvoiceData = false, isReturnData = true">
                                                         <i class="bi bi-arrow-counterclockwise"></i>
                                                     </button>
                                                 @endcan
@@ -53,7 +52,6 @@
                                     @endforeach
                                 </tbody>
                             </table>
-
                             {{ $invoices->links() }}
                         </div>
                     </div>
@@ -63,7 +61,7 @@
     </div>
 
     <div x-show="isInvoiceData" x-transition x-cloak>
-        <button class="btn btn-sm btn-info" wire:click="invoiceView()" @click="isTableData = true, isInvoiceData = false">back</button>
+        <button class="btn btn-sm btn-info" wire:click="invoiceView()" @click="isTableData = true, isInvoiceData = false, isReturnData = false">back</button>
         @if ($invoice_data)
         <div class="container">
             <div class="row">
@@ -76,9 +74,10 @@
                                         <h2 class="mb-1 text-muted">{{url('/')}}</h2>
                                     </div>
                                     <div class="text-muted">
-                                        <p class="mb-1">3184 Spruce Drive Pittsburgh, PA 15201</p>
-                                        <p class="mb-1"><i class="uil uil-envelope-alt me-1"></i> xyz@987.com</p>
-                                        <p><i class="uil uil-phone me-1"></i> 012-345-6789</p>
+                                        <p class="mb-1">{{$site_settings->site_name}}</p>
+                                        <p class="mb-1">{{$site_settings->site_address}}</p>
+                                        <p class="mb-1"><i class="uil uil-envelope-alt me-1"></i> {{$site_settings->site_email}}</p>
+                                        <p><i class="uil uil-phone me-1"></i> {{$site_settings->site_phone}}</p>
                                     </div>
                                 </div>
 
@@ -88,10 +87,10 @@
                                     <div class="col-sm-6">
                                         <div class="text-muted">
                                             <h5 class="font-size-16 mb-3">Billed To:</h5>
-                                            <h5 class="font-size-15 mb-2">Preston Miller</h5>
-                                            <p class="mb-1">4068 Post Avenue Newfolden, MN 56738</p>
-                                            <p class="mb-1">PrestonMiller@armyspy.com</p>
-                                            <p>001-234-5678</p>
+                                            <h5 class="font-size-15 mb-2">{{$invoice_data->customer->name}}</h5>
+                                            <p class="mb-1">{{$invoice_data->customer->address}}</p>
+                                            <p class="mb-1">{{$invoice_data->customer->email}}</p>
+                                            <p>{{$invoice_data->customer->phone}}</p>
                                         </div>
                                     </div>
                                     <!-- end col -->
@@ -121,8 +120,7 @@
                                                 <tr class="text-center">
                                                     <th>SN</th>
                                                     <th colspan="2">Medicine</th>
-                                                    <th>Batch</th>
-                                                    <th>Expiry Date</th>
+                                                    <th>Pack Size</th>
                                                     <th>Quantity</th>
                                                     <th>MRP/Selling Price</th>
                                                     <th class="text-end">Total</th>
@@ -143,40 +141,39 @@
                                                                 <p class="text-muted mb-0">{{ $medicine_list->medicine->category_name }}</p>
                                                             </div>
                                                         </td>
-                                                        <td>{{ $medicine_list->batch_number }}</td>
                                                         <td>
-                                                            {{ \Carbon\Carbon::parse($medicine_list->expiry_date)->format('d M Y') }}
+                                                            {{ $medicine_list->medicine->pack_size }}
                                                         </td>
-                                                        <td>{{ $medicine_list->quantity }}</td>
+                                                        <td>{{ $medicine_list->initial_quantity }}</td>
                                                         <td class="text-center">{{ $medicine_list->price }}</td>
-                                                        <td class="text-end">{{ $medicine_list->quantity * $medicine_list->price }}</td>
+                                                        <td class="text-end">{{ $medicine_list->initial_quantity * $medicine_list->price }}</td>
                                                     </tr>
                                                 @endforeach
                                                 <!-- end tr -->
                                                 <tr>
-                                                    <th scope="row" colspan="7" class="text-end">Sub Total</th>
+                                                    <th scope="row" colspan="6" class="text-end">Sub Total</th>
                                                     <td class="text-end">{{ $invoice_data->sub_total }}৳</td>
                                                 </tr>
                                                 <!-- end tr -->
                                                 <tr>
-                                                    <th scope="row" colspan="7" class="border-0 text-end">
+                                                    <th scope="row" colspan="6" class="border-0 text-end">
                                                         Discount :</th>
                                                     <td class="border-0 text-end">- {{ $invoice_data->discount }}৳</td>
                                                 </tr>
                                                 <!-- end tr -->
                                                 <tr>
-                                                    <th scope="row" colspan="7" class="border-0 text-end">
+                                                    <th scope="row" colspan="6" class="border-0 text-end">
                                                         Grand Total</th>
                                                     <td class="border-0 text-end">{{ $invoice_data->grand_total }}৳</td>
                                                 </tr>
                                                 <!-- end tr -->
                                                 <tr>
-                                                    <th scope="row" colspan="7" class="border-0 text-end">Paid</th>
+                                                    <th scope="row" colspan="6" class="border-0 text-end">Paid</th>
                                                     <td class="border-0 text-end"><h5 class="m-0 fw-semibold">{{ $invoice_data->paid }}৳</h5></td>
                                                 </tr>
                                                 <!-- end tr -->
                                                 <tr>
-                                                    <th scope="row" colspan="7" class="border-0 text-end">Due</th>
+                                                    <th scope="row" colspan="6" class="border-0 text-end">Due</th>
                                                     <td class="border-0 text-end"><h5 class="m-0 fw-semibold">{{ $invoice_data->due }}৳</h5></td>
                                                 </tr>
                                                 <!-- end tr -->
@@ -185,8 +182,7 @@
                                     </div><!-- end table responsive -->
                                     <div class="d-print-none mt-4">
                                         <div class="float-end">
-                                            <a href="javascript:window.print()" class="btn btn-success me-1"><i class="bi bi-printer"></i></a>
-                                            {{-- <a href="#" class="btn btn-primary w-md">Send</a> --}}
+                                            <a href="{{ route('invoice.pdf', $invoice->invoice_no) }}" target="_blank" class="btn btn-success me-1"><i class="bi bi-printer"></i></a>
                                         </div>
                                     </div>
                                 </div>
@@ -196,5 +192,66 @@
                 </div>
             </div>
         @endif
+    </div>
+
+    <div x-show="isReturnData" x-transition x-cloak>
+        <button class="btn btn-sm btn-info" wire:click="invoiceView()" @click="isTableData = true, isInvoiceData = false, isReturnData = false">back</button>
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="invoice-title">
+                                <h2>Return Medicines</h2>
+                            </div>
+                            <hr>
+                            @if ($invoice_data)
+                                <div class="row">
+                                    <div class="col-12">
+                                        <form wire:submit.prevent="returnSubmit">
+                                            <div class="row">
+                                                <div class="col-sm-6 col-md-3">
+                                                    <div class="mb-3">
+                                                        <label for="return_date" class="form-label">Return Date</label>
+                                                        <input type="date" class="form-control" wire:model="return_date">
+                                                        @error('return_date') <span class="text-danger">{{ $message }}</span> @enderror
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-6 col-md-3">
+                                                    <div class="mb-3">
+                                                        <label for="return_medicine" class="form-label">Medicines</label>
+                                                        <select name="return_medicine" id="return_medicine" class="form-select" wire:model="return_medicine">
+                                                            <option value="">Select Medicine</option>
+                                                            @foreach ($invoice_data->salesMedicines as $medicine_list)
+                                                                <option value="{{ $medicine_list->id }}">
+                                                                    {{ $medicine_list->medicine->name }} ({{ $medicine_list->quantity }}PC) - {{$site_settings->site_currency}} {{ $medicine_list->price }}
+                                                                </option>
+                                                            @endforeach
+                                                        </select>
+                                                        @error('return_medicine') <span class="text-danger">{{ $message }}</span> @enderror
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-6 col-md-3">
+                                                    <div class="mb-3">
+                                                        <label for="return_quantity" class="form-label">Return Quantity</label>
+                                                        <input type="number" class="form-control" wire:model="return_quantity">
+                                                        @error('return_quantity') <span class="text-danger">{{ $message }}</span> @enderror
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-6 col-md-3">
+                                                    <div class="mb-3 mt-2">
+                                                        <button type="submit" class="btn btn-primary btn-sm mt-4">Submit</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
