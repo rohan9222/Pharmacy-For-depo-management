@@ -16,7 +16,7 @@ class SiteSettings extends Component
 {
     use WithFileUploads;
 
-    public $site_name, $site_title, $site_email, $site_phone, $site_address, $site_logo, $preview_site_logo, $site_favicon, $preview_site_favicon, $site_currency, $site_invoice_prefix, $medicine_expiry_days, $medicine_low_stock_quantity, $amount, $discount,$discount_value;
+    public $site_name, $site_title, $site_email, $site_phone, $site_address, $site_logo, $preview_site_logo, $site_favicon, $preview_site_favicon, $site_currency, $site_invoice_prefix, $medicine_expiry_days, $medicine_low_stock_quantity, $discountId, $start_amount, $end_amount, $discount, $discount_values;
 
     public function mount()
     {
@@ -41,7 +41,7 @@ class SiteSettings extends Component
     }
     public function render()
     {
-        $this->discount_value = DiscountValue::all();
+        $this->discount_values = DiscountValue::all();
         return view('livewire.site-settings')->layout('layouts.app');
     }
 
@@ -78,7 +78,6 @@ class SiteSettings extends Component
             flash()->error('Invalid image type!');
         }
     }
-
 
     public function updateSettings(){
         $this->validate([
@@ -136,15 +135,35 @@ class SiteSettings extends Component
     public function addDiscountValue()
     {
         $this->validate([
-            'amount' => 'required|numeric',
+            'start_amount' => 'required|numeric',
+            'end_amount' => 'required|numeric',
             'discount' => 'required|numeric',
         ]);
-        DiscountValue::create([
-            'amount' => $this->amount,
-            'discount' => $this->discount,
-        ]);
-        $this->amount = '';
-        $this->discount = '';
+        DiscountValue::updateOrCreate(
+            [
+                'id' => $this->discountId
+            ],
+            [
+                'start_amount' => $this->start_amount,
+                'end_amount' => $this->end_amount,
+                'discount' => $this->discount,
+            ]
+        );
+        $this->start_amount = $this->end_amount = $this->discount = $this->discountId = null;
         flash()->success('Discount value added successfully!');
+    }
+
+    public function editDiscountValue($id)
+    {
+        $discount_value = DiscountValue::find($id);
+        $this->discountId = $discount_value->id;
+        $this->start_amount = $discount_value->start_amount;
+        $this->end_amount = $discount_value->end_amount;
+        $this->discount = $discount_value->discount;
+    }
+
+    public function deleteDiscountValue($id){
+        DiscountValue::find($id)->delete();
+        flash()->success('Discount value deleted successfully!');
     }
 }

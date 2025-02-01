@@ -43,7 +43,7 @@
                                                             <img class="w-100 h-100 img-fluid img-thumbnail" src="{{ asset($stock_list->medicine->image_url ?? 'img/medicine-logo.png') }}" alt="">
                                                         </span>
                                                         <span class="lh-sm fw-medium text-nowrap" title="{{ $stock_list->medicine->name }}">
-                                                            <span class="text-uppercase fw-bold">{{ $stock_list->medicine->name }} (<span style="color: rgb(177, 55, 181)">{{ $stock_list->medicine->price }} ৳</span>)</span>
+                                                            <span class="text-uppercase fw-bold">{{ $stock_list->medicine->name }} (<span style="color: rgb(177, 55, 181)">{{ $stock_list->medicine->buy_price }} ৳</span>)</span>
                                                             <span class="d-block text-muted" style="font-size: 13px;">Generic name: {{ $stock_list->medicine->generic_name }}</span>
                                                             <span class="d-block text-muted" style="font-size: 13px;">Manufacturers: {{$stock_list->medicine->supplier}}</span>
                                                         </span>
@@ -63,8 +63,8 @@
                                                 @endif
                                             </td>
                                             <td>{{ $stock_list->quantity }}</td>
-                                            <td>{{ $stock_list->price }}</td>
-                                            <td>{{ $stock_list->quantity * $stock_list->price }}</td>
+                                            <td>{{ $stock_list->buy_price }}</td>
+                                            <td>{{ $stock_list->quantity * $stock_list->buy_price }}</td>
                                             {{-- <td>
                                                 @can('edit-customer')
                                                     <button class="btn btn-sm btn-info" wire:click="edit()" @click="isOpen = true"><i class="bi bi-pencil-square"></i></button>
@@ -148,17 +148,17 @@
                                     <div class="mb-4">
                                         <h2 class="mb-1 text-muted">{{url('/')}}</h2>
                                     </div>
-                                    <div class="text-muted">
+                                    {{-- <div class="text-muted">
                                         <p class="mb-1">3184 Spruce Drive Pittsburgh, PA 15201</p>
                                         <p class="mb-1"><i class="uil uil-envelope-alt me-1"></i> xyz@987.com</p>
                                         <p><i class="uil uil-phone me-1"></i> 012-345-6789</p>
-                                    </div>
+                                    </div> --}}
                                 </div>
 
                                 <hr class="my-4">
 
                                 <div class="row">
-                                    <div class="col-sm-6">
+                                    {{-- <div class="col-sm-6">
                                         <div class="text-muted">
                                             <h5 class="font-size-16 mb-3">Billed To:</h5>
                                             <h5 class="font-size-15 mb-2">Preston Miller</h5>
@@ -166,9 +166,9 @@
                                             <p class="mb-1">PrestonMiller@armyspy.com</p>
                                             <p>001-234-5678</p>
                                         </div>
-                                    </div>
+                                    </div> --}}
                                     <!-- end col -->
-                                    <div class="col-sm-6">
+                                    <div class="col-12 justify-end">
                                         <div class="text-muted text-sm-end">
                                             <div>
                                                 <h5 class="font-size-15 mb-1">Invoice No: #{{$stock_invoice_data->invoice_no}}</h5>
@@ -197,7 +197,7 @@
                                                     <th>Batch</th>
                                                     <th>Expiry Date</th>
                                                     <th>Quantity</th>
-                                                    <th>MRP/Selling Price</th>
+                                                    <th>Price</th>
                                                     <th class="text-end">Total</th>
                                                 </tr>
                                             </thead><!-- end thead -->
@@ -221,8 +221,8 @@
                                                             {{ \Carbon\Carbon::parse($medicine_list->expiry_date)->format('d M Y') }}
                                                         </td>
                                                         <td>{{ $medicine_list->quantity }}</td>
-                                                        <td class="text-center">{{ $medicine_list->price }}</td>
-                                                        <td class="text-end">{{ $medicine_list->quantity * $medicine_list->price }}</td>
+                                                        <td class="text-center">{{ $medicine_list->buy_price }}</td>
+                                                        <td class="text-end">{{ $medicine_list->quantity * $medicine_list->buy_price }}</td>
                                                     </tr>
                                                 @endforeach
                                                 <!-- end tr -->

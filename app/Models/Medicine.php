@@ -17,6 +17,7 @@ class Medicine extends Model
         'description',
         'shelf',
         'category_name',
+        'pack_size',
         'supplier',
         'image_url',
         'stock',

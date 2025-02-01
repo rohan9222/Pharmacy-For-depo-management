@@ -11,12 +11,15 @@ class Invoice extends Model
     protected $fillable = [
         'invoice_no',
         'invoice_date',
-        'customer',
-        'field_officer',
-        'sales_manager',
-        'manager',
+        'customer_id',
+        'field_officer_id',
+        'sales_manager_id',
+        'manager_id',
         'sub_total',
         'vat',
+        'discount',
+        'dis_type',
+        'dis_amount',
         'spl_discount',
         'spl_dis_type',
         'spl_dis_amount',
@@ -35,24 +38,29 @@ class Invoice extends Model
         return $this->hasMany(SalesMedicine::class);
     }
 
+    public function salesReturnMedicines()
+    {
+        return $this->hasMany(ReturnMedicine::class);
+    }
+
     public function customer()
     {
-        return $this->belongsTo(User::class, 'customer');
+        return $this->belongsTo(User::class, 'customer_id');
     }
 
     public function fieldOfficer()
     {
-        return $this->belongsTo(User::class, 'field_officer');
+        return $this->belongsTo(User::class, 'field_officer_id');
     }
 
     public function salesManager()
     {
-        return $this->belongsTo(User::class, 'sales_manager');
+        return $this->belongsTo(User::class, 'sales_manager_id');
     }
 
     public function manager()
     {
-        return $this->belongsTo(User::class, 'manager');
+        return $this->belongsTo(User::class, 'manager_id');
     }
 
     public function supplier()

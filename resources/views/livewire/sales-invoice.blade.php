@@ -130,7 +130,7 @@
             </div>
             <hr>
             <div class="row d-flex justify-content-end">
-                <div class="col-4">
+                <div class="col-5">
                     <table class="table table-sm">
                         <tr>
                             <th>Sub Total</th>
@@ -143,12 +143,28 @@
                             <td>{{$vat}} ৳</td>
                         </tr>
                         <tr>
-                            <th>Spacial Discount</th>
+                            <th>Total</th>
+                            <th>:</th>
+                            <td>{{$total}} ৳</td>
+                        </tr>
+                        <tr>
+                            <th>Discount(%)</th>
+                            <th>:</th>
+                            <td>
+                                <div class="input-group w-75 ">
+                                    <input type="text" placeholder="Spacial Discount Price" class="form-control form-control-sm" wire:model.live.debounce.1000ms="discount" disabled readonly>
+                                    <span class="input-group-text bg-info bg-opacity-10">{{$discount_amount}}৳</span>
+                                </div>
+                                @error('discount') <span class="text-danger">{{ $message }}</span> @enderror
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Spacial Discount (%)</th>
                             <th>:</th>
                             <td>
                                 <div class="input-group w-75 ">
                                     <input type="text" placeholder="Spacial Discount Price" class="form-control form-control-sm" wire:model.live.debounce.1000ms="spl_discount" >
-                                    <span class="input-group-text bg-info bg-opacity-10">৳</span>
+                                    <span class="input-group-text bg-info bg-opacity-10">{{$spl_discount_amount}}৳</span>
                                 </div>
                                 @error('spl_discount') <span class="text-danger">{{ $message }}</span> @enderror
                             </td>

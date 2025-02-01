@@ -15,7 +15,8 @@ return new class extends Migration
             $table->id();
             $table->string('pack_name')->unique();
             $table->string('pack_size');
-            $table->string('pack_description')->nullable();
+            $table->string('description')->nullable();
+            $table->boolean('status')->default(1);
             $table->timestamps();
         });
     }

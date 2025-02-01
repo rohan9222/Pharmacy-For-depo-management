@@ -29,7 +29,7 @@
                                             @error('name') <span class="text-danger">{{ $message }}</span> @enderror
                                         </div>
                                         <div class="col-4">
-                                            <input class="form-control" type="text" id="description" wire:model="description" placeholder="description Address" aria-label="description Address">
+                                            <input class="form-control" type="text" id="description" wire:model="description" placeholder="Description" aria-label="Description">
                                             @error('description') <span class="text-danger">{{ $message }}</span> @enderror
                                         </div>
                                         <div class="col-4">

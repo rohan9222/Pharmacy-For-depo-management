@@ -5,6 +5,7 @@ namespace App\Livewire;
 use App\Models\Medicine;
 use App\Models\StockInvoice;
 use App\Models\StockList;
+use App\Models\StockPaymentHistory;
 use App\Models\Supplier;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -186,6 +187,13 @@ class StockMedicines extends Component
                 'paid' => $this->paid_amount,
                 'due' => $this->due_amount,
             ]);
+            if($this->paid_amount > 0){
+                StockPaymentHistory::create([
+                    'stock_invoice_id' => $stockInvoice->id,
+                    'amount' => $this->paid_amount,
+                    'date' => $this->invoice_date
+                ]);
+            }
 
             foreach ($this->stockMedicines as $medicine) {
                 StockList::create([

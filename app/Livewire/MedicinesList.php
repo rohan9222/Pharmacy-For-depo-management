@@ -4,7 +4,9 @@ namespace App\Livewire;
 
 use App\Models\Medicine;
 use App\Models\Category;
+use App\Models\PackSize;
 use App\Models\Supplier;
+
 use Livewire\WithFileUploads;
 use Intervention\Image\Drivers\Gd\Driver;
 use Intervention\Image\ImageManager;
@@ -26,7 +28,7 @@ class MedicinesList extends Component
 {
     use WithFileUploads, WithPagination, WithoutUrlPagination;
 
-    public $categoryLists, $suppliers, $barcode, $name, $generic_name, $supplier_name, $shelf, $description, $category_name, $search, $supplier_price, $price, $image_url;
+    public $medicineId, $categoryLists, $packSizeLists, $suppliers, $barcode, $name, $generic_name, $supplier_name, $shelf, $description, $category_name, $pack_size, $search, $supplier_price, $price, $image_url;
     public $vat = 17.4;
     public  $status = 1;
 
@@ -43,6 +45,7 @@ class MedicinesList extends Component
     public function render()
     {
         $this->categoryLists = Category::select('name')->get();
+        $this->packSizeLists = PackSize::select('pack_name','pack_size')->get();
         $this->suppliers = Supplier::select('name')->get();
 
         $medicines = Medicine::search($this->search)->paginate(15);
@@ -69,6 +72,7 @@ class MedicinesList extends Component
             'shelf' => 'nullable|string|max:10',
             'description' => 'nullable|string|max:255',
             'category_name' => 'required|string|max:255',
+            'pack_size' => 'required|string|max:255',
             // 'quantity' => 'required|numeric',
             'status' => 'required|boolean',
             'supplier_price' => 'required|numeric',
@@ -117,6 +121,7 @@ class MedicinesList extends Component
                     'shelf' => $this->shelf,
                     'description' => $this->description,
                     'category_name' => $this->category_name,
+                    'pack_size' => $this->pack_size,
                     'status' => $this->status,
                     'supplier_price' => $this->supplier_price,
                     'price' => $this->price,

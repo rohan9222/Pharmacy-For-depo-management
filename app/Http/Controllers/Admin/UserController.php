@@ -73,6 +73,9 @@ class UserController extends Controller
         $validatedData = $request->validate($validation);
 
         $input = $request->all();
+        $latestInvoiceNo = User::orderByDesc('user_id')->value('user_id');
+        $user_id = ($latestInvoiceNo) ? ((int) filter_var($latestInvoiceNo, FILTER_SANITIZE_NUMBER_INT) + 1) : 010500;
+        $input['user_id'] = $user_id;
         $input['password'] = Hash::make($request->password);
 
         if (!empty($request->roles)) {

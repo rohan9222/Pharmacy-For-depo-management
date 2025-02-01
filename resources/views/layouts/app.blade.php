@@ -119,7 +119,7 @@
             .sidebar.collapsed:hover + .navbar {
                 z-index: -1; /* Ensure it stays above other content */
             }
-            
+
             /* .sidebar.collapsed:hover + .navbar {
                 left: 15.5rem;
                 width: calc(100% - 15.5rem);

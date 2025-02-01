@@ -20,7 +20,9 @@ return new class extends Migration
             $table->string('description')->nullable();
             $table->string('shelf')->nullable();
             $table->string('category_name')->nullable();
-            $table->foreign('category_name')->references('name')->on('categories')->nullOnDelete()->cascadeOnUpdate();
+            $table->foreign('category_name')->references('name')->on('categories')->cascadeOnUpdate();
+            $table->string('pack_size')->nullable();
+            // $table->foreign('pack_size')->references('pack_size')->on('pack_sizes')->cascadeOnUpdate();
             $table->string('image_url')->nullable();
             $table->string('supplier')->nullable();
             $table->decimal('supplier_price', 11, 2)->nullable()->default(0.00);

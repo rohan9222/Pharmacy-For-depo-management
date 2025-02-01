@@ -13,6 +13,7 @@ class StockList extends Model
         'stock_invoice_id',
         'batch_number',
         'expiry_date',
+        'initial_quantity',
         'quantity',
         'price',
         'buy_price',

@@ -53,6 +53,13 @@
                     <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
                         <li class="dropdown-header">{{ __('Manage Account') }}</li>
                         <li><a class="dropdown-item" href="{{ route('user.profile') }}">{{ __('Profile') }}</a></li>
+                        @canany(['create-role', 'edit-role', 'delete-role'])
+                            <li><a class="dropdown-item" href="{{ route('roles.index') }}">{{ __('Manage Role') }}</a></li>
+                        @endcanany
+
+                        @canany(['create-user', 'edit-user', 'delete-user'])
+                            <li><a class="dropdown-item" href="{{ route('users.index') }}">{{ __('Manage User') }}</a></li>
+                        @endcanany
                         @if (Laravel\Jetstream\Jetstream::hasApiFeatures())
                             <li><a class="dropdown-item" href="{{ route('api-tokens.index') }}">{{ __('API Tokens') }}</a></li>
                         @endif

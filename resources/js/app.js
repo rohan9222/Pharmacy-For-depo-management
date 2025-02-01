@@ -20,7 +20,6 @@ pdfMake.addVirtualFileSystem(pdfFonts);
 // pdfmake.vfs = pdfFonts.pdfMake.vfs;
 window.pdfmake = pdfmake;
 
-
 import moment from 'moment';
 window.moment = moment;
 

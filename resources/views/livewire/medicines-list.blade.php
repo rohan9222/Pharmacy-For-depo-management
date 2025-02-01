@@ -59,6 +59,17 @@
                                             @error('category_name') <span class="text-danger">{{ $message }}</span> @enderror
                                         </div>
                                         <div class="col-3">
+                                            <select name="pack_size" id="pack_size" class="form-control" wire:model="pack_size">
+                                                <option value="">Select Package</option>
+                                                @foreach ($packSizeLists as $packSizeLists)
+                                                    <option value="{{ $packSizeLists->pack_size }}" {{ ($packSizeLists->pack_size ?? '') == $pack_size ? 'selected' : '' }}>
+                                                        {{ $packSizeLists->pack_name }} ({{ $packSizeLists->pack_size }})
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                            @error('pack_size') <span class="text-danger">{{ $message }}</span> @enderror
+                                        </div>
+                                        <div class="col-3">
                                             <select name="supplier_name" id="supplier_name" class="form-control" wire:model="supplier_name">
                                                 <option value="">Select Supplier Name</option>
                                                 @foreach($suppliers as $supplier)
@@ -134,7 +145,7 @@
             @endif
 
             @can('view-medicine')
-                <div class="row mt-3">
+                <div class="row mt-3 table-responsive">
                     <div class="row justify-content-end mb-1">
                         <div class="col-3">
                             <input id="search" class="form-control" type="search" wire:model.live="search" placeholder="Search By Name" aria-label="Search By Name">
@@ -151,6 +162,7 @@
                                 <th>Description</th>
                                 <th>Shelf No</th>
                                 <th>Category Name</th>
+                                <th>Pack Size</th>
                                 <th>Supplier Name</th>
                                 <th>Supplier Price</th>
                                 <th>Price</th>
@@ -170,6 +182,7 @@
                                     <td>{{ $medicine->description }}</td>
                                     <td>{{ $medicine->shelf }}</td>
                                     <td>{{ $medicine->category_name }}</td>
+                                    <td>{{ $medicine->pack_size }}</td>
                                     <td>{{ $medicine->supplier }}</td>
                                     <td>{{ $medicine->supplier_price }}</td>
                                     <td>{{ $medicine->price }}</td>
