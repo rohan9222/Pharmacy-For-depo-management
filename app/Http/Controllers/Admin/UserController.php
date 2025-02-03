@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Models\TargetReport;
 use App\Models\Team;
 use App\Http\Requests\StoreUserRequest;
 use App\Http\Requests\UpdateUserRequest;
@@ -11,12 +12,14 @@ use Illuminate\Http\RedirectResponse;
 use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
+use Carbon\Carbon;
 
 class UserController extends Controller
 {
     /**
      * Instantiate a new UserController instance.
      */
+
     public function __construct()
     {
         // $this->middleware('auth');
@@ -24,6 +27,29 @@ class UserController extends Controller
         // $this->middleware('permission:create-user', ['only' => ['create','store']]);
         // $this->middleware('permission:edit-user', ['only' => ['edit','update']]);
         // $this->middleware('permission:delete-user', ['only' => ['destroy']]);
+        $action = request()->route()->getActionMethod(); // Get current method name
+        $user = auth()->user();
+
+        if (!$user) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        // Permission checks for specific methods
+        if (in_array($action, ['index', 'show']) && !$user->canany(['create-user', 'edit-user', 'delete-user'])) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        if (in_array($action, ['create', 'store']) && !$user->can('create-user')) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        if (in_array($action, ['edit', 'update']) && !$user->can('edit-user')) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        if ($action === 'destroy' && !$user->can('delete-user')) {
+            abort(403, 'Unauthorized action.');
+        }
     }
 
     /**
@@ -31,8 +57,22 @@ class UserController extends Controller
      */
     public function index(): View
     {
+        $users = User::latest('id');
+        if(!auth()->user()->canany(['edit-manager', 'delete-manager'])){
+            $users = $users->whereNotIn('role', ['Super Admin','Manager']);
+        }
+        if(!auth()->user()->canany(['edit-sales-manager', 'delete-sales-manager'])){
+            $users = $users->whereNotIn('role', ['Super Admin','Sales Manager']);
+        }
+        if(!auth()->user()->canany(['edit-field-officer', 'delete-field-officer'])){
+            $users = $users->whereNotIn('role', ['Super Admin','Field Officer']);
+        }
+        if(!auth()->user()->canany(['edit-depo-manager', 'delete-depo-manager'])){
+            $users = $users->whereNotIn('role', ['Super Admin','Depo Incharge']);
+        }
+        $users = $users->whereNotIn('role', ['Delivery Man','Customer'])->paginate(10);
         return view('users.index', [
-            'users' => User::latest('id')->whereNotIn('role', ['Delivery Man','Customer'])->paginate(10)
+            'users' => $users
         ]);
     }
 
@@ -94,6 +134,15 @@ class UserController extends Controller
         $user = User::create($input);
         $user->assignRole($request->roles);
 
+        if (in_array($input['role'], ['Manager', 'Sales Manager', 'Field Officer'])) {
+            TargetReport::create([
+                'user_id' => $user->id,
+                'product_target' => $user->product_target ?? 0,
+                'target_month' => Carbon::now()->format('F'),
+                'target_year' => Carbon::now()->format('Y')
+            ]);
+        }
+        
         return redirect()->route('users.index')
                 ->withSuccess('New user is added successfully.');
     }

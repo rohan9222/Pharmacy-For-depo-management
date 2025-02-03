@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\{DashboardController,UserProfileController};
 use App\Http\Controllers\Admin\{RoleController,UserController};
 use App\Http\Controllers\makepdf\{MakeInvoiceController,MakeSummaryController,MakeReportController};
-use App\Livewire\{CustomersList,DeliveryManList,SupplierList,MedicinesList,CategoryList, PackSizeList, StockMedicines,StockMedicinesList,SalesInvoice,InvoiceHistory,InvoiceReturnHistory,SiteSettings,SummaryList};
+use App\Livewire\{SupportersList,CustomersList,DeliveryManList,SupplierList,MedicinesList,CategoryList, PackSizeList, StockMedicines,StockMedicinesList,SalesInvoice,InvoiceHistory,InvoiceReturnHistory,SiteSettings,SummaryList};
 
 
 Route::get('/', function () {
@@ -19,7 +19,7 @@ Route::middleware([
 // Supporters management
     Route::get('/customers', CustomersList::class)->name('customers');
     Route::get('/delivery-man', DeliveryManList::class)->name('delivery-man');
-    // Route::get('/delivery-man/supporter', CustomersList::class)->name('supporter.customers');
+    Route::get('/admin-person/{type}', SupportersList::class)->name('supporter.list');
 
 // supplier management
     Route::get('/suppliers', SupplierList::class)->name('suppliers');

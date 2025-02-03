@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('target_reports', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id');
+            $table->foreignId('user_id')->constrained()->cascadeOnDelete()->cascadeOnUpdate();
             $table->string('role')->nullable();
             $table->foreignId('manager')->nullable()->constrained('users')->nullOnDelete()->cascadeOnUpdate()->comment('user id who has manager role');
             $table->foreignId('sales_manager')->nullable()->constrained('users')->nullOnDelete()->cascadeOnUpdate()->comment('user id who has sales manager role');
@@ -23,7 +23,8 @@ return new class extends Migration
             $table->boolean('product_target_achieve')->nullable();
             $table->string('sales_target')->nullable();
             $table->boolean('sales_target_achieve')->nullable();
-            $table->string('target_month');
+            $table->string('target_month',50)->nullable();
+            $table->smallInteger('target_year')->nullable();
             $table->timestamps();
         });
     }

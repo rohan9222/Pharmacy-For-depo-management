@@ -5,7 +5,7 @@
     </x-slot>
 
     <div class="d-flex justify-content-center">
-        <div class="col-8" x-show="!isCustomerProfile" x-transition>
+        <div class="col-10" x-show="!isCustomerProfile" x-transition>
             @if(auth()->user()->can('create-customer') || $customerId)
                 <div class="row">
                     <div class="col">
@@ -53,7 +53,7 @@
                                                             ? 'selected'
                                                             : ($field_officer->id == auth()->user()->id ? 'selected' : '') }}>
                                                         {{ $field_officer->name }}
-                                                    </option>
+                                                    </option>                                                
                                                 @endforeach
                                             </select>
                                             @error('field_officer_team') <span class="text-danger">{{ $message }}</span> @enderror
@@ -66,7 +66,7 @@
                                             <select name="category" id="category" wire:model="category" class="form-control">
                                                 <option value="">Select Category</option>
                                                 <option value="Institution">Institution</option>
-                                                <option value="CASH">CASH</option>
+                                                <option value="General">General</option>
                                             </select>
                                             @error('category') <span class="text-danger">{{ $message }}</span> @enderror
                                         </div>
@@ -135,7 +135,7 @@
             </div>
         </div>
 
-        <div class="col-8" x-show="isCustomerProfile" x-transition x-cloak>
+        <div class="col-10" x-show="isCustomerProfile" x-transition x-cloak>
             <button class="btn btn-sm btn-info" @click="isCustomerProfile = false">back</button>
             @if ($customerData)
                 <div class="row pt-2">

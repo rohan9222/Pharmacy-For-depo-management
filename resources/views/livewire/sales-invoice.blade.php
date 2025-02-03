@@ -86,13 +86,13 @@
                     </thead>
                     <tbody>
                         @foreach ($stockMedicines as $index => $medicine)
-                            <tr>
+                            <tr class="text-center">
                                 <td>{{ $index + 1 }}</td>
-                                <td>
+                                <td class="text-start">
                                     <input type="hidden" wire:model.live.debounce.1000ms="stockMedicines.{{ $index }}.medicine_id">
                                     {{ $medicine['medicine_name'] }}
                                 </td>
-                                <td>{{ $medicine['category_name'] }}</td>
+                                <td class="text-start">{{ $medicine['category_name'] }}</td>
                                 <td>
                                     <div class="d-flex">
                                         <a class="btn btn-sm btn-outline-danger" wire:click="decreaseQuantity({{ $index }})"><i class="bi bi-dash-lg"></i></a>
@@ -102,15 +102,23 @@
                                     @error("stockMedicines.{$index}.quantity") <span class="text-danger">{{ $message }}</span> @enderror
                                 </td>
                                 <td>
-                                    <input type="text" class="form-control form-control-sm" wire:model.live.debounce.1000ms="stockMedicines.{{ $index }}.price" >
+                                    {{-- <input type="text" class="form-control form-control-sm" wire:model.live.debounce.1000ms="stockMedicines.{{ $index }}.price" disabled> --}}
+                                    <span>{{ $stockMedicines[$index]['price'] }}</span>
                                     @error("stockMedicines.{$index}.price") <span class="text-danger">{{ $message }}</span> @enderror
                                 </td>
-                                <td><input type="text" class="form-control form-control-sm" wire:model.live.debounce.1000ms="stockMedicines.{{ $index }}.sub_total" readonly></td>
                                 <td>
-                                    <input type="text" class="form-control form-control-sm" wire:model.live.debounce.1000ms="stockMedicines.{{ $index }}.vat" >
+                                    {{-- <input type="text" class="form-control form-control-sm" wire:model.live.debounce.1000ms="stockMedicines.{{ $index }}.sub_total" disabled> --}}
+                                    <span>{{ $stockMedicines[$index]['sub_total'] }}</span>
+                                </td>
+                                <td>
+                                    {{-- <input type="text" class="form-control form-control-sm" wire:model.live.debounce.1000ms="stockMedicines.{{ $index }}.vat" disabled> --}}
+                                    <span>{{ $stockMedicines[$index]['vat'] }}</span>
                                     @error("stockMedicines.{$index}.vat") <span class="text-danger">{{ $message }}</span> @enderror
                                 </td>
-                                <td><input type="text" class="form-control form-control-sm" wire:model.live.debounce.1000ms="stockMedicines.{{ $index }}.total" readonly></td>
+                                <td>
+                                    {{-- <input type="text" class="form-control form-control-sm" wire:model.live.debounce.1000ms="stockMedicines.{{ $index }}.total" disabled> --}}
+                                    <span>{{ $stockMedicines[$index]['total'] }}</span>                                    
+                                </td>
                                 <td><button type="button" class="btn btn-sm btn-outline-danger" wire:click="removeMedicine({{ $index }})"><i class="bi bi-x"></i></button></td>
                             </tr>
                         @endforeach

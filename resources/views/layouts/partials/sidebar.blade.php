@@ -15,6 +15,39 @@
         </li>
 
         {{-- Supporters --}}
+        @if (Auth::user()->hasRole('Super Admin') || Auth::user()->hasPermissionTo('admin-role'))
+            <li class="nav-item">
+                <a href="#" class="nav-link link-body-emphasis {{ request()->routeIs('supporter.list') ? 'active' : '' }}" data-bs-toggle="collapse" data-bs-target="#admin-collapse" aria-expanded="false">
+                    <i class="bi bi-people me-2"></i>
+                    <span class="sidebar-text">Admin Panel</span>
+                    <i class="bi bi-chevron-down ms-auto toggle-icon sidebar-text"></i>
+                </a>
+        
+                <div class="collapse" id="admin-collapse">
+                    <ul class="ms-4 btn-toggle-nav list-unstyled fw-normal pb-1 small">
+                        <li>
+                            <a href="{{ route('supporter.list', ['type' => 'manager']) }}" class="nav-link link-body-emphasis {{ request()->routeIs('supporter.list') && request('type') === 'manager' ? 'active' : '' }}">
+                                <i class="bi bi-caret-right-fill me-2"></i>
+                                <span class="sidebar-text">Managers</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ route('supporter.list', ['type' => 'sales-manager']) }}" class="nav-link link-body-emphasis {{ request()->routeIs('supporter.list') && request('type') === 'sales-manager' ? 'active' : '' }}">
+                                <i class="bi bi-caret-right-fill me-2"></i>
+                                <span class="sidebar-text">Sales Managers</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ route('supporter.list', ['type' => 'field-officer']) }}" class="nav-link link-body-emphasis {{ request()->routeIs('supporter.list') && request('type') === 'field-officer' ? 'active' : '' }}">
+                                <i class="bi bi-caret-right-fill me-2"></i>
+                                <span class="sidebar-text">Field Officers</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </li>
+        @endif
+
         <li class="nav-item">
             <a href="#" class="nav-link link-body-emphasis {{ in_array(request()->route()->getName(), ['suppliers', 'customers', 'delivery-man']) ? 'active' : '' }}" data-bs-toggle="collapse" data-bs-target="#supporter-collapse" aria-expanded="false">
                 <i class="bi bi-people me-2"></i>

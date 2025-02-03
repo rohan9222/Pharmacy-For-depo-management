@@ -64,20 +64,20 @@
                     </div> --}}
 
                     <div class="mb-3 row">
-                        <label for="product_target" class="col-md-3 col-form-label text-md-end text-start">Product Target</label>
-                        <div class="col-md-3">
+                        <label for="product_target" class="col-md-4 col-form-label text-md-end text-start">Product Target</label>
+                        <div class="col-md-6">
                           <input type="product_target" class="form-control @error('product_target') is-invalid @enderror" id="product_target" name="product_target" placeholder="Product Target" value="{{ old('product_target') }}">
                             @if ($errors->has('product_target'))
                                 <span class="text-danger">{{ $errors->first('product_target') }}</span>
                             @endif
                         </div>
-                        <label for="sales_target" class="col-md-3 col-form-label text-md-end text-start">Sales Target</label>
+                        {{-- <label for="sales_target" class="col-md-3 col-form-label text-md-end text-start">Sales Target</label>
                         <div class="col-md-3">
                           <input type="sales_target" class="form-control @error('sales_target') is-invalid @enderror" id="sales_target" name="sales_target" placeholder="Sales Target" value="{{ old('sales_target') }}">
                             @if ($errors->has('sales_target'))
                                 <span class="text-danger">{{ $errors->first('sales_target') }}</span>
                             @endif
-                        </div>
+                        </div> --}}
                     </div>
 
                     <div class="mb-3 row">
@@ -109,9 +109,9 @@
                                     @else
                                         @if (
                                             Auth::user()->hasRole('Super Admin') ||
-                                            (Auth::user()->hasRole('Manager') && ($role == 'Manager' || $role == 'Sales Manager' || $role == 'Field Officer')) ||
-                                            (Auth::user()->hasRole('Sales Manager') && ($role == 'Sales Manager' || $role == 'Field Officer')) ||
-                                            (Auth::user()->hasRole('Depo Incharge') && ($role == 'Depo Incharge' || $role == 'Delivery Man'))
+                                            (Auth::user()->hasRole('Manager') && ( $role == 'Sales Manager' || $role == 'Field Officer')) ||
+                                            (Auth::user()->hasRole('Sales Manager') && ( $role == 'Field Officer')) ||
+                                            (Auth::user()->hasRole('Depo Incharge') && ($role == 'Manager' || $role == 'Sales Manager' || $role == 'Field Officer' || $role == 'Delivery Man'))
                                         )
                                         @php
                                             $formattedRole = match ($role) {

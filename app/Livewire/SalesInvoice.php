@@ -158,37 +158,51 @@ class SalesInvoice extends Component
         $this->stockMedicines = array_values($this->stockMedicines);
         $this->calculateTotals();
     }
-
     public function increaseQuantity($index, $quantity = 1)
     {
-
-        $medicineQty = Medicine::find($this->stockMedicines[$index]['medicine_id']);
-        if ($medicineQty->quantity < $this->stockMedicines[$index]['quantity'] + $quantity) {
-            $this->stockMedicines[$index]['quantity'] = $medicineQty->quantity;
+        // Get the medicine details from the database
+        $medicine = Medicine::find($this->stockMedicines[$index]['medicine_id']);
+    
+        if (!$medicine) {
+            return;
+            flash()->error('Medicine not found!');
+        }
+    
+        $newQuantity = $this->stockMedicines[$index]['quantity'] + $quantity;
+    
+        // Ensure the requested quantity does not exceed stock
+        if ($newQuantity > $medicine->quantity) {
+            $this->stockMedicines[$index]['quantity'] = $medicine->quantity;
             flash()->error('Not enough stock available!');
-            return;
+        } else {
+            $this->stockMedicines[$index]['quantity'] = $newQuantity;
         }
-        $this->stockMedicines[$index]['quantity'] += $quantity;
+    
+        // Update the total price
         $this->stockMedicines[$index]['total'] = $this->stockMedicines[$index]['quantity'] * $this->stockMedicines[$index]['price'];
-        $this->calculateTotals();
-    }
-
-    public function decreaseQuantity($index, $quantity = 1)
-    {
-        // Check if quantity is less than the requested decrement amount
-        if ($this->stockMedicines[$index]['quantity'] <= $quantity) {
-            flash()->error('Quantity cannot be less than 1!'); // Flash error
-            $this->stockMedicines[$index]['quantity'] = 1; // Reset quantity to 1
-            return;
-        }
-
-        // Decrease the quantity
-        $this->stockMedicines[$index]['quantity'] -= $quantity;
-        $this->stockMedicines[$index]['total'] = $this->stockMedicines[$index]['quantity'] * $this->stockMedicines[$index]['price'];
-
+    
         // Recalculate totals
         $this->calculateTotals();
     }
+    
+    public function decreaseQuantity($index, $quantity = 1)
+    {
+        // Ensure stock is not reduced below 1
+        $newQuantity = max(1, $this->stockMedicines[$index]['quantity'] - $quantity);
+    
+        if ($newQuantity < $this->stockMedicines[$index]['quantity']) {
+            $this->stockMedicines[$index]['quantity'] = $newQuantity;
+        } else {
+            flash()->error('Quantity cannot be less than 1!');
+        }
+    
+        // Update the total price
+        $this->stockMedicines[$index]['total'] = $this->stockMedicines[$index]['quantity'] * $this->stockMedicines[$index]['price'];
+    
+        // Recalculate totals
+        $this->calculateTotals();
+    }
+    
 
     public function updatedStockMedicines($value, $key)
     {
@@ -211,14 +225,12 @@ class SalesInvoice extends Component
             if ($value < 1) {
                 $this->stockMedicines[$index]['quantity'] = 1;
                 flash()->error('Quantity cannot be less than 1!');
-                return;
             }
 
             // Ensure stock is sufficient
             if ((float)$value > (float)$medicine->quantity) {
                 $this->stockMedicines[$index]['quantity'] = $medicine->quantity;
                 flash()->error('Not enough stock available!');
-                return;
             }
         }
 
@@ -328,6 +340,7 @@ class SalesInvoice extends Component
 
             DB::commit();
 
+            return redirect()->route('invoice.pdf', $invoice->invoice_no);
             flash()->success('Invoice created successfully!');
             $this->reset();
 
