@@ -47,9 +47,9 @@
                 {{ $admin_users->links() }}
             </div>
         </div>
-        
+
         <div class="col-10" x-show="isUserProfile" x-transition x-cloak>
-            <button class="btn btn-sm btn-info" @click="isCustomerProfile = false">back</button>
+            <button class="btn btn-sm btn-info" @click="isUserProfile = false">back</button>
             @if ($adminUserData)
                 <div class="row pt-2">
                     <div class="col-xl-4 col-lg-5 col-md-5 order-1 order-md-0">
@@ -70,8 +70,8 @@
                                             <i class="bi bi-arrow-left-right"></i>
                                         </span>
                                         <div class="ms-75">
-                                            <h5 class="mb-0">{{ $site_settings->site_currency }}{{ $adminUserData->total_buy}}</h5>
-                                            <small>Total Buy</small>
+                                            <h5 class="mb-0">{{ $site_settings->site_currency }}{{ $adminUserData->total_sales}}</h5>
+                                            <small>Total Sales</small>
                                         </div>
                                     </div>
                                     <div class="d-flex align-items-start">
@@ -79,8 +79,8 @@
                                             <i class="bi bi-exclamation-triangle"></i>
                                         </span>
                                         <div class="ms-75">
-                                            <h5 class="mb-0">{{ $site_settings->site_currency }}{{ $adminUserData->total_due}}</h4>
-                                            <small>Total Due</small>
+                                            <h5 class="mb-0">{{ $site_settings->site_currency }}{{ $adminUserData->total_return}}</h4>
+                                            <small>Total Return</small>
                                         </div>
                                     </div>
                                 </div>
@@ -102,16 +102,16 @@
                                             <span>{{ $adminUserData->total_invoice }}</span>
                                         </li>
                                         <li class="mb-75">
-                                            <span class="fw-bolder me-25">Total Transaction:</span>
-                                            <span>{{ $adminUserData->total_transaction }}</span>
-                                        </li>
-                                        <li class="mb-75">
-                                            <span class="fw-bolder me-25">Total Buy:</span>
-                                            <span class="fw-bold">{{ $site_settings->site_currency }}{{ $adminUserData->total_buy }}</span>
+                                            <span class="fw-bolder me-25">Total Sales:</span>
+                                            <span class="fw-bold">{{ $site_settings->site_currency }}{{ $adminUserData->total_sales }}</span>
                                         </li>
                                         <li class="mb-75">
                                             <span class="fw-bolder me-25">Total Paid:</span>
                                             <span class="fw-bold">{{ $site_settings->site_currency }}{{ $adminUserData->total_paid }}</span>
+                                        </li>
+                                        <li class="mb-75">
+                                            <span class="fw-bolder me-25">Total Due:</span>
+                                            <span>{{ $adminUserData->total_due }}</span>
                                         </li>
                                         <li class="mb-75">
                                             <span class="fw-bolder me-25">Address:</span>
@@ -148,14 +148,6 @@
                                                     <td>{{ $site_settings->site_currency }}{{ $invoice->paid }}</td>
                                                     <td>{{ $site_settings->site_currency }}{{ $invoice->due }}</td>
                                                     <td>
-                                                        @if ($invoice->due > 0)
-                                                            <button wire:click="setInvoice({{ $invoice->id }}, {{ $adminUserData->id }})"
-                                                                class="btn btn-primary btn-sm"
-                                                                data-bs-toggle="modal"
-                                                                data-bs-target="#duePaymentModal">
-                                                                <i class="bi bi-credit-card"></i>
-                                                            </button>
-                                                        @endif
                                                         <a href="{{ route('invoice.pdf', $invoice->invoice_no) }}" target="_blank"
                                                             title="View Invoice"
                                                             class="btn btn-warning btn-sm">

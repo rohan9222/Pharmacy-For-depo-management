@@ -22,7 +22,7 @@
                     <span class="sidebar-text">Admin Panel</span>
                     <i class="bi bi-chevron-down ms-auto toggle-icon sidebar-text"></i>
                 </a>
-        
+
                 <div class="collapse" id="admin-collapse">
                     <ul class="ms-4 btn-toggle-nav list-unstyled fw-normal pb-1 small">
                         <li>
@@ -32,13 +32,13 @@
                             </a>
                         </li>
                         <li>
-                            <a href="{{ route('supporter.list', ['type' => 'sales-manager']) }}" class="nav-link link-body-emphasis {{ request()->routeIs('supporter.list') && request('type') === 'sales-manager' ? 'active' : '' }}">
+                            <a href="{{ route('supporter.list', ['type' => 'sales_manager']) }}" class="nav-link link-body-emphasis {{ request()->routeIs('supporter.list') && request('type') === 'sales_manager' ? 'active' : '' }}">
                                 <i class="bi bi-caret-right-fill me-2"></i>
                                 <span class="sidebar-text">Sales Managers</span>
                             </a>
                         </li>
                         <li>
-                            <a href="{{ route('supporter.list', ['type' => 'field-officer']) }}" class="nav-link link-body-emphasis {{ request()->routeIs('supporter.list') && request('type') === 'field-officer' ? 'active' : '' }}">
+                            <a href="{{ route('supporter.list', ['type' => 'field_officer']) }}" class="nav-link link-body-emphasis {{ request()->routeIs('supporter.list') && request('type') === 'field_officer' ? 'active' : '' }}">
                                 <i class="bi bi-caret-right-fill me-2"></i>
                                 <span class="sidebar-text">Field Officers</span>
                             </a>
@@ -177,7 +177,7 @@
                                 <span class="sidebar-text">Invoice History</span>
                             </a>
                         </li>
-                        
+
                         <li class="nav-item">
                             <a href="{{ route('return-medicines-list') }}" class="nav-link link-body-emphasis {{ request()->routeIs('return-medicines-list') ? 'active' : '' }}">
                                 <i class="bi bi-caret-right-fill me-2"></i>

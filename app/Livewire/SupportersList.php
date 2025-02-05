@@ -17,14 +17,14 @@ use Illuminate\Validation\Rule;
 class SupportersList extends Component
 {
     use WithPagination, WithoutUrlPagination;
-    
-    public $type, $adminUserData, $site_settings, $invoices,$selectedInvoice,$customer,   $customerId, $name, $email, $mobile, $address, $balance, $search, $field_officers, $field_officer_team;
+
+    public $type, $adminUserData, $site_settings, $invoices, $selectedInvoice, $sales_managers, $field_officers, $customers,     $customerId, $name, $email, $mobile, $address, $balance, $search,  $field_officer_team;
 
     public function mount($type)
     {
         $this->type = $type;
         // Validate the type type
-        if (!in_array($type, ['manager', 'sales-manager','field-officer'])) {
+        if (!in_array($type, ['manager', 'sales_manager','field_officer'])) {
             abort(403, 'Access Denied: Invalid Admin Type');
         }
         return true;
@@ -38,9 +38,9 @@ class SupportersList extends Component
             ->search($this->search);
             if($this->type == 'manager'){
                 $admin_user = $admin_user->where('role', 'Manager');
-            }elseif($this->type == 'sales-manager'){
+            }elseif($this->type == 'sales_manager'){
                 $admin_user = $admin_user->where('role', 'Sales Manager');
-            }elseif($this->type == 'field-officer'){
+            }elseif($this->type == 'field_officer'){
                 $admin_user = $admin_user->where('role', 'Field Officer');
             }
         $admin_users = $admin_user->paginate(10);
@@ -48,20 +48,29 @@ class SupportersList extends Component
         return view('livewire.supporters-list', ['admin_users' => $admin_users])->layout('layouts.app');
     }
 
-
-    public function view($id = null){
+    public function view($id = null) {
         $adminUserData = User::find($id);
-        $invoices = Invoice::where('customer_id', $adminUserData->id)->get();
-        $paymentHistory = PaymentHistory::whereIn('invoice_id', $invoices->pluck('id'))->get();
-        $adminUserData->total_buy = $invoices->sum('grand_total');
-        $adminUserData->total_due = $invoices->sum('due');
-        $adminUserData->total_invoice = $invoices->count();
-        $adminUserData->total_transaction = $paymentHistory->count();
-        $adminUserData->total_paid = $paymentHistory->sum('amount');
+        $invoices = Invoice::where($this->type . '_id', $adminUserData->id)
+                    ->with([
+                        'salesReturnMedicines',
+                        'salesManager:id,name,address,email,mobile,role',
+                        'fieldOfficer:id,name,address,email,mobile,role',
+                        'customer:id,name,address,email,mobile,role'
+                    ])->get();
 
+        $adminUserData->total_sales = $invoices->sum('grand_total');
+        $adminUserData->total_invoice = $invoices->count();
+        $adminUserData->total_paid = $invoices->sum('paid');
+        $adminUserData->total_return = $invoices->flatMap->salesReturnMedicines->sum('total');
+        $adminUserData->total_due = $invoices->sum('due');
         $this->adminUserData = $adminUserData;
         $this->invoices = $invoices;
+        $this->sales_managers = $adminUserData->salesManager();
+        dd($this->sales_managers->name);
+        $this->field_officers = $adminUserData->fieldOfficer();
+        $this->customers = $adminUserData->customer();
     }
+
 
 
     // public function hydrate()
