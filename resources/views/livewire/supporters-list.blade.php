@@ -124,9 +124,68 @@
                     </div>
 
                     <div class="col-xl-8 col-lg-7 col-md-7 order-0 order-md-1">
+                        @if ($type == 'manager')
+                            <div class="row p-1 mb-1">
+                                <div class="col-4">
+                                    <select class="form-select form-select-sm" wire:change="view({{$adminUserData->id}})" wire:model="sales_manager_id">
+                                        <option selected>Select Sales Manager</option>
+                                        @foreach ($sales_managers as $sales_manager)
+                                            <option value="{{ $sales_manager->id }}">{{ $sales_manager->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="col-4">
+                                    <select class="form-select form-select-sm" wire:change="view({{$adminUserData->id}})" wire:model="field_officer_id" >
+                                        <option selected>Select Field Officer</option>
+                                        @foreach ($field_officers as $field_officer)
+                                            <option value="{{ $field_officer->id }}">{{ $field_officer->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="col-4">
+                                    <select class="form-select form-select-sm" wire:change="view({{$adminUserData->id}})" wire:model="customer_id">
+                                        <option selected>Select Customer</option>
+                                        @foreach ($customers as $customer)
+                                            <option value="{{ $customer->id }}">{{ $customer->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                        @elseif ($type == 'sales_manager')
+                            <div class="row p-1 mb-1">
+                                <div class="col-4">
+                                    <select class="form-select form-select-sm" wire:change="view({{$adminUserData->id}})" wire:model="field_officer_id">
+                                        <option selected>Select Field Officer</option>
+                                        @foreach ($field_officers as $field_officer)
+                                            <option value="{{ $field_officer->id }}">{{ $field_officer->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="col-4">
+                                    <select class="form-select form-select-sm" wire:change="view({{$adminUserData->id}})" wire:model="customer_id">
+                                        <option selected>Select Customer</option>
+                                        @foreach ($customers as $customer)
+                                            <option value="{{ $customer->id }}">{{ $customer->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                        @elseif ($type == 'field_officer')
+                            <div class="row p-1 mb-1">
+                                <div class="col-4">
+                                    <select class="form-select form-select-sm" wire:change="view({{$adminUserData->id}})" wire:model="customer_id">
+                                        <option selected>Select Customer</option>
+                                        @foreach ($customers as $customer)
+                                            <option value="{{ $customer->id }}">{{ $customer->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                        @endif
+
                         <div class="card">
                             <div class="card-header">
-                                <h4>Customer Invoice</h4>
+                                <h4>Invoice List</h4>
                             </div>
                             <div class="card-body border-bottom">
                                 <div class="table-responsive">
@@ -158,40 +217,6 @@
                                             @endforeach
                                         </tbody>
                                     </table>
-
-                                    <!-- Bootstrap Modal -->
-                                    <div wire:ignore.self class="modal fade" id="duePaymentModal" tabindex="-1" aria-labelledby="duePaymentModalLabel" aria-hidden="true">
-                                        <div class="modal-dialog modal-dialog-centered">
-                                            <div class="modal-content border-0">
-                                                <form wire:submit.prevent="payDue">
-                                                    <div class="modal-header">
-                                                        <h5 class="modal-title" id="duePaymentModalLabel">Due Payment</h5>
-                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                                    </div>
-                                                    <div class="modal-body">
-                                                        @if($selectedInvoice)
-                                                            <input type="hidden" wire:model="selectedInvoice.id">
-                                                            <div class="form-group">
-                                                                <label class="form-label fw-bold">Due Amount</label>
-                                                                <input type="text" class="form-control"
-                                                                    value="{{ $site_settings->site_currency }}{{ $selectedInvoice->due }}"
-                                                                    readonly>
-                                                            </div>
-                                                            <div class="form-group mt-2">
-                                                                <label class="form-label fw-bold">Amount</label>
-                                                                <input type="number" wire:model="amount" class="form-control" required>
-                                                                @error('amount') <span class="text-danger">{{ $message }}</span> @enderror
-                                                            </div>
-                                                        @endif
-                                                    </div>
-                                                    <div class="modal-footer">
-                                                        <button type="submit" class="btn btn-primary btn-sm" wire:click="view({{ $adminUserData->id }})">Pay Now</button>
-                                                        <button type="button" class="btn btn-danger btn-sm" data-bs-dismiss="modal">Close</button>
-                                                    </div>
-                                                </form>
-                                            </div>
-                                        </div>
-                                    </div>
                                 </div>
                             </div>
                         </div>

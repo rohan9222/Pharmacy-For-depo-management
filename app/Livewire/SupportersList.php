@@ -18,7 +18,8 @@ class SupportersList extends Component
 {
     use WithPagination, WithoutUrlPagination;
 
-    public $type, $adminUserData, $site_settings, $invoices, $selectedInvoice, $sales_managers, $field_officers, $customers,     $customerId, $name, $email, $mobile, $address, $balance, $search,  $field_officer_team;
+    public $type, $adminUserData, $site_settings, $invoices, $selectedInvoice, $sales_managers, $field_officers, $customers, $sales_manager_id, $field_officer_id, $customer_id,     $customerId, $name, $email, $mobile, $address, $balance, $search,  $field_officer_team;
+
 
     public function mount($type)
     {
@@ -50,13 +51,7 @@ class SupportersList extends Component
 
     public function view($id = null) {
         $adminUserData = User::find($id);
-        $invoices = Invoice::where($this->type . '_id', $adminUserData->id)
-                    ->with([
-                        'salesReturnMedicines',
-                        'salesManager:id,name,address,email,mobile,role',
-                        'fieldOfficer:id,name,address,email,mobile,role',
-                        'customer:id,name,address,email,mobile,role'
-                    ])->get();
+        $invoices = Invoice::where($this->type . '_id', $adminUserData->id)->with(['salesReturnMedicines'])->get();
 
         $adminUserData->total_sales = $invoices->sum('grand_total');
         $adminUserData->total_invoice = $invoices->count();
@@ -64,11 +59,36 @@ class SupportersList extends Component
         $adminUserData->total_return = $invoices->flatMap->salesReturnMedicines->sum('total');
         $adminUserData->total_due = $invoices->sum('due');
         $this->adminUserData = $adminUserData;
-        $this->invoices = $invoices;
-        $this->sales_managers = $adminUserData->salesManager();
-        dd($this->sales_managers->name);
-        $this->field_officers = $adminUserData->fieldOfficer();
-        $this->customers = $adminUserData->customer();
+        $this->updateInvoiceList($adminUserData->id);
+    }
+
+
+    public function updateInvoiceList($id = null) {
+        // Use relationships properly
+        $sales_managers = User::where('role', 'Sales Manager')->where($this->type . '_id', $id);
+        $field_officers = User::where('role', 'Field Officer')->where($this->type . '_id', $id);
+        $customers = User::where('role', 'Customer')->where($this->type . '_id', $id);
+
+        $invoices = Invoice::where($this->type . '_id', $id);
+        if($this->sales_manager_id != null){
+            $invoices = $invoices->where('sales_manager_id', $this->sales_manager_id);
+            $field_officers = $field_officers->where('sales_manager_id', $this->sales_manager_id);
+            $customers = $customers->where('sales_manager_id', $this->sales_manager_id);
+        }
+
+        if($this->field_officer_id != null){
+            $invoices = $invoices->where('field_officer_id', $this->field_officer_id);
+            $customers = $customers->where('field_officer_id', $this->field_officer_id);
+        }
+
+        if($this->customer_id != null){
+            $invoices = $invoices->where('customer_id', $this->customer_id);
+        }
+
+        $this->invoices = $invoices->get() ?? null;
+        $this->sales_managers = $sales_managers->get() ?? null;
+        $this->field_officers = $field_officers->get() ?? null;
+        $this->customers = $customers->get() ?? null;
     }
 
 
