@@ -149,9 +149,77 @@
                 <div class="col-4">
                     <div class="card">
                         <div class="card-header">
+                            <table class="table table-striped table-bordered" x-data="{ isOpen1: false }">
+                                <thead>
+                                    <tr class="text-center"><th colspan="4"><h3>Bonuses for Institutions</h3></th></tr>
+                                    <tr class="text-start">
+                                        <th colspan="4">
+                                            <div class="p-1">
+                                                <!-- Toggle Button -->
+                                                <button
+                                                    @click="isOpen1 = !isOpen1; if (!isOpen1) { $wire.set('start_amount', ''); $wire.set('end_amount', ''); $wire.set('discount', ''); $wire.set('discountId', ''); }"
+                                                    class="btn btn-sm btn-primary"
+                                                    type="button">
+                                                    <span x-text="isOpen1 ? 'Hide This' : 'Add Discount'"></span>
+                                                </button>
+                                            </div>
+
+                                            <!-- Collapse Section -->
+                                            <div x-show="isOpen1" x-transition x-cloak>
+                                                <div class="card card-body">
+                                                    <form wire:submit.prevent="addDiscountValueIns">
+                                                        <div class="row g-2">
+                                                            <div class="col-8">
+                                                                <div class="input-group mb-3">
+                                                                    <input class="form-control" type="text" id="start_amount" wire:model="start_amount" placeholder="Start Amount" aria-label="start_amount">
+                                                                    <span class="input-group-text">To</span>
+                                                                    <input class="form-control" type="text" id="end_amount" wire:model="end_amount" placeholder="End Amount" aria-label="end_amount">
+                                                                </div>
+                                                                @error('start_amount') <span class="text-danger">{{ $message }}</span> @enderror
+                                                                @error('end_amount') <span class="text-danger">{{ $message }}</span> @enderror
+                                                            </div>
+                                                            <div class="col-4">
+                                                                <div class="input-group mb-3">
+                                                                    <input class="form-control" type="text" id="discount" wire:model="discount" placeholder="Discount" aria-label="discount">
+                                                                    <span class="input-group-text" id="basic-addon2">%</span>
+                                                                </div>
+                                                                @error('discount') <span class="text-danger">{{ $message }}</span> @enderror
+                                                            </div>
+                                                        </div>
+                                                        <button class="btn btn-primary mt-2" type="submit">Submit</button>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </th>
+                                    </tr>
+                                    <tr>
+                                        <th>Id</th>
+                                        <th>Amount</th>
+                                        <th>Discount Value</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach ($discount_values->where('discount_type', 'Institution') as $discount_value)
+                                        <tr class="text-center">
+                                            <td>{{ $loop->iteration }}</td>
+                                            <td>{{ $discount_value->start_amount }} - {{ $discount_value->end_amount }}</td>
+                                            <td>{{ $discount_value->discount }}</td>
+                                            <td>
+                                                <button class="btn btn-primary btn-sm" wire:click="editDiscountValue({{ $discount_value->id }})" @click="isOpen1 = true"><i class="bi bi-pencil-square"></i></button>
+                                                <button class="btn btn-danger btn-sm" wire:click="deleteDiscountValue({{ $discount_value->id }})"><i class="bi bi-trash"></i></button>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="card mt-2">
+                        <div class="card-header">
                             <table class="table table-striped table-bordered" x-data="{ isOpen: false }">
                                 <thead>
-                                    <tr class="text-center"><th colspan="4"><h3>Bonuses for refills</h3></th></tr>
+                                    <tr class="text-center"><th colspan="4"><h3>Bonuses for Generals</h3></th></tr>
                                     <tr class="text-start">
                                         <th colspan="4">
                                             <div class="p-1">
@@ -167,7 +235,7 @@
                                             <!-- Collapse Section -->
                                             <div x-show="isOpen" x-transition x-cloak>
                                                 <div class="card card-body">
-                                                    <form wire:submit.prevent="addDiscountValue">
+                                                    <form wire:submit.prevent="addDiscountValueGen">
                                                         <div class="row g-2">
                                                             <div class="col-8">
                                                                 <div class="input-group mb-3">
@@ -200,7 +268,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach ($discount_values as $discount_value)
+                                    @foreach ($discount_values->where('discount_type', 'General') as $discount_value)
                                         <tr class="text-center">
                                             <td>{{ $loop->iteration }}</td>
                                             <td>{{ $discount_value->start_amount }} - {{ $discount_value->end_amount }}</td>

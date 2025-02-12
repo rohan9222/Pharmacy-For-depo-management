@@ -7,7 +7,7 @@ use App\Models\SiteSetting;
 use App\Models\Invoice;
 use Redirect,Response;
 use PDF;
-use Illuminate\Support\Number;
+// use Illuminate\Support\Number;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -21,9 +21,9 @@ class MakeSummaryController extends Controller
     */
 
     public function summaryPDF(Request $request){
-        $invoice_data = Invoice::where('invoice_no', $request->invoice)
-            ->with('salesMedicines', 'customer', 'fieldOfficer', 'salesManager', 'manager')
-            ->first();
+        $invoice_data = Invoice::where('summary_id', $request->id)
+            ->with('salesMedicines', 'customer', 'fieldOfficer', 'salesManager', 'manager','deliveredBy')
+            ->get();
 
         $site_data = SiteSetting::first();
         $data = [
@@ -31,7 +31,6 @@ class MakeSummaryController extends Controller
             'pdf_title' => $site_data->site_name,
             'pdf_logo' => url($site_data->site_logo),
             'invoice_data' => $invoice_data,
-            'grand_total_words' =>  Number::spell($invoice_data->grand_total, locale: 'en'), // Corrected
             'site_data' => $site_data
         ];
 

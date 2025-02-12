@@ -15,38 +15,64 @@
         </li>
 
         {{-- Supporters --}}
-        @if (Auth::user()->hasRole('Super Admin') || Auth::user()->hasPermissionTo('admin-role'))
+        {{-- @if (Auth::user()->hasRole('Super Admin') || Auth::user()->hasPermissionTo('admin-role')) --}}
             <li class="nav-item">
                 <a href="#" class="nav-link link-body-emphasis {{ request()->routeIs('supporter.list') ? 'active' : '' }}" data-bs-toggle="collapse" data-bs-target="#admin-collapse" aria-expanded="false">
                     <i class="bi bi-people me-2"></i>
-                    <span class="sidebar-text">Admin Panel</span>
+                    <span class="sidebar-text">Admin Panel Report</span>
                     <i class="bi bi-chevron-down ms-auto toggle-icon sidebar-text"></i>
                 </a>
 
                 <div class="collapse" id="admin-collapse">
                     <ul class="ms-4 btn-toggle-nav list-unstyled fw-normal pb-1 small">
-                        <li>
-                            <a href="{{ route('supporter.list', ['type' => 'manager']) }}" class="nav-link link-body-emphasis {{ request()->routeIs('supporter.list') && request('type') === 'manager' ? 'active' : '' }}">
-                                <i class="bi bi-caret-right-fill me-2"></i>
-                                <span class="sidebar-text">Managers</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="{{ route('supporter.list', ['type' => 'sales_manager']) }}" class="nav-link link-body-emphasis {{ request()->routeIs('supporter.list') && request('type') === 'sales_manager' ? 'active' : '' }}">
-                                <i class="bi bi-caret-right-fill me-2"></i>
-                                <span class="sidebar-text">Sales Managers</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="{{ route('supporter.list', ['type' => 'field_officer']) }}" class="nav-link link-body-emphasis {{ request()->routeIs('supporter.list') && request('type') === 'field_officer' ? 'active' : '' }}">
-                                <i class="bi bi-caret-right-fill me-2"></i>
-                                <span class="sidebar-text">Field Officers</span>
-                            </a>
-                        </li>
+                        @if (Auth::user()->role == 'Manager' || Auth::user()->hasRole('Depo Incharge') || Auth::user()->hasRole('Super Admin') )
+                            <li>
+                                <a href="{{ route('supporter.list', ['type' => 'manager']) }}" class="nav-link link-body-emphasis {{ request()->routeIs('supporter.list') && request('type') === 'manager' ? 'active' : '' }}">
+                                    <i class="bi bi-caret-right-fill me-2"></i>
+                                    <span class="sidebar-text">Managers</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{{ route('supporter.list', ['type' => 'sales_manager']) }}" class="nav-link link-body-emphasis {{ request()->routeIs('supporter.list') && request('type') === 'sales_manager' ? 'active' : '' }}">
+                                    <i class="bi bi-caret-right-fill me-2"></i>
+                                    <span class="sidebar-text">Sales Managers</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{{ route('supporter.list', ['type' => 'field_officer']) }}" class="nav-link link-body-emphasis {{ request()->routeIs('supporter.list') && request('type') === 'field_officer' ? 'active' : '' }}">
+                                    <i class="bi bi-caret-right-fill me-2"></i>
+                                    <span class="sidebar-text">Field Officers</span>
+                                </a>
+                            </li>
+                        @endif
+
+                        @if (Auth::user()->role == 'Sales Manager' )
+                            <li>
+                                <a href="{{ route('supporter.list', ['type' => 'sales_manager']) }}" class="nav-link link-body-emphasis {{ request()->routeIs('supporter.list') && request('type') === 'sales_manager' ? 'active' : '' }}">
+                                    <i class="bi bi-caret-right-fill me-2"></i>
+                                    <span class="sidebar-text">Sales Managers</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{{ route('supporter.list', ['type' => 'field_officer']) }}" class="nav-link link-body-emphasis {{ request()->routeIs('supporter.list') && request('type') === 'field_officer' ? 'active' : '' }}">
+                                    <i class="bi bi-caret-right-fill me-2"></i>
+                                    <span class="sidebar-text">Field Officers</span>
+                                </a>
+                            </li>
+                        @endif
+
+                        @if (Auth::user()->role == 'Field Officer' )
+                            <li>
+                                <a href="{{ route('supporter.list', ['type' => 'field_officer']) }}" class="nav-link link-body-emphasis {{ request()->routeIs('supporter.list') && request('type') === 'field_officer' ? 'active' : '' }}">
+                                    <i class="bi bi-caret-right-fill me-2"></i>
+                                    <span class="sidebar-text">Field Officers</span>
+                                </a>
+                            </li>
+                        @endif
                     </ul>
                 </div>
             </li>
-        @endif
+        {{-- @endif --}}
 
         <li class="nav-item">
             <a href="#" class="nav-link link-body-emphasis {{ in_array(request()->route()->getName(), ['suppliers', 'customers', 'delivery-man']) ? 'active' : '' }}" data-bs-toggle="collapse" data-bs-target="#supporter-collapse" aria-expanded="false">
@@ -179,6 +205,13 @@
                         </li>
 
                         <li class="nav-item">
+                            <a href="{{ route('sales-delivery-history') }}" class="nav-link link-body-emphasis {{ request()->routeIs('sales-delivery-history') ? 'active' : '' }}">
+                                <i class="bi bi-caret-right-fill me-2"></i>
+                                <span class="sidebar-text">Delivery List</span>
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
                             <a href="{{ route('return-medicines-list') }}" class="nav-link link-body-emphasis {{ request()->routeIs('return-medicines-list') ? 'active' : '' }}">
                                 <i class="bi bi-caret-right-fill me-2"></i>
                                 <span class="sidebar-text">Return History</span>
@@ -204,12 +237,12 @@
                                 <span class="sidebar-text">Summary</span>
                             </a>
                         </li>
-                        <li class="nav-item">
+                        {{-- <li class="nav-item">
                             <a href="#" class="nav-link link-body-emphasis">
                                 <i class="bi bi-caret-right-fill me-2"></i>
                                 <span class="sidebar-text">Reports</span>
                             </a>
-                        </li>
+                        </li> --}}
                     @endcan
                 </ul>
             </div>
@@ -225,12 +258,12 @@
             </li>
         @endif
 
-        <li class="nav-item">
+        {{-- <li class="nav-item">
             <a href="#" class="nav-link link-body-emphasis">
                 <i class="bi bi-capsule-pill me-2"></i>
                 <span class="sidebar-text">Order</span>
             </a>
-        </li>
+        </li> --}}
     </ul>
 
 

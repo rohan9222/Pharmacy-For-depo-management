@@ -17,10 +17,7 @@ class CustomersList extends Component
 {
     use WithPagination, WithoutUrlPagination;
 
-    public $site_settings, $customerId, $name, $email, $mobile, $address, $balance, $supplier_type, $route, $category, $search, $field_officers, $field_officer_team, $customerData, $invoices, $invoiceDue;
-    // public $invoices;
-    public $selectedInvoice;
-    public $amount;
+    public $site_settings, $customerId, $name, $email, $mobile, $address, $balance, $supplier_type, $route, $category, $search, $field_officers, $field_officer_team, $customerData, $invoices, $invoiceDue, $selectedInvoice, $partialPayment, $amount;
 
     // protected $listeners = ['openModal' => 'setInvoice'];
     public function mount()
@@ -85,7 +82,6 @@ class CustomersList extends Component
     {
         $this->validate($this->role());
         try {
-
             $latestInvoiceNo = User::orderByDesc('user_id')->value('user_id');
             $user_id = ($latestInvoiceNo) ? ((int) filter_var($latestInvoiceNo, FILTER_SANITIZE_NUMBER_INT) + 1) : 010500;
             $newCustomer = User::updateOrCreate(
@@ -162,11 +158,21 @@ class CustomersList extends Component
     {
         $this->view($customerId);
         $this->selectedInvoice = Invoice::find($invoiceId);
+        $this->partialPayment = '';
+        $this->amount = '';
+    }
+
+    public function partialPay($customerId)
+    {
+        $this->view($customerId);
+        $this->partialPayment = $this->customerData->total_due;
+        $this->selectedInvoice = null;
         $this->amount = '';
     }
 
     public function payDue()
     {
+        $this->view($this->customerData->id);
         $this->validate([
             'amount' => 'required|numeric|min:1',
         ]);
@@ -185,11 +191,35 @@ class CustomersList extends Component
             $this->amount = '';
 
             flash()->success('Amount paid successfully.');
-            // $this->dispatch('closeModal');
+        }elseif ($this->partialPayment){
+            $inv = Invoice::where('customer_id', $this->customerData->id)->where('due', '>', 0)->orderBy('id', 'desc')->get();
+            $remainingPayment = $this->amount;
+            foreach ($inv as $invoice) {
+                if ($remainingPayment <= 0) {
+                    break;
+                }
+                $amountToPay = min($remainingPayment, $invoice->due); // Pay only what's needed to clear the due
+                // Update invoice payment
+                $invoice->paid += $amountToPay;
+                $invoice->due -= $amountToPay;
+                $invoice->save();
+                // Store payment history
+                PaymentHistory::create([
+                    'invoice_id' => $invoice->id,
+                    'amount' => $amountToPay,
+                    'date' => now()
+                ]);
+                // Reduce the remaining payment amount
+                $remainingPayment -= $amountToPay;
+            }
+            // Reset input fields
+            $this->amount = '';
 
-        }else {
+            flash()->success('Amount paid successfully.');
+        }else{
             flash()->error('Something went wrong!');
         }
+        $this->view($this->customerData->id);
     }
 
 }

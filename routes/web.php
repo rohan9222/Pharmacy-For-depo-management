@@ -4,18 +4,59 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\{DashboardController,UserProfileController};
 use App\Http\Controllers\Admin\{RoleController,UserController};
 use App\Http\Controllers\makepdf\{MakeInvoiceController,MakeSummaryController,MakeReportController};
-use App\Livewire\{SupportersList,CustomersList,DeliveryManList,SupplierList,MedicinesList,CategoryList, PackSizeList, StockMedicines,StockMedicinesList,SalesInvoice,InvoiceHistory,InvoiceReturnHistory,SiteSettings,SummaryList};
+use App\Livewire\{SupportersList,CustomersList,DeliveryManList,SupplierList,MedicinesList,CategoryList, PackSizeList, StockMedicines,StockMedicinesList,SalesInvoice,InvoiceHistory,DeliveryHistory,InvoiceReturnHistory,SiteSettings,SummaryList};
 
 
 Route::get('/', function () {
     return redirect()->route('login');
 });
+Route::get('/php-artisan-optimize', function () {
+    $commands = [
+        'config:cache',
+        'route:cache',
+        'view:cache',
+        'cache:clear',
+        'event:cache',
+        'compiled:clear',
+        // Add more commands as needed
+    ];
+
+    $output = [];
+    foreach ($commands as $command) {
+        try {
+            Artisan::call($command);
+            $output[$command] = Artisan::output();
+        } catch (\Exception $e) {
+            $output[$command] = $e->getMessage();
+        }
+    }
+
+    return response()->json($output);
+});
+Route::get('/mac-address', function () {
+    // Test with a simple command to check execution
+    $macAddress = trim(shell_exec('/sbin/ifconfig -a | grep -Po \'(\w\w:\w\w:\w\w:\w\w:\w\w:\w\w)\''));
+
+    $result = shell_exec('hostname');
+    \Log::info("Command output: " . $macAddress);
+
+    return response()->json(['result' => $macAddress]);
+});
+
 
 Route::middleware([
     'auth:sanctum',
     config('jetstream.auth_session'),
     'verified',
 ])->group(function () {
+// user and role management
+    Route::get('/users/sales-managers', [UserController::class, 'salesManagers'])->name('users.sales-managers');
+    Route::resources([
+        'dashboard' => DashboardController::class,
+        'roles' => RoleController::class,
+        'users' => UserController::class,
+    ]);
+
 // Supporters management
     Route::get('/customers', CustomersList::class)->name('customers');
     Route::get('/delivery-man', DeliveryManList::class)->name('delivery-man');
@@ -37,6 +78,7 @@ Route::middleware([
     Route::get('/pos', SalesInvoice::class)->name('pos');
     Route::get('/sales-medicines', InvoiceHistory::class)->name('sales-medicines');
     Route::get('/sales-medicines-list', InvoiceHistory::class)->name('sales-medicines-list');
+    Route::get('/sales-delivery-history', DeliveryHistory::class)->name('sales-delivery-history');
     Route::get('/sales-return-medicines-list', InvoiceReturnHistory::class)->name('return-medicines-list');
 
 // site settings
@@ -50,14 +92,6 @@ Route::middleware([
 
 // summary
     Route::get('/summary-details', SummaryList::class)->name('summary.list');
-
-// user and role management
-    Route::get('/users/sales-managers', [UserController::class, 'salesManagers'])->name('users.sales-managers');
-    Route::resources([
-        'dashboard' => DashboardController::class,
-        'roles' => RoleController::class,
-        'users' => UserController::class,
-    ]);
 
 // pdf generate
     Route::get('/invoice/{invoice}', [MakeInvoiceController::class,'invoicePDF'])->name('invoice.pdf');

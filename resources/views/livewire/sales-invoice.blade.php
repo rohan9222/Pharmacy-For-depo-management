@@ -56,7 +56,7 @@
                 <div class="col-4">
                     <label for="customer" class="form-label">Customer</label>
                     <div class="input-group mb-3">
-                        <select class="form-select" wire:model="customer">
+                        <select class="form-select" wire:model.live.debounce.1000ms="customer">
                             <option value="">Select Customer</option>
                             @foreach ($customers as $customer)
                                 <option value="{{ $customer->id }}">{{ $customer->name }}</option>
@@ -117,7 +117,7 @@
                                 </td>
                                 <td>
                                     {{-- <input type="text" class="form-control form-control-sm" wire:model.live.debounce.1000ms="stockMedicines.{{ $index }}.total" disabled> --}}
-                                    <span>{{ $stockMedicines[$index]['total'] }}</span>                                    
+                                    <span>{{ $stockMedicines[$index]['total'] }}</span>
                                 </td>
                                 <td><button type="button" class="btn btn-sm btn-outline-danger" wire:click="removeMedicine({{ $index }})"><i class="bi bi-x"></i></button></td>
                             </tr>
@@ -160,7 +160,8 @@
                             <th>:</th>
                             <td>
                                 <div class="input-group w-75 ">
-                                    <input type="text" placeholder="Spacial Discount Price" class="form-control form-control-sm" wire:model.live.debounce.1000ms="discount" disabled readonly>
+                                    {{-- <input type="text" placeholder="Spacial Discount Price" class="form-control form-control-sm" wire:model.live.debounce.1000ms="discount" disabled readonly> --}}
+                                    <input type="text" placeholder="Spacial Discount Price" class="form-control form-control-sm" value="{{$discount}}" disabled readonly>
                                     <span class="input-group-text bg-info bg-opacity-10">{{$discount_amount}}৳</span>
                                 </div>
                                 @error('discount') <span class="text-danger">{{ $message }}</span> @enderror

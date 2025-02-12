@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
+use App\Models\TargetReport;
 use App\Models\Invoice;
 use App\Models\PaymentHistory;
 use App\Models\SiteSetting;
@@ -18,7 +19,7 @@ class SupportersList extends Component
 {
     use WithPagination, WithoutUrlPagination;
 
-    public $type, $adminUserData, $site_settings, $invoices, $selectedInvoice, $sales_managers, $field_officers, $customers, $sales_manager_id, $field_officer_id, $customer_id,     $customerId, $name, $email, $mobile, $address, $balance, $search,  $field_officer_team;
+    public $type, $adminUserData, $site_settings, $invoices, $selectedInvoice, $sales_managers, $field_officers, $customers, $sales_manager_id, $field_officer_id, $customer_id, $target_edit, $sales_target, $start_date, $end_date,      $customerId, $name, $email, $mobile, $address, $balance, $search,  $field_officer_team;
 
 
     public function mount($type)
@@ -35,15 +36,33 @@ class SupportersList extends Component
     {
         $this->site_settings = SiteSetting::first();
         // Fetch admin_users based on search and role
-        $admin_user = User::query()
-            ->search($this->search);
+        $admin_user = User::query()->search($this->search);
             if($this->type == 'manager'){
                 $admin_user = $admin_user->where('role', 'Manager');
+                if(auth()->user()->hasRole('Manager')) {
+                    $admin_user = $admin_user->where('id', auth()->user()->id);
+                }
             }elseif($this->type == 'sales_manager'){
                 $admin_user = $admin_user->where('role', 'Sales Manager');
+                if(auth()->user()->hasRole('Manager')) {
+                    $admin_user = $admin_user->where('manager_id', auth()->user()->id);
+                }
+                if(auth()->user()->hasRole('Sales Manager')) {
+                    $admin_user = $admin_user->where('id', auth()->user()->id);
+                }
             }elseif($this->type == 'field_officer'){
                 $admin_user = $admin_user->where('role', 'Field Officer');
+                if(auth()->user()->hasRole('Manager')) {
+                    $admin_user = $admin_user->where('manager_id', auth()->user()->id);
+                }
+                if(auth()->user()->hasRole('Sales Manager')) {
+                    $admin_user = $admin_user->where('sales_manager_id', auth()->user()->id);
+                }
+                if(auth()->user()->hasRole('Field Officer')) {
+                    $admin_user = $admin_user->where('id', auth()->user()->id);
+                }
             }
+
         $admin_users = $admin_user->paginate(10);
 
         return view('livewire.supporters-list', ['admin_users' => $admin_users])->layout('layouts.app');
@@ -62,6 +81,18 @@ class SupportersList extends Component
         $this->updateInvoiceList($adminUserData->id);
     }
 
+    public function edit($id = null) {
+        $this->target_edit = User::find($id);
+        $this->sales_target = $this->target_edit->sales_target;
+    }
+
+    public function targetUpdate($id) {
+        $user = User::find($id);
+        $user->sales_target = $this->sales_target;
+        $user->save();
+        TargetReport::where('user_id', $user->id)->where('target_month', date('F'))->where('target_year', date('Y'))->update(['sales_target' => $this->sales_target]);
+        flash()->success('Sales Target Updated Successfully');
+    }
 
     public function updateInvoiceList($id = null) {
         // Use relationships properly
@@ -74,21 +105,43 @@ class SupportersList extends Component
             $invoices = $invoices->where('sales_manager_id', $this->sales_manager_id);
             $field_officers = $field_officers->where('sales_manager_id', $this->sales_manager_id);
             $customers = $customers->where('sales_manager_id', $this->sales_manager_id);
+            $this->field_officers = $field_officers->get() ?? null;
+        }else{
+            $this->field_officer_id = null;
+            $this->customer_id = null;
+            $this->field_officers = [];
+            $this->customers = [];
         }
 
         if($this->field_officer_id != null){
             $invoices = $invoices->where('field_officer_id', $this->field_officer_id);
             $customers = $customers->where('field_officer_id', $this->field_officer_id);
+            $this->customers = $customers->get() ?? null;
+        }else{
+            $this->customer_id = null;
+            $this->customers = [];
         }
 
         if($this->customer_id != null){
             $invoices = $invoices->where('customer_id', $this->customer_id);
         }
-
+        if($this->start_date){
+            $invoices = $invoices->where('invoice_date', '<', $this->start_date);
+        }
+        if($this->end_date){
+            $invoices = $invoices->where('invoice_date', '>', $this->end_date);
+        }
         $this->invoices = $invoices->get() ?? null;
-        $this->sales_managers = $sales_managers->get() ?? null;
-        $this->field_officers = $field_officers->get() ?? null;
-        $this->customers = $customers->get() ?? null;
+        if($this->type == 'manager'){
+            $this->sales_managers = $sales_managers->get() ?? null;
+        }elseif($this->type == 'sales_manager'){
+            $this->sales_manager_id = $id;
+            $this->field_officers = $field_officers->get() ?? null;
+        }elseif($this->type == 'field_officer'){
+            $this->sales_manager_id = User::find($id)->sales_manager_id;
+            $this->field_officer_id = $id;
+            $this->customers = $customers->get() ?? null;
+        }
     }
 
 

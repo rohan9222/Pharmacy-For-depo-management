@@ -21,7 +21,7 @@ class InvoiceHistory extends Component
 {
     use WithPagination, WithoutUrlPagination;
 
-    public $search, $invoice_data, $site_settings, $return_date, $return_quantity, $return_medicine;
+    public $search, $invoice_data, $site_settings, $return_date, $return_quantity, $return_medicine, $invoice_discount, $spl_discount;
 
     public function mount(){
         if(auth()->user()->hasRole('Super Admin')) {
@@ -38,10 +38,40 @@ class InvoiceHistory extends Component
     public function render()
     {
         $this->site_settings = SiteSetting::first();
-        $invoices = Invoice::search($this->search)->paginate(15);
+        $invoices = Invoice::search($this->search)->with(['customer:id,name', 'deliveredBy:id,name'])->paginate(15);
+        // dd($invoices);
         return view('livewire.invoice-history',[
             'invoices' => $invoices
         ])->layout('layouts.app');
+    }
+
+    public function invoiceEdit($invoiceID = null)
+    {
+        if($invoiceID) {
+            $this->invoice_discount = Invoice::find($invoiceID);
+            $this->spl_discount = $this->invoice_discount->spl_discount;
+        }else {
+            $this->invoice_discount = null;
+            $this->spl_discount = '';
+        }
+    }
+
+    public function invoiceUpdate($invoiceID = null)
+    {
+        if($invoiceID){
+            $inv = Invoice::find($invoiceID);
+            $inv->spl_dis_amount = $inv->sub_total * $this->spl_discount/100;
+            $inv->spl_discount = $this->spl_discount;
+            $inv->grand_total = $inv->sub_total + $inv->vat - ($inv->dis_amount + $inv->spl_dis_amount);
+            $inv->due = $inv->grand_total - $inv->paid;
+            $inv->save();
+
+            $this->spl_discount = '';
+
+            flash()->success('Invoice updated successfully');
+        }else{
+            flash()->error('Something is wrong');
+        }
     }
 
     public function invoiceView($invoiceID = null)

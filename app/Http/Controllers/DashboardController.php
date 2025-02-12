@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\{User, Medicine, SalesMedicine, StockInvoice, Invoice};
+use App\Models\{User, Medicine, SalesMedicine, StockInvoice, StockList, SiteSetting, Invoice};
 
 use Illuminate\Http\Request;
 // use App\Models\{CustomersInfo,CollectionSummary,BillingInfo};
@@ -24,9 +24,18 @@ class DashboardController extends Controller
 
         // Recursive method to build the hierarchy
         $hierarchy = $this->buildHierarchy($users);
-        // \dd($hierarchy);
+        $site_setting = SiteSetting::first();
 
-        return view('dashboard', compact('total_medicine', 'total_sales', 'total_purchases', 'total_customers', 'hierarchy'));
+        // Medicines that are out of stock (quantity < 0)
+        $stock_out_medicine = Medicine::where('quantity', '<', 0)->get() ?? null;
+        // Medicines that are low in stock based on a setting value
+        $low_stock_medicine = $site_setting->medicine_low_stock_quantity ? Medicine::where('quantity', '<', $site_setting->medicine_low_stock_quantity)->get() ?? null : null;
+        // Medicines that have expired
+        $expired_medicine = StockList::where('expiry_date', '<', Carbon::now()->format('Y-m-d'))->get() ??  null;
+        // Medicines that will expire soon (within the set number of days)
+        $expire_alert_medicine = $site_setting->medicine_expiry_days ? StockList::where('expiry_date', '<', Carbon::now()->addDays(floatval($site_setting->medicine_expiry_days))->format('Y-m-d'))->get() ?? null :  null;
+
+        return view('dashboard', compact('total_medicine', 'total_sales', 'total_purchases', 'total_customers', 'hierarchy', 'stock_out_medicine', 'low_stock_medicine', 'expired_medicine', 'expire_alert_medicine'));
     }
 
     /**

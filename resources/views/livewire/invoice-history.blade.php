@@ -24,6 +24,10 @@
                                         <th>Total</th>
                                         <th>Paid</th>
                                         <th>Due</th>
+                                        <th>Customer Name</th>
+                                        <th>Delivery Status</th>
+                                        <th>Delivered By</th>
+                                        <th>Delivered Date</th>
                                         <th>Action</th>
                                     </tr>
                                 </thead>
@@ -36,8 +40,27 @@
                                             <td>{{ $invoice->grand_total }}</td>
                                             <td>{{ $invoice->paid }}</td>
                                             <td>{{ $invoice->due }}</td>
+                                            <td>{{ $invoice->customer->name }}</td>
+                                            <td>
+                                                @if($invoice->delivery_status == 'pending')
+                                                    <span class="badge text-bg-warning">Pending</span>
+                                                @elseif($invoice->delivery_status == 'delivered')
+                                                    <span class="badge text-bg-success">Delivered</span>
+                                                @elseif($invoice->delivery_status == 'shipped')
+                                                    <span class="badge text-bg-primary">Shipped</span>
+                                                @elseif($invoice->delivery_status == 'cancelled')
+                                                    <span class="badge text-bg-danger">Cancelled</span>
+                                                @endif
+                                            </td>
+                                            <td>{{ $invoice->deliveredBy->name ?? 'Not Assigned' }}</td>
+                                            <td>{{ $invoice->delivered_date ? \Carbon\Carbon::parse($invoice->delivered_date)->format('d M Y') : 'N/A' }}</td>
                                             <td>
                                                 @can('invoice')
+                                                    @if($invoice->delivery_status == 'pending')
+                                                        <button class="btn btn-sm btn-info" wire:click="invoiceEdit({{ $invoice->id }})" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                                                            <i class="bi bi-pencil"></i>
+                                                        </button>
+                                                    @endif
                                                     <button class="btn btn-sm btn-success" wire:click="invoiceView({{ $invoice->id }})" @click="isTableData = false, isInvoiceData = true, isReturnData = false">
                                                         <i class="bi bi-eye"></i>
                                                     </button>
@@ -53,6 +76,42 @@
                                 </tbody>
                             </table>
                             {{ $invoices->links() }}
+
+                            @if ($invoice_discount && $spl_discount !== '')
+                                <div class="modal fade show d-block" tabindex="-1" role="dialog">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <form wire:submit.prevent="invoiceUpdate({{ $invoice_discount->id ?? '' }})">
+                                                <div class="modal-header">
+                                                    <h1 class="modal-title fs-5">Update Invoice Discount</h1>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+                                                        wire:click="$set('spl_discount', '')"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <div class="mb-3">
+                                                        <label for="invoice_no" class="form-label">Invoice NO</label>
+                                                        <input type="text" class="form-control" id="invoice_no" disabled
+                                                            value="{{ $invoice_discount->invoice_no ?? '' }}">
+                                                    </div>
+                                                    <div class="mb-3">
+                                                        <label for="spl_discount" class="form-label">Invoice Special Discount (%)</label>
+                                                        <input type="number" class="form-control" id="spl_discount" wire:model.defer="spl_discount">
+                                                        @error('spl_discount')
+                                                            <span class="text-danger">{{ $message }}</span>
+                                                        @enderror
+                                                    </div>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" wire:click="$set('spl_discount', '')">Close</button>
+                                                    <button type="submit" class="btn btn-primary">Save changes</button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="modal-backdrop fade show"></div>
+                            @endif
                         </div>
                     </div>
                 </div>

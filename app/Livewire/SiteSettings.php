@@ -9,6 +9,8 @@ use Livewire\WithFileUploads;
 use Intervention\Image\Drivers\Gd\Driver;
 use Intervention\Image\ImageManager;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\DB;
 
 use Livewire\Component;
 
@@ -132,11 +134,121 @@ class SiteSettings extends Component
         flash()->success('Site settings updated successfully!');
     }
 
-    public function addDiscountValue()
+    public function addDiscountValueIns()
     {
+        // Validate the data before processing
         $this->validate([
-            'start_amount' => 'required|numeric',
-            'end_amount' => 'required|numeric',
+            'start_amount' => [
+                'required',
+                'numeric',
+                function ($attribute, $value, $fail) {
+                    if($this->discountId){
+                        $latestDiscount = DB::table('discount_values')
+                            ->where('id', $this->discountId)
+                            ->first();
+
+                        // If it's an edit scenario and we have a valid record
+                        if ($latestDiscount) {
+                            // Check if the start_amount is between the previous start and end amount
+                            if ($value > $latestDiscount->end_amount || $value < $latestDiscount->start_amount) {
+                                $fail('The ' . $attribute . ' must be between the previous start and end amount.');
+                            }
+                        }
+                    }else{
+                        // Get the latest end_amount for the same discount_type and Institution
+                        $latestEndAmount = DB::table('discount_values')
+                            ->where('discount_type', 'Institution')
+                            ->orderByDesc('end_amount')
+                            ->value('end_amount');
+                        // If there's a latest end_amount, check if start_amount is greater
+                        if ($latestEndAmount !== null && $value < $latestEndAmount) {
+                            $fail('The ' . $attribute . ' must be greater than the previous last end amount.');
+                        }
+                    }
+
+                }
+            ],
+            'end_amount' => [
+                'required',
+                'numeric',
+                function ($attribute, $value, $fail) {
+                    // Ensure end_amount is greater than the start_amount
+                    if ($value <= $this->start_amount) {
+                        $fail('The ' . $attribute . ' must be greater than the start amount.');
+                    }
+                }
+            ],
+            'discount' => 'required|numeric',
+        ]);
+
+        // Use updateOrCreate to either update an existing discount value or create a new one
+        DiscountValue::updateOrCreate(
+            [
+                'id' => $this->discountId  // If the ID is null, it'll create a new entry
+            ],
+            [
+                'start_amount' => $this->start_amount,
+                'end_amount' => $this->end_amount,
+                'discount' => $this->discount,
+                'discount_type' => 'Institution'
+            ]
+        );
+
+        // Reset input values after successful save
+        $this->start_amount = $this->end_amount = $this->discount = $this->discountId = null;
+
+        // Flash success message
+        flash()->success('Discount value added successfully!');
+    }
+
+
+    public function addDiscountValueGen()
+    {
+
+        $this->validate([
+            'start_amount' => [
+                'required',
+                'numeric',
+                // Rule::unique('discount_values', 'start_amount')
+                //     ->where('discount_type', 'General'),
+                function ($attribute, $value, $fail) {
+                    if($this->discountId){
+                        $latestDiscount = DB::table('discount_values')
+                            ->where('id', $this->discountId)
+                            ->first();
+
+                        // If it's an edit scenario and we have a valid record
+                        if ($latestDiscount) {
+                            // Check if the start_amount is between the previous start and end amount
+                            if ($value > $latestDiscount->end_amount || $value < $latestDiscount->start_amount) {
+                                $fail('The ' . $attribute . ' must be between the previous start and end amount.');
+                            }
+                        }
+                    }else{
+                        // Get the latest end_amount for the same discount_type and Institution
+                        $latestEndAmount = DB::table('discount_values')
+                            ->where('discount_type', 'General')
+                            ->orderByDesc('end_amount')
+                            ->value('end_amount');
+                        // If there's a latest end_amount, check if start_amount is greater
+                        if ($latestEndAmount !== null && $value < $latestEndAmount) {
+                            $fail('The ' . $attribute . ' must be greater than the previous last end amount.');
+                        }
+                    }
+                }
+            ],
+            'end_amount' => [
+                'required',
+                'numeric',
+                // Rule::unique('discount_values', 'end_amount')
+                //     ->where('discount_type', 'General'),
+                function ($attribute, $value, $fail) {
+                    // Ensure end_amount is greater than the start_amount
+                    if ($value <= $this->start_amount) {
+                        $fail('The ' . $attribute . ' must be greater than the start amount.');
+                    }
+                }
+            ],
             'discount' => 'required|numeric',
         ]);
         DiscountValue::updateOrCreate(
@@ -147,6 +259,7 @@ class SiteSettings extends Component
                 'start_amount' => $this->start_amount,
                 'end_amount' => $this->end_amount,
                 'discount' => $this->discount,
+                'discount_type' => 'General'
             ]
         );
         $this->start_amount = $this->end_amount = $this->discount = $this->discountId = null;

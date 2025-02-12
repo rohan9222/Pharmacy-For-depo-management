@@ -10,5 +10,6 @@ class DiscountValue extends Model
         'start_amount',
         'end_amount',
         'discount',
+        'discount_type'
     ];
 }

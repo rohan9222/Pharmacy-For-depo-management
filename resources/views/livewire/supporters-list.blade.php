@@ -34,13 +34,50 @@
                                 <td>{{ $admin_user->address }}</td>
                                 <td>{{ $admin_user->sales_target }}</td>
                                 <td>
-                                    <button class="btn btn-sm btn-info" wire:click="edit({{ $admin_user->id }})" @click="isOpen = true"><i class="bi bi-pencil-square"></i></button>
+                                    @if(Auth::user()->hasRole('Super Admin') || Auth::user()->hasRole('Depo Incharge'))
+                                        <button class="btn btn-sm btn-info" wire:click="edit({{ $admin_user->id }})" @click="isOpen = true"><i class="bi bi-pencil-square"></i></button>
+                                    @endif
                                     <button class="btn btn-sm btn-primary" wire:click="view({{ $admin_user->id }})" @click="isUserProfile = true, isUserList = false" ><i class="bi bi-eye"></i></button>
                                 </td>
                             </tr>
                         @endforeach
                     </tbody>
                 </table>
+                @if ($target_edit && $sales_target !== '')
+                    <div class="modal fade show d-block" tabindex="-1" role="dialog">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <form wire:submit.prevent="targetUpdate({{ $target_edit->id ?? '' }})">
+                                    <div class="modal-header">
+                                        <h1 class="modal-title fs-5">Update Monthly Sales Target</h1>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+                                            wire:click="$set('sales_target', '')"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div class="mb-3">
+                                            <label for="user_id" class="form-label">Person Data</label>
+                                            <input type="text" class="form-control" id="user_id" disabled
+                                                value="{{ $target_edit->name ?? '' }} (User ID: {{ $target_edit->user_id ?? '' }}) ({{ $target_edit->role ?? '' }})">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="sales_target" class="form-label">Sales Target Amount</label>
+                                            <input type="number" class="form-control" id="sales_target" wire:model="sales_target">
+                                            @error('sales_target')
+                                                <span class="text-danger">{{ $message }}</span>
+                                            @enderror
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" wire:click="$set('sales_target', '')">Close</button>
+                                        <button type="submit" class="btn btn-primary">Save changes</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-backdrop fade show"></div>
+                @endif
             </div>
 
             <div class="pagination">
@@ -49,7 +86,7 @@
         </div>
 
         <div class="col-10" x-show="isUserProfile" x-transition x-cloak>
-            <button class="btn btn-sm btn-info" @click="isUserProfile = false">back</button>
+            <button class="btn btn-sm btn-info" @click="isUserProfile = false; $wire.set('sales_manager_id', ''); $wire.set('field_officer_id', ''); $wire.set('customer_id', '');">back</button>
             @if ($adminUserData)
                 <div class="row pt-2">
                     <div class="col-xl-4 col-lg-5 col-md-5 order-1 order-md-0">
@@ -124,64 +161,67 @@
                     </div>
 
                     <div class="col-xl-8 col-lg-7 col-md-7 order-0 order-md-1">
+                        <div class="row p-1 mb-1">
                         @if ($type == 'manager')
-                            <div class="row p-1 mb-1">
-                                <div class="col-4">
-                                    <select class="form-select form-select-sm" wire:change="view({{$adminUserData->id}})" wire:model="sales_manager_id">
-                                        <option selected>Select Sales Manager</option>
-                                        @foreach ($sales_managers as $sales_manager)
-                                            <option value="{{ $sales_manager->id }}">{{ $sales_manager->name }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                                <div class="col-4">
-                                    <select class="form-select form-select-sm" wire:change="view({{$adminUserData->id}})" wire:model="field_officer_id" >
-                                        <option selected>Select Field Officer</option>
-                                        @foreach ($field_officers as $field_officer)
-                                            <option value="{{ $field_officer->id }}">{{ $field_officer->name }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                                <div class="col-4">
-                                    <select class="form-select form-select-sm" wire:change="view({{$adminUserData->id}})" wire:model="customer_id">
-                                        <option selected>Select Customer</option>
-                                        @foreach ($customers as $customer)
-                                            <option value="{{ $customer->id }}">{{ $customer->name }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
+                            <div class="col-3">
+                                <select class="form-select form-select-sm" wire:change="view({{$adminUserData->id}})" wire:model="sales_manager_id">
+                                    <option value=''>Select Sales Manager</option>
+                                    @foreach ($sales_managers as $sales_manager)
+                                        <option value="{{ $sales_manager->id }}">{{ $sales_manager->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="col-3">
+                                <select class="form-select form-select-sm" wire:change="view({{$adminUserData->id}})" wire:model="field_officer_id" >
+                                    <option value=''>Select Field Officer</option>
+                                    @foreach ($field_officers ?? [] as $field_officer)
+                                        <option value="{{ $field_officer->id }}">{{ $field_officer->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="col-3">
+                                <select class="form-select form-select-sm" wire:change="view({{$adminUserData->id}})" wire:model="customer_id">
+                                    <option value=''>Select Customer</option>
+                                    @foreach ($customers ?? [] as $customer)
+                                        <option value="{{ $customer->id }}">{{ $customer->name }}</option>
+                                    @endforeach
+                                </select>
                             </div>
                         @elseif ($type == 'sales_manager')
-                            <div class="row p-1 mb-1">
-                                <div class="col-4">
-                                    <select class="form-select form-select-sm" wire:change="view({{$adminUserData->id}})" wire:model="field_officer_id">
-                                        <option selected>Select Field Officer</option>
-                                        @foreach ($field_officers as $field_officer)
-                                            <option value="{{ $field_officer->id }}">{{ $field_officer->name }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                                <div class="col-4">
-                                    <select class="form-select form-select-sm" wire:change="view({{$adminUserData->id}})" wire:model="customer_id">
-                                        <option selected>Select Customer</option>
-                                        @foreach ($customers as $customer)
-                                            <option value="{{ $customer->id }}">{{ $customer->name }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
+                            <div class="col-4">
+                                <select class="form-select form-select-sm" wire:change="view({{$adminUserData->id}})" wire:model="field_officer_id">
+                                    <option value=''>Select Field Officer</option>
+                                    @foreach ($field_officers as $field_officer)
+                                        <option value="{{ $field_officer->id }}">{{ $field_officer->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="col-4">
+                                <select class="form-select form-select-sm" wire:change="view({{$adminUserData->id}})" wire:model="customer_id">
+                                    <option value=''>Select Customer</option>
+                                    @foreach ($customers as $customer)
+                                        <option value="{{ $customer->id }}">{{ $customer->name }}</option>
+                                    @endforeach
+                                </select>
                             </div>
                         @elseif ($type == 'field_officer')
-                            <div class="row p-1 mb-1">
-                                <div class="col-4">
-                                    <select class="form-select form-select-sm" wire:change="view({{$adminUserData->id}})" wire:model="customer_id">
-                                        <option selected>Select Customer</option>
-                                        @foreach ($customers as $customer)
-                                            <option value="{{ $customer->id }}">{{ $customer->name }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
+                            <div class="col-4">
+                                <select class="form-select form-select-sm" wire:change="view({{$adminUserData->id}})" wire:model="customer_id">
+                                    <option value=''>Select Customer</option>
+                                    @foreach ($customers as $customer)
+                                        <option value="{{ $customer->id }}">{{ $customer->name }}</option>
+                                    @endforeach
+                                </select>
                             </div>
                         @endif
+                            <div class="col-4">
+                                <div class="input-group mb-3">
+                                    <input type="date" class="form-control" placeholder="Start Date" wire:model="start_date">
+                                    <span class="input-group-text">To</span>
+                                    <input type="date" class="form-control" placeholder="End Date" wire:model="end_date">
+                                </div>
+                            </div>
+                        </div>
 
                         <div class="card">
                             <div class="card-header">

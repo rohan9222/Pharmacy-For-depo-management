@@ -25,6 +25,7 @@ class RoleSeeder extends Seeder
         ]);
 
         $depo->givePermissionTo([
+            'admin-role',
             'create-medicine',
             'edit-medicine',
             'view-medicine',
@@ -81,6 +82,7 @@ class RoleSeeder extends Seeder
         ]);
 
         $sales_manager->givePermissionTo([
+            'admin-role',
             'create-user',
             'edit-user',
             'view-medicine',
@@ -98,6 +100,7 @@ class RoleSeeder extends Seeder
         ]);
 
         $field_officer->givePermissionTo([
+            'admin-role',
             'view-medicine',
             'create-customer',
             'edit-customer',

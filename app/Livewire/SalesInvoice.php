@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use App\Models\Medicine;
 use App\Models\Invoice;
+use App\Models\TargetReport;
 use App\Models\StockList;
 use App\Models\SalesMedicine;
 use App\Models\SiteSetting;
@@ -63,7 +64,10 @@ class SalesInvoice extends Component
         $this->customers = User::where('role', 'customer')->get();
         flash()->info('Customer list refreshed!');
     }
-
+    public function updatedCustomer() {
+        // This method is triggered when the customer is updated
+        $this->calculateTotals();
+    }
     public function calculateTotals()
     {
         // Initialize totals
@@ -97,13 +101,19 @@ class SalesInvoice extends Component
         $this->spl_discount = (float) ($this->spl_discount ?? 0);
         $this->spl_discount_amount = round($this->sub_total * $this->spl_discount / 100, 2);
 
-        // Fetch applicable discount
-        $disValue = DiscountValue::where('start_amount', '<=', $this->sub_total)
-                                ->where('end_amount', '>=', $this->sub_total)
-                                ->first();
+        if($this->customer){
+            // Fetch applicable discount
+            $disValue = DiscountValue::where('start_amount', '<=', $this->sub_total)
+                                    ->where('end_amount', '>=', $this->sub_total)
+                                    ->where('discount_type', User::find($this->customer)->category)
+                                    ->first();
 
-        $this->discount = $disValue ? $disValue->discount : 0;
-        $this->discount_amount = round($this->sub_total * $this->discount / 100, 2);
+            $this->discount = $disValue ? $disValue->discount : 0;
+            $this->discount_amount = round($this->sub_total * $this->discount / 100, 2);
+        }else{
+            $this->discount = 0;
+            $this->discount_amount = 0;
+        }
 
         // Handle paid amount safely
         $this->paid_amount = (float) ($this->paid_amount ?? 0);
@@ -162,14 +172,14 @@ class SalesInvoice extends Component
     {
         // Get the medicine details from the database
         $medicine = Medicine::find($this->stockMedicines[$index]['medicine_id']);
-    
+
         if (!$medicine) {
             return;
             flash()->error('Medicine not found!');
         }
-    
+
         $newQuantity = $this->stockMedicines[$index]['quantity'] + $quantity;
-    
+
         // Ensure the requested quantity does not exceed stock
         if ($newQuantity > $medicine->quantity) {
             $this->stockMedicines[$index]['quantity'] = $medicine->quantity;
@@ -177,32 +187,32 @@ class SalesInvoice extends Component
         } else {
             $this->stockMedicines[$index]['quantity'] = $newQuantity;
         }
-    
+
         // Update the total price
         $this->stockMedicines[$index]['total'] = $this->stockMedicines[$index]['quantity'] * $this->stockMedicines[$index]['price'];
-    
+
         // Recalculate totals
         $this->calculateTotals();
     }
-    
+
     public function decreaseQuantity($index, $quantity = 1)
     {
         // Ensure stock is not reduced below 1
         $newQuantity = max(1, $this->stockMedicines[$index]['quantity'] - $quantity);
-    
+
         if ($newQuantity < $this->stockMedicines[$index]['quantity']) {
             $this->stockMedicines[$index]['quantity'] = $newQuantity;
         } else {
             flash()->error('Quantity cannot be less than 1!');
         }
-    
+
         // Update the total price
         $this->stockMedicines[$index]['total'] = $this->stockMedicines[$index]['quantity'] * $this->stockMedicines[$index]['price'];
-    
+
         // Recalculate totals
         $this->calculateTotals();
     }
-    
+
 
     public function updatedStockMedicines($value, $key)
     {
@@ -294,6 +304,11 @@ class SalesInvoice extends Component
                 'paid' => $this->paid_amount,
                 'due' => $this->due_amount,
             ]);
+
+            TargetReport::where('user_id', $userRoles->field_officer_id)->where('target_month', date('F'))->where('target_year', date('Y'))->increment('sales_target_achieve', $this->sub_total);
+            TargetReport::where('user_id', $userRoles->sales_manager_id)->where('target_month', date('F'))->where('target_year', date('Y'))->increment('sales_target_achieve', $this->sub_total);
+            TargetReport::where('user_id', $userRoles->manager_id)->where('target_month', date('F'))->where('target_year', date('Y'))->increment('sales_target_achieve', $this->sub_total);
+
             if($this->paid_amount > 0){
                 PaymentHistory::create([
                     'invoice_id' => $invoice->id,
@@ -340,9 +355,9 @@ class SalesInvoice extends Component
 
             DB::commit();
 
+            $this->reset();
             return redirect()->route('invoice.pdf', $invoice->invoice_no);
             flash()->success('Invoice created successfully!');
-            $this->reset();
 
         } catch (\Exception $e) {
             flash()->error('Error: ' . $e->getMessage());

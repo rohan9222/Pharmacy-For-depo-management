@@ -25,12 +25,25 @@ class Invoice extends Model
         'spl_dis_amount',
         'grand_total',
         'paid',
-        'due'
+        'due',
+        'delivery_status',
+        'delivery_date',
+        'delivery_by',
+        'summary_id',
     ];
 
     public function scopeSearch($query, $search)
     {
-        return $query->where('invoice_no', 'like', '%' . $search . '%');
+        return $query->where('invoice_no', 'like', '%' . $search . '%')
+            ->orWhere('invoice_date', 'like', '%' . $search . '%')
+            ->orWhere('customer_id', 'like', '%' . $search . '%')
+            ->orWhere('field_officer_id', 'like', '%' . $search . '%')
+            ->orWhere('sales_manager_id', 'like', '%' . $search . '%')
+            ->orWhere('manager_id', 'like', '%' . $search . '%')
+            ->orWhere('invoice_no', 'like', '%' . $search . '%')
+            ->orWhere('delivery_date', 'like', '%' . $search . '%')
+            ->orWhere('summary_id', 'like', '%' . $search . '%')
+            ->orWhere('delivery_by', 'like', '%' . $search . '%');
     }
 
     public function salesMedicines()
@@ -68,4 +81,8 @@ class Invoice extends Model
         return $this->belongsTo(Supplier::class);
     }
 
+    public function deliveredBy()
+    {
+        return $this->belongsTo(User::class, 'delivery_by');
+    }
 }

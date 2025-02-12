@@ -42,7 +42,7 @@
             <tr>
                 <td>Mobile: {{$invoice_data->customer->mobile}}</td>
                 <td>Route: {{$invoice_data->customer->route}}</td>
-                <td>Delivery Date: </td>
+                <td>Delivery Date: {{ date('d-M-Y', strtotime($invoice_data->delivery_date))}}</td>
             </tr>
         </table>
 
@@ -108,6 +108,9 @@
         </table>
     </div>
 </body>
+<script>
+    window.print();
+</script>
 </html>
 
 

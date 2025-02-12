@@ -137,12 +137,16 @@ class UserController extends Controller
         if (in_array($input['role'], ['Manager', 'Sales Manager', 'Field Officer'])) {
             TargetReport::create([
                 'user_id' => $user->id,
-                'product_target' => $user->product_target ?? 0,
+                'manager' => $user->manager_id ?? null,
+                'sales_manager' => $user->sales_manager_id ?? null,
+                // 'field_officer' => $user->field_officer_id ?? null,
+                // 'role' => $input['role'],
+                'sales_target' => $user->sales_target ?? 0,
                 'target_month' => Carbon::now()->format('F'),
                 'target_year' => Carbon::now()->format('Y')
             ]);
         }
-        
+
         return redirect()->route('users.index')
                 ->withSuccess('New user is added successfully.');
     }

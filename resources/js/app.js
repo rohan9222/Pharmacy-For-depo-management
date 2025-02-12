@@ -1,8 +1,9 @@
 import './bootstrap';
-import 'bootstrap';
-
-import jquery from 'jquery';
-window.$ = window.jQuery = jquery;
+import 'bootstrap'; // Bootstrap JS লোড
+import * as bootstrap from 'bootstrap'; // Bootstrap object import
+import jQuery from 'jquery';
+window.bootstrap = bootstrap;
+window.$ = window.jQuery = jQuery;
 
 import ApexCharts from 'apexcharts'
 window.ApexCharts = ApexCharts

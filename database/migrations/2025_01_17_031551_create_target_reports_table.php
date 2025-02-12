@@ -14,15 +14,15 @@ return new class extends Migration
         Schema::create('target_reports', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete()->cascadeOnUpdate();
-            $table->string('role')->nullable();
+            // $table->string('role')->nullable();
             $table->foreignId('manager')->nullable()->constrained('users')->nullOnDelete()->cascadeOnUpdate()->comment('user id who has manager role');
             $table->foreignId('sales_manager')->nullable()->constrained('users')->nullOnDelete()->cascadeOnUpdate()->comment('user id who has sales manager role');
-            $table->foreignId('field_officer')->nullable()->constrained('users')->nullOnDelete()->cascadeOnUpdate()->comment('user id who has field officer role');
-            $table->foreignId('customer')->nullable()->constrained('users')->nullOnDelete()->cascadeOnUpdate()->comment('user id who has customer role');
-            $table->string('product_target')->nullable();
-            $table->boolean('product_target_achieve')->nullable();
-            $table->string('sales_target')->nullable();
-            $table->boolean('sales_target_achieve')->nullable();
+            // $table->foreignId('field_officer')->nullable()->constrained('users')->nullOnDelete()->cascadeOnUpdate()->comment('user id who has field officer role');
+            // $table->foreignId('customer')->nullable()->constrained('users')->nullOnDelete()->cascadeOnUpdate()->comment('user id who has customer role');
+            $table->decimal('product_target', 11, 2)->nullable()->default(0.00);
+            $table->decimal('product_target_achieve', 11, 2)->nullable()->default(0.00);
+            $table->decimal('sales_target', 11, 2)->nullable()->default(0.00);
+            $table->decimal('sales_target_achieve', 11, 2)->nullable()->default(0.00);
             $table->string('target_month',50)->nullable();
             $table->smallInteger('target_year')->nullable();
             $table->timestamps();

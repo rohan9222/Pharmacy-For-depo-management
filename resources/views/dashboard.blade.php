@@ -107,8 +107,114 @@
         </div>
     </div>
 
+<!-- Bootstrap 5 Modal -->
+<div class="modal fade" id="alertModal" tabindex="-1" aria-labelledby="alertModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="alertModalLabel">Modal Title</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                @if ($low_stock_medicine != null)
+                    <h3 class="text-center h3">Low Stock Medicine</h3>
+                    <table class="table table-striped">
+                        <thead>
+                            <tr class="thead-dark">
+                                <th>SN</th>
+                                <th>Medicine</th>
+                                <th>Quantity</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($low_stock_medicine as $medicine)
+                                <tr>
+                                    <td>{{ $loop->iteration }}</td>
+                                    <td>{{ $medicine->name }}</td>
+                                    <td>{{ $medicine->quantity }}</td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                @endif
+                @if($stock_out_medicine != null)
+                    <h3 class="text-center h3">Stock Out Medicine</h3>
+                    <table class="table table-striped">
+                        <thead>
+                            <tr class="thead-dark">
+                                <th>SN</th>
+                                <th>Medicine</th>
+                                <th>Quantity</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($stock_out_medicine as $medicine)
+                                <tr>
+                                    <td>{{ $loop->iteration }}</td>
+                                    <td>{{ $medicine->name }}</td>
+                                    <td>{{ $medicine->quantity }}</td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                @endif
+                @if ($expired_medicine != null)
+                    <h3 class="text-center h3">Expired Medicine</h3>
+                    <table class="table table-striped">
+                        <thead>
+                            <tr class="thead-dark">
+                                <th>SN</th>
+                                <th>Medicine</th>
+                                <th>Batch</th>
+                                <th>Expiry Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($expired_medicine as $medicine)
+                                <tr>
+                                    <td>{{ $loop->iteration }}</td>
+                                    <td>{{ $medicine->name }}</td>
+                                    <td>{{ $medicine->batch }}</td>
+                                    <td>{{ date('Y-m-d', strtotime($medicine->expiry_date)) }}</td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                @endif
+                @if ($expire_alert_medicine != null)
+                    <h3 class="text-center h3">Expire Alert Medicine</h3>
+                    <table class="table table-striped">
+                        <thead>
+                            <tr class="thead-dark">
+                                <th>SN</th>
+                                <th>Medicine</th>
+                                <th>Batch</th>
+                                <th>Expiry Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($expire_alert_medicine as $medicine)
+                                <tr>
+                                    <td>{{ $loop->iteration }}</td>
+                                    <td>{{ $medicine->name }}</td>
+                                    <td>{{ $medicine->batch }}</td>
+                                    <td>{{ date('Y-m-d', strtotime($medicine->expiry_date)) }}</td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                @endif
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 @push('scripts')
-    <script type="text/javascript">
+    {{-- <script type="text/javascript">
         document.addEventListener('DOMContentLoaded', function () {
             const data = @json($hierarchy);
             const options = {
@@ -135,6 +241,12 @@
 
             const tree = new ApexTree(document.getElementById('svg-tree'), options);
             tree.render(data);
+        });
+    </script> --}}
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            var myModal = new window.bootstrap.Modal(document.getElementById('alertModal'));
+            myModal.show();
         });
     </script>
 @endpush
