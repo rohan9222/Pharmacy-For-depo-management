@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\{DashboardController,UserProfileController};
 use App\Http\Controllers\Admin\{RoleController,UserController};
 use App\Http\Controllers\makepdf\{MakeInvoiceController,MakeSummaryController,MakeReportController};
-use App\Livewire\{SupportersList,CustomersList,DeliveryManList,SupplierList,MedicinesList,CategoryList, PackSizeList, StockMedicines,StockMedicinesList,SalesInvoice,InvoiceHistory,DeliveryHistory,InvoiceReturnHistory,SiteSettings,SummaryList};
+use App\Livewire\{SupportersList,CustomersList,DeliveryManList,SupplierList,MedicinesList,CategoryList, PackSizeList, StockMedicines,StockMedicinesList,SalesInvoice,InvoiceHistory,DeliveryHistory,InvoiceReturnHistory,SiteSettings,TargetHistory,DueInvoiceList};
 
 
 Route::get('/', function () {
@@ -33,16 +33,6 @@ Route::get('/php-artisan-optimize', function () {
 
     return response()->json($output);
 });
-Route::get('/mac-address', function () {
-    // Test with a simple command to check execution
-    $macAddress = trim(shell_exec('/sbin/ifconfig -a | grep -Po \'(\w\w:\w\w:\w\w:\w\w:\w\w:\w\w)\''));
-
-    $result = shell_exec('hostname');
-    \Log::info("Command output: " . $macAddress);
-
-    return response()->json(['result' => $macAddress]);
-});
-
 
 Route::middleware([
     'auth:sanctum',
@@ -76,9 +66,10 @@ Route::middleware([
 
 // pos
     Route::get('/pos', SalesInvoice::class)->name('pos');
-    Route::get('/sales-medicines', InvoiceHistory::class)->name('sales-medicines');
+    Route::get('/sales-medicines-table', [InvoiceHistory::class, 'invoiceList'])->name('sales-medicines-table');
     Route::get('/sales-medicines-list', InvoiceHistory::class)->name('sales-medicines-list');
     Route::get('/sales-delivery-history', DeliveryHistory::class)->name('sales-delivery-history');
+    Route::get('/sales-return-medicines-table', [InvoiceReturnHistory::class, 'invoiceReturnList'])->name('return-medicines-table');
     Route::get('/sales-return-medicines-list', InvoiceReturnHistory::class)->name('return-medicines-list');
 
 // site settings
@@ -91,9 +82,13 @@ Route::middleware([
     Route::get('/user/password/update', [UserProfileController::class, 'updatePassword'])->name('user.password.update');
 
 // summary
-    Route::get('/summary-details', SummaryList::class)->name('summary.list');
+    Route::get('/target-history', TargetHistory::class)->name('target-history');
+    Route::get('/due-list-table', [DueInvoiceList::class, 'invoiceDueList'])->name('due-list-table');
+    Route::get('/due-list', DueInvoiceList::class)->name('due-list');
 
 // pdf generate
+    Route::get('/invoice/print/{invoice}', [MakeInvoiceController::class,'invoicePrint'])->name('invoice.print');
+    Route::get('/invoice/return/print/{invoice}', [MakeInvoiceController::class,'invoiceReturnPrint'])->name('invoice.return.print');
     Route::get('/invoice/{invoice}', [MakeInvoiceController::class,'invoicePDF'])->name('invoice.pdf');
     Route::get('/summary/{id}', [MakeSummaryController::class,'summaryPDF'])->name('summary.pdf');
     Route::get('/report/{report}', [MakeReportController::class,'reportPDF'])->name('report.pdf');

@@ -12,7 +12,7 @@ use Livewire\Component;
 class CategoryList extends Component
 {
     use WithPagination, WithoutUrlPagination;
-    
+
     public $categoryId, $name, $description, $status, $address, $balance, $category_type, $search;
 
     public function mount()
@@ -37,7 +37,7 @@ class CategoryList extends Component
     public function role()
     {
         return [
-            'name' => 'required|string|max:255',
+            'name' => 'required|string|max:255|unique:categories,name,' . $this->categoryId,
             'description' => 'nullable|string|max:255',
             'status' => 'required|boolean',
         ];

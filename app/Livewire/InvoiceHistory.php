@@ -4,6 +4,8 @@ namespace App\Livewire;
 
 use App\Models\Medicine;
 use App\Models\Invoice;
+use App\Models\TargetReport;
+use App\Models\PaymentHistory;
 use App\Models\StockList;
 use App\Models\SiteSetting;
 use App\Models\SalesMedicine;
@@ -15,13 +17,17 @@ use Illuminate\Support\Facades\DB;
 use Livewire\WithPagination;
 use Livewire\WithoutUrlPagination;
 
+use Illuminate\Http\Request;
+
+use Yajra\DataTables\Facades\DataTables;
+
 use Livewire\Component;
 
 class InvoiceHistory extends Component
 {
     use WithPagination, WithoutUrlPagination;
 
-    public $search, $invoice_data, $site_settings, $return_date, $return_quantity, $return_medicine, $invoice_discount, $spl_discount;
+    public $search, $invoice_data, $site_settings, $return_date, $return_quantity, $return_medicine, $invoice_discount, $spl_discount,$partialPayment,$amount,$selectedInvoice;
 
     public function mount(){
         if(auth()->user()->hasRole('Super Admin')) {
@@ -38,11 +44,83 @@ class InvoiceHistory extends Component
     public function render()
     {
         $this->site_settings = SiteSetting::first();
-        $invoices = Invoice::search($this->search)->with(['customer:id,name', 'deliveredBy:id,name'])->paginate(15);
-        // dd($invoices);
-        return view('livewire.invoice-history',[
-            'invoices' => $invoices
-        ])->layout('layouts.app');
+        return view('livewire.invoice-history')->layout('layouts.app');
+    }
+
+    public function invoiceList(Request $request)
+    {
+        if ($request->ajax()) {
+            $data = Invoice::with(['customer:id,name', 'deliveredBy:id,name']);
+
+            // Apply filtering conditions
+            if ($request->manager_id != null) {
+                $data = $data->where('manager_id', $request->manager_id);
+            }
+
+            if ($request->sales_manager_id != null) {
+                $data = $data->where('sales_manager_id', $request->sales_manager_id);
+            }
+
+            if ($request->field_officer_id != null) {
+                $data = $data->where('field_officer_id', $request->field_officer_id);
+            }
+
+            if ($request->customer_id != null) {
+                $data = $data->where('customer_id', $request->customer_id);
+            }
+
+            if ($request->start_date && $request->end_date) {
+                $data = $data->whereBetween('invoice_date', [Carbon::parse($request->start_date)->format('Y-m-d'), Carbon::parse($request->end_date)->format('Y-m-d')]);
+            }
+
+            // Return data for DataTables
+            return DataTables::of($data->get())
+                ->addIndexColumn()
+                ->addColumn('action', function ($row) {
+                    $action = '';
+
+                    // Check if the invoice has a due amount
+                    if ($row->due > 0) {
+                        $action .= '
+                            <button wire:click="setInvoice('.$row->id.')"
+                                class="btn btn-primary btn-sm"
+                                data-bs-toggle="modal"
+                                data-bs-target="#duePaymentModal">
+                                <i class="bi bi-credit-card"></i>
+                            </button>
+                        ';
+                    }
+
+                    // Check if the user has the 'invoice' permission
+                    if (auth()->user()->can('invoice')) {
+                        if ($row->delivery_status == 'pending') {
+                            $action .= '
+                                <button class="btn btn-sm btn-info" wire:click="invoiceEdit('.$row->id.')" data-bs-toggle="modal" data-bs-target="#invoiceEditModal"><i class="bi bi-pencil"></i></button>
+                            ';
+                        }
+                        $action .= '
+                            <a href="' . route('invoice.pdf', $row->invoice_no) . '" target="_blank" class="btn btn-sm btn-success me-1">
+                                <i class="bi bi-eye"></i>
+                            </a>
+                        ';
+
+                    }
+
+                    // Check if the user has the 'return-medicine' permission
+                    if (auth()->user()->can('return-medicine')) {
+                        $action .= '
+                            <button class="btn btn-sm btn-warning" wire:click="returnMedicine('.$row->id.')" @click="isTableData = false, isInvoiceData = false, isReturnData = true"><i class="bi bi-arrow-counterclockwise"></i></button>
+                        ';
+                    }
+
+                    return $action;
+                })
+                ->editColumn('deliveredBy.name', function ($row) {
+                    return $row->deliveredBy ? $row->deliveredBy->name : 'N/A'; // Avoids null errors
+                })
+                ->rawColumns(['action']) // Ensure HTML buttons render correctly
+                ->make(true);
+        }
     }
 
     public function invoiceEdit($invoiceID = null)
@@ -54,6 +132,7 @@ class InvoiceHistory extends Component
             $this->invoice_discount = null;
             $this->spl_discount = '';
         }
+        $this->dispatch('refreshTable');
     }
 
     public function invoiceUpdate($invoiceID = null)
@@ -71,6 +150,38 @@ class InvoiceHistory extends Component
             flash()->success('Invoice updated successfully');
         }else{
             flash()->error('Something is wrong');
+        }
+    }
+
+    public function setInvoice($invoiceId)
+    {
+        $this->selectedInvoice = Invoice::find($invoiceId);
+        $this->partialPayment = '';
+        $this->amount = '';
+    }
+
+    public function payDue()
+    {
+        $this->validate([
+            'amount' => 'required|numeric|min:1',
+        ]);
+
+        if ($this->selectedInvoice) {
+            $this->selectedInvoice->paid += $this->amount;
+            $this->selectedInvoice->due -= $this->amount;
+            $this->selectedInvoice->save();
+
+            PaymentHistory::create([
+                'invoice_id' => $this->selectedInvoice->id,
+                'amount' => $this->amount,
+                'date' => now()
+            ]);
+
+            $this->amount = '';
+
+            flash()->success('Amount paid successfully.');
+        }else{
+            flash()->error('Something went wrong!');
         }
     }
 

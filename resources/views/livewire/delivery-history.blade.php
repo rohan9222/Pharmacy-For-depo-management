@@ -94,7 +94,7 @@
                             </select>
                         </div> --}}
                         <div class="col">
-                            <select class="form-control form-control-sm" wire:change="updateInvoiceList('field_officer')" wire:model="field_officer_id">
+                            <select class="form-control form-control-sm tom-select p-0" x-init="initTomSelect()" wire:change="updateInvoiceList('field_officer')" wire:model="field_officer_id">
                                 <option value="">Select Field Officer</option>
                                 @foreach ($field_officers ?? [] as $field_officer)
                                     <option value="{{ $field_officer->id }}">{{ $field_officer->name }}</option>
@@ -102,7 +102,7 @@
                             </select>
                         </div>
                         <div class="col">
-                            <select class="form-control form-control-sm" wire:change="updateInvoiceList()"  wire:model="customer_id">
+                            <select class="form-control form-control-sm tom-select p-0" x-init="initTomSelect()" wire:change="updateInvoiceList()"  wire:model="customer_id">
                                 <option value="">Select Customer</option>
                                 @foreach ($customers ?? [] as $customer)
                                     <option value="{{ $customer->id }}">{{ $customer->name }}</option>
@@ -119,8 +119,19 @@
                                     @elseif ($invoices->isEmpty())
                                         <div class="text-danger text-center">!!! No Invoice Found !!!</div>
                                     @else
+                                        {{-- <input type="checkbox" wire:model="selected_invoices" class="btn-check" id="invoice_all" autocomplete="off" >
+                                        <label class="btn btn-sm btn-outline-info" for="invoice_all">All</label>
                                         @foreach ($invoices as $invoice)
                                             <input type="checkbox" wire:model="selected_invoices" value="{{ $invoice->id }}" class="btn-check" id="invoice_{{ $invoice->id }}" autocomplete="off">
+                                            <label class="btn btn-sm btn-outline-info" for="invoice_{{ $invoice->id }}">{{ $invoice->invoice_no }}</label>
+                                        @endforeach --}}
+                                        <input type="checkbox" class="btn-check" id="invoice_all" autocomplete="off" wire:click="toggleSelectAll">
+                                        <label class="btn btn-sm btn-outline-info" for="invoice_all">All</label>
+
+                                        @foreach ($invoices as $invoice)
+                                            <input type="checkbox" class="btn-check" id="invoice_{{ $invoice->id }}"
+                                                value="{{ $invoice->id }}" autocomplete="off"
+                                                wire:model="selected_invoices">
                                             <label class="btn btn-sm btn-outline-info" for="invoice_{{ $invoice->id }}">{{ $invoice->invoice_no }}</label>
                                         @endforeach
                                     @endif

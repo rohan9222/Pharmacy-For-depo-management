@@ -11,7 +11,7 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <link href="{{ url('css/pdf.css') }}" rel="stylesheet" />
 </head>
-<body>
+<body class="a4">
     <div class="p-1 h-100">
         <div>
             <div style="display: inline-block; width: 45%; float: left;">

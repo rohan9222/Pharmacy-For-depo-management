@@ -7,6 +7,7 @@ use App\Models\Invoice;
 use App\Models\TargetReport;
 use App\Models\StockList;
 use App\Models\SalesMedicine;
+use App\Models\Category;
 use App\Models\SiteSetting;
 use App\Models\PaymentHistory;
 use App\Models\DiscountValue;
@@ -14,6 +15,7 @@ use App\Models\user;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
+use Illuminate\Support\Facades\Hash;
 use Livewire\WithPagination;
 use Livewire\WithoutUrlPagination;
 
@@ -23,7 +25,7 @@ class SalesInvoice extends Component
 {
     use WithPagination, WithoutUrlPagination;
 
-    public $search, $medicines, $customers, $invoice_date, $customer;
+    public $search, $medicines, $customers, $invoice_date, $customer,$category,$category_lists, $field_officers, $invoice_number, $field_officer,$name,$email,$mobile,$address,$balance,$field_officer_team,$route,$customer_category;
     public $highlightedIndex = 0;
     public $stockMedicines = []; // Medicine stock data
     public $sub_total = 0;
@@ -42,11 +44,20 @@ class SalesInvoice extends Component
         if(!(auth()->user()->hasRole('Super Admin') || auth()->user()->can('invoice'))) {
             abort(403, 'Unauthorized action.');
         }
-
     }
 
     public function render()
     {
+        $field_officers = User::select('id', 'name')->role('Field Officer');
+        if (auth()->user()->hasRole('Manager')) {
+            $field_officers = $field_officers->where('manager_id', auth()->user()->id);
+        } elseif (auth()->user()->hasRole('Sales Manager')) {
+            $field_officers = $field_officers->where('sales_manager_id', auth()->user()->id);
+        } elseif (auth()->user()->hasRole('Field Officer')) {
+            $field_officers = $field_officers->where('id', auth()->user()->id);
+        }
+        $this->field_officers = $field_officers->get();
+        $this->category_lists = Category::select('name')->get();
         $this->invoice_date = Carbon::now()->toDateString();
         $customers = User::where('role', 'customer');
 
@@ -55,8 +66,74 @@ class SalesInvoice extends Component
         }
 
         $this->customers = $customers->get();
-        $this->medicines = Medicine::search($this->search)->get();
+
+        if($this->category) {
+            $this->medicines = Medicine::search($this->search)->where('category_name', $this->category)->get();
+        } else {
+            $this->medicines = Medicine::search($this->search)->get();
+        }
         return view('livewire.sales-invoice')->layout('layouts.app');
+    }
+
+    public function medicinesCategory($category) {
+        $this->category = $category;
+        $this->dispatch('slickCategory');
+    }
+
+    public function customerSubmit()
+    {
+        $this->validate( [
+            'name' => 'required|string|max:255',
+            'email' => ['required', 'email', 'max:255',
+                function ($attribute, $value, $fail) {
+                    $users = User::where('email', $value)->first();
+                    if ($users) {
+                        $fail('The email address is already associated with a '.ucfirst($users->role).' list. Please use a different email address');
+                    }
+                }
+            ],
+            'mobile' => 'required|numeric|digits:11',
+            'address' => 'required|string|max:255',
+            'balance' => 'nullable|numeric',
+            'route' => 'required|string|max:255',
+            'customer_category' => 'required|string|max:255',
+            'field_officer_team' => ['required','exists:users,id',
+                function ($attribute, $value, $fail) {
+                    $user = User::find($value); // Retrieve the user once to avoid multiple queries
+                    if (!$user || (!$user->sales_manager_id && !$user->manager_id)) {
+                        $fail('This field officer team does not exist or not assigned to any manager and sales manager.');
+                    }
+                }
+            ],
+        ]);
+
+        try {
+            $latestNo = User::orderByDesc('user_id')->value('user_id');
+            $user_id = ($latestNo) ? ((int) filter_var($latestNo, FILTER_SANITIZE_NUMBER_INT) + 1) : 010500;
+            $newCustomer = User::Create(
+                [
+                    'user_id' => $user_id,
+                    'name' => $this->name,
+                    'email' => $this->email,
+                    'password' => Hash::make($this->email.$this->mobile.$this->name),
+                    'mobile' => $this->mobile,
+                    'address' => $this->address,
+                    'balance' => $this->balance ?? 0.00,
+                    'role' => 'Customer',
+                    'route' => $this->route,
+                    'category' => $this->customer_category,
+                    'field_officer_id' => $this->field_officer_team,
+                    'sales_manager_id' => User::where('id', $this->field_officer_team)->first()->sales_manager_id,
+                    'manager_id' => User::where('id', $this->field_officer_team)->first()->manager_id,
+                ]
+            );
+
+            $this->reset();
+            flash()->success('Customer added successfully!');
+        } catch (\Exception $e) {
+            flash()->error('Error: ' . $e->getMessage());
+            return;
+        }
     }
 
     public function refreshCustomer()
@@ -263,7 +340,6 @@ class SalesInvoice extends Component
         $this->calculateTotals();
     }
 
-
     public function submit()
     {
         $this->validate([
@@ -275,7 +351,6 @@ class SalesInvoice extends Component
             'stockMedicines.*.price' => 'required|numeric|min:0',
             'stockMedicines.*.total' => 'required|numeric|min:0',
         ]);
-
 
         DB::beginTransaction();
 
@@ -356,7 +431,7 @@ class SalesInvoice extends Component
             DB::commit();
 
             $this->reset();
-            return redirect()->route('invoice.pdf', $invoice->invoice_no);
+            return redirect()->route('invoice.print', $invoice->invoice_no);
             flash()->success('Invoice created successfully!');
 
         } catch (\Exception $e) {

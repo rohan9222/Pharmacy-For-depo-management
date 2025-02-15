@@ -17,6 +17,7 @@ class DeliveryHistory extends Component
     public $perPage = 15;
     public $selected_invoices = [];
 
+
     public function render()
     {
         $allInvoices = Invoice::search($this->delivered_search)
@@ -35,6 +36,15 @@ class DeliveryHistory extends Component
             ),
             'delivery_man_lists' => User::where('role', 'Delivery Man')->get(),
         ])->layout('layouts.app');
+    }
+
+    public function toggleSelectAll()
+    {
+        if (count($this->selected_invoices) < count($this->invoices)) {
+            $this->selected_invoices = $this->invoices->pluck('id')->toArray();
+        } else {
+            $this->selected_invoices = [];
+        }
     }
 
     public function updateInvoiceList($type = null) {
@@ -77,6 +87,7 @@ class DeliveryHistory extends Component
             $customers = $customers->where('field_officer_id', $this->field_officer_id);
             $this->customers = $customers->get() ?? null;
         }else{
+            $this->invoices = null;
             $this->customer_id = null;
             $this->customers = [];
         }

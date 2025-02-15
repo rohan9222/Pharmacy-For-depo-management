@@ -154,14 +154,6 @@ class CustomersList extends Component
         $this->invoices = $invoices;
     }
 
-    public function setInvoice($invoiceId, $customerId)
-    {
-        $this->view($customerId);
-        $this->selectedInvoice = Invoice::find($invoiceId);
-        $this->partialPayment = '';
-        $this->amount = '';
-    }
-
     public function partialPay($customerId)
     {
         $this->view($customerId);

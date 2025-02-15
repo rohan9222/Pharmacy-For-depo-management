@@ -1,5 +1,27 @@
 <div class="row">
     <div class="col-md-5 card z-2">
+        <div class="row px-4 py-1 slick-category" wire:ignore>
+            <div class="btn btn-outline-success btn-sm" wire:click="medicinesCategory(null)" >All</div>
+            @foreach ($category_lists as $category_list)
+                <div class="btn btn-outline-success btn-sm" wire:click="medicinesCategory('{{ $category_list->name }}')" >{{ $category_list->name }}</div>
+            @endforeach
+        </div>
+        {{-- <div class="row px-4 py-1 slick-category" wire:ignore>
+            <div class="btn btn-outline-success btn-sm {{ $category == '' ? 'active' : '' }}" wire:click="medicinesCategory(null)" >All</div>
+            @foreach ($category_lists as $category_list)
+                <div class="btn btn-outline-success btn-sm {{ $category == $category_list->name ? 'active' : '' }}" wire:click="medicinesCategory('{{ $category_list->name }}')" >{{ $category_list->name }}</div>
+            @endforeach
+        </div> --}}
+
+        <div class="row px-4 py-1">
+            <div class="col-12">
+                <input id="search" class="form-control from-control-sm" type="search" wire:model.live="search" placeholder="Search By Name" aria-label="Search By Name">
+            </div>
+            <div class="col-12 mt-1">
+                {{$category == '' ?  'All' : $category}} Medicines List ({{ count($medicines) }})
+            </div>
+        </div>
+
         <div class="row g-1 nav">
             @if (!empty($medicines))
                 @foreach ($medicines as  $medicine)
@@ -53,17 +75,19 @@
                     <label for="invoice_no" class="form-label">Invoice No</label>
                     <input type="text" class="form-control" wire:model.live.debounce.1000ms="invoice_no" readonly>
                 </div> --}}
-                <div class="col-4">
+                <div class="col-6">
                     <label for="customer" class="form-label">Customer</label>
                     <div class="input-group mb-3">
-                        <select class="form-select" wire:model.live.debounce.1000ms="customer">
+                        <select class="form-select tom-select p-0" wire:model.live.debounce.1000ms="customer" x-init="initTomSelect()">
                             <option value="">Select Customer</option>
                             @foreach ($customers as $customer)
-                                <option value="{{ $customer->id }}">{{ $customer->name }}</option>
+                                <option value="{{ $customer->id }}">{{$customer->user_id}}-{{ $customer->name }} ({{$customer->mobile}})</option>
                             @endforeach
                         </select>
                         <span class="input-group-text" wire:click="refreshCustomer()"><i class="bi bi-arrow-counterclockwise"></i></span>
-                        <span class="input-group-text"><a href="{{route('customers')}}" target="blank"><i class="bi bi-person-plus-fill"></i></a></span>
+                        <span class="input-group-text"><a class="text-info" data-bs-toggle="modal" data-bs-target="#addCustomer">
+                            <i class="bi bi-person-plus-fill"></i>
+                        </a></span>
                     </div>
                     @error('customer') <span class="text-danger">{{ $message }}</span> @enderror
                 </div>
@@ -210,4 +234,106 @@
             </div>
         </form>
     </div>
+
+
+    <!-- Modal -->
+    <div class="modal fade" id="addCustomer" tabindex="-1" aria-labelledby="addCustomerLabel" aria-hidden="true" wire:ignore.self>
+        <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+            <h1 class="modal-title fs-5" id="addCustomerLabel">Modal title</h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form wire:submit.prevent="customerSubmit">
+                    <div class="row g-2">
+                        <div class="col-3">
+                            <input class="form-control" type="text" id="name" wire:model="name" placeholder="customer Name" aria-label="customer Name">
+                            @error('name') <span class="text-danger">{{ $message }}</span> @enderror
+                        </div>
+                        <div class="col-3">
+                            <input class="form-control" type="text" id="email" wire:model="email" placeholder="Email Address" aria-label="Email Address">
+                            @error('email') <span class="text-danger">{{ $message }}</span> @enderror
+                        </div>
+                        <div class="col-3">
+                            <input class="form-control" type="text" id="mobile" wire:model="mobile" placeholder="mobile" aria-label="mobile">
+                            @error('mobile') <span class="text-danger">{{ $message }}</span> @enderror
+                        </div>
+                        <div class="col-3">
+                            <input class="form-control" type="address" id="address" wire:model="address" placeholder="address" aria-label="address">
+                            @error('address') <span class="text-danger">{{ $message }}</span> @enderror
+                        </div>
+                        <div class="col-3">
+                            <input class="form-control" type="number" id="balance" wire:model="balance" placeholder="Balance" aria-label="Balance">
+                            @error('balance') <span class="text-danger">{{ $message }}</span> @enderror
+                        </div>
+                        <div class="col-3">
+                            <select name="field_officer_team" id="field_officer_team" class="form-control" wire:model="field_officer_team">
+                                <option value="">Select Field Officer</option>
+                                @foreach ($field_officers as $field_officer)
+                                    <option value="{{ $field_officer->id }}"
+                                        {{ isset($field_officer->fieldOfficer) && $field_officer->fieldOfficer->id == $field_officer->id
+                                            ? 'selected'
+                                            : ($field_officer->id == auth()->user()->id ? 'selected' : '') }}>
+                                        {{ $field_officer->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            @error('field_officer_team') <span class="text-danger">{{ $message }}</span> @enderror
+                        </div>
+                        <div class="col-3">
+                            <input type="text" class="form-control" id="route" wire:model="route" placeholder="Route" aria-label="Route">
+                            @error('route') <span class="text-danger">{{ $message }}</span> @enderror
+                        </div>
+                        <div class="col-3">
+                            <select name="customer_category" id="customer_category" wire:model="customer_category" class="form-control">
+                                <option value="">Select Category</option>
+                                <option value="Institution">Institution</option>
+                                <option value="General">General</option>
+                            </select>
+                            @error('customer_category') <span class="text-danger">{{ $message }}</span> @enderror
+                        </div>
+                    </div>
+                    <button class="btn btn-primary mt-2" type="submit">Submit</button>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+        </div>
+    </div>
 </div>
+@push('styles')
+    <style>
+        .slick-slide{
+            padding: 1px;
+        }
+        .slick-prev {
+            left: -3px !important;
+        }
+        .slick-next {
+            right: -3px !important;
+        }
+        .slick-prev, .slick-next {
+            color: black !important;
+            background: black !important;
+            border: 1px solid black;
+            border-radius: 50%;
+        }
+    </style>
+@endpush
+
+@push('scripts')
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            $('.slick-category').slick({
+                infinite: true,
+                slidesToShow: 6,
+                slidesToScroll: 1
+            });
+        });
+    </script>
+@endpush
+
+
