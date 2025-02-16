@@ -223,7 +223,7 @@
         </li>
 {{-- all target and reports --}}
         <li class="nav-item">
-            <a href="#" class="nav-link link-body-emphasis {{ in_array(request()->route()->getName(), ['target-history', 'due-list']) ? 'active' : '' }}" data-bs-toggle="collapse" data-bs-target="#report-collapse" aria-expanded="false">
+            <a href="#" class="nav-link link-body-emphasis {{ in_array(request()->route()->getName(), ['target-history', 'due-list', 'collection-list']) ? 'active' : '' }}" data-bs-toggle="collapse" data-bs-target="#report-collapse" aria-expanded="false">
                 <i class="bi bi-graph-up"></i>
                 <span class="sidebar-text">Reports</span>
                 <i class="bi bi-chevron-down ms-auto toggle-icon sidebar-text"></i>
@@ -244,7 +244,7 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="#" class="nav-link link-body-emphasis">
+                            <a href="{{ route('collection-list') }}" class="nav-link link-body-emphasis">
                                 <i class="bi bi-caret-right-fill me-2"></i>
                                 <span class="sidebar-text">Collection Report</span>
                             </a>

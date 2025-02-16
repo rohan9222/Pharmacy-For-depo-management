@@ -38,7 +38,7 @@
                                         <h3>৳ {{$total_sales}}</h3>
                                     </div>
                                 </div>
-                                <a href="{{ route('sales-medicines') }}" class="nav-link">
+                                <a href="{{ route('sales-medicines-list') }}" class="nav-link">
                                     <span>Total Sales</span> <i class="bi bi-arrow-right-circle-fill"></i>
                                 </a>
                             </div>

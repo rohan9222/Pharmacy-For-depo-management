@@ -19,18 +19,6 @@ moment().tz("Asia/Dhaka").format();
 import "daterangepicker/daterangepicker.css";
 import "daterangepicker/daterangepicker.js";
 
-// Initialize TomSelect
-window.initTomSelect = function () {
-    document.querySelectorAll(".tom-select").forEach((el) => {
-        if (!el.tomSelect) {
-            new TomSelect(el, {
-                allowEmptyOption: true,
-                create: true,
-            });
-        }
-    });
-};
-
 // Slick carousel and its styles
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
@@ -78,3 +66,15 @@ import 'datatables.net-staterestore-bs5';
 // Optional CKEditor (commented out if not used)
 // import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 // window.ClassicEditor = ClassicEditor;
+
+// Initialize TomSelect
+window.initTomSelect = function () {
+    document.querySelectorAll(".tom-select").forEach((el) => {
+        if (!el.tomSelect) {
+            new TomSelect(el, {
+                allowEmptyOption: true,
+                create: true,
+            });
+        }
+    });
+};

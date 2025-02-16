@@ -85,4 +85,9 @@ class Invoice extends Model
     {
         return $this->belongsTo(User::class, 'delivery_by');
     }
+    
+    public function paymentHistory()
+    {
+        return $this->hasMany(PaymentHistory::class, 'invoice_id');
+    }
 }
