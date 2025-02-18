@@ -12,7 +12,7 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <link href="{{ url('css/pdf.css') }}" rel="stylesheet" />
 </head>
-<body>
+<body class="a4">
     <div class="p-1">
         <div>
             <div style="display: inline-block; width: 45%; float: left;">
@@ -42,7 +42,7 @@
             <tr>
                 <td>Mobile: {{$invoice_data->customer->mobile}}</td>
                 <td>Route: {{$invoice_data->customer->route}}</td>
-                <td>Delivery Date: </td>
+                <td>Delivery Date: {{ date('d-M-Y', strtotime($invoice_data->delivery_date))}}</td>
             </tr>
         </table>
 
@@ -108,6 +108,9 @@
         </table>
     </div>
 </body>
+<script>
+    window.print();
+</script>
 </html>
 
 

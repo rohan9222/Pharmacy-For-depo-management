@@ -119,4 +119,9 @@ class User extends Authenticatable
             ->orWhere('field_officer_id', $this->id);
     }
 
+    public function targetReports()
+    {
+        return $this->hasMany(TargetReport::class);
+    }
+
 }

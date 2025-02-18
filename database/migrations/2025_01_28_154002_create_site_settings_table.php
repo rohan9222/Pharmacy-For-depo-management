@@ -46,6 +46,11 @@ return new class extends Migration
             $table->string('medicine_expiry_days')->nullable();
             $table->string('medicine_low_stock_alert')->nullable();
             $table->string('medicine_low_stock_quantity')->nullable();
+            $table->string('site_secret_key')->nullable();
+            $table->string('site_secret_value')->nullable();
+            $table->string('site_secret_validity')->nullable();
+            $table->string('site_secret_url')->nullable();
+            $table->string('site_secret_email')->nullable();
             $table->timestamps();
         });
     }

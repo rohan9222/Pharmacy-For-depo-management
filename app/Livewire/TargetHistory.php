@@ -7,7 +7,7 @@ use App\Models\TargetReport;
 
 use Livewire\Component;
 
-class SummaryList extends Component
+class TargetHistory extends Component
 {
     public $search, $admin_targets,$managers, $manager_id, $sales_managers, $sales_manager_id, $field_officers, $field_officer_id, $customers, $customer_id, $invoices, $type;
 
@@ -27,7 +27,7 @@ class SummaryList extends Component
     {
         $this->updateUserList();
 
-        return view('livewire.summary-list')->layout('layouts.app');
+        return view('livewire.target-history')->layout('layouts.app');
     }
 
     public function updateUserList() {

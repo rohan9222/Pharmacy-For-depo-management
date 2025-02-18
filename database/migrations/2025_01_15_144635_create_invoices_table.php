@@ -32,6 +32,10 @@ return new class extends Migration
             $table->decimal('grand_total', 11, 2)->default(0.00);
             $table->decimal('paid', 11, 2)->default(0.00)->nullable();
             $table->decimal('due', 11, 2)->default(0.00);
+            $table->enum('delivery_status',['pending','cancel','delivered','return','shipped'])->default('pending')->nullable();
+            $table->foreignId('delivery_by')->nullable()->constrained('users')->nullOnDelete()->cascadeOnUpdate()->comment('user id who has delivery role');
+            $table->timestamp('delivery_date')->nullable();
+            $table->integer('summary_id')->nullable();
             $table->timestamps();
         });
     }

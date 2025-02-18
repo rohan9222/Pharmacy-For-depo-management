@@ -14,12 +14,13 @@ return new class extends Migration
         Schema::create('discount_values', function (Blueprint $table) {
             $table->id();
             $table->decimal('start_amount', 11, 2);
-            $table->decimal('end_amount', 11, 2)->nullable(); // Allows NULL for open-ended discounts
+            $table->decimal('end_amount', 11, 2); // Allows NULL for open-ended discounts
             $table->unsignedInteger('discount'); // Ensures no negative values
+            $table->string('discount_type',50);
             $table->timestamps();
 
             // Ensure unique discount ranges to prevent overlap
-            $table->unique(['start_amount', 'end_amount']);
+            // $table->unique(['start_amount', 'end_amount']);
         });
     }
 

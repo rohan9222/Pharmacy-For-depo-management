@@ -1,0 +1,58 @@
+<?php
+
+namespace App\Livewire;
+
+use Livewire\Component;
+
+use App\Models\Invoice;
+use Carbon\Carbon;
+use Illuminate\Http\Request;
+
+use Yajra\DataTables\Facades\DataTables;
+class DueInvoiceList extends Component
+{
+    public function render()
+    {
+        return view('livewire.due-invoice-list')->layout('layouts.app');
+    }
+
+    public function invoiceDueList(Request $request)
+    {
+        if ($request->ajax()) {
+            $data = Invoice::with(['customer:id,name,user_id,mobile', 'deliveredBy:id,name'])->where('due', '>', 0);
+
+            // Apply filtering conditions
+            if ($request->manager_id != null) {
+                $data = $data->where('manager_id', $request->manager_id);
+            }
+
+            if ($request->sales_manager_id != null) {
+                $data = $data->where('sales_manager_id', $request->sales_manager_id);
+            }
+
+            if ($request->field_officer_id != null) {
+                $data = $data->where('field_officer_id', $request->field_officer_id);
+            }
+
+            if ($request->customer_id != null) {
+                $data = $data->where('customer_id', $request->customer_id);
+            }
+
+            if ($request->start_date && $request->end_date) {
+                $data = $data->whereBetween('invoice_date', [Carbon::parse($request->start_date)->format('Y-m-d'), Carbon::parse($request->end_date)->format('Y-m-d')]);
+            }
+
+            // Return data for DataTables
+            return DataTables::of($data->get())
+                ->addIndexColumn()
+                ->addColumn('action', function ($row) {
+                    return '';
+                })
+                ->editColumn('deliveredBy.name', function ($row) {
+                    return $row->deliveredBy ? $row->deliveredBy->name : 'N/A'; // Avoids null errors
+                })
+                ->rawColumns(['action']) // Ensure HTML buttons render correctly
+                ->make(true);
+        }
+    }
+}

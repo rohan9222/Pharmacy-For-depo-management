@@ -1,9 +1,8 @@
+
 @php
     ini_set("pcre.backtrack_limit", "500000000");
     error_reporting(0);
 @endphp
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -12,8 +11,8 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <link href="{{ url('css/pdf.css') }}" rel="stylesheet" />
 </head>
-<body>
-    <div class="p-1">
+<body class="a4">
+    <div class="p-1 h-100">
         <div>
             <div style="display: inline-block; width: 45%; float: left;">
                 <p class="m-0 subtitle ">Sales Office :</p>
@@ -22,92 +21,293 @@
             </div>
             <div class="title">Invoice</div>
         </div>
-        {{-- {{ dd($invoice_data) }} --}}
+        @php
+            $inv_user_data = $invoice_data->first();
+        @endphp
         <table class="table border">
             <tr>
-                <td >Cust ID: {{$invoice_data->customer->user_id}}</td>
-                <td >MPO ID: {{$invoice_data->fieldOfficer->user_id}}</td>
-                <td>Category: {{$invoice_data->customer->category}}</td>
+                <td >Summary ID: {{$inv_user_data->summary_id}}</td>
+                <td >MPO ID: {{$inv_user_data->fieldOfficer->user_id}}</td>
+                <td>Delivery Man ID: {{$inv_user_data->deliveredBy->user_id}}</td>
             </tr>
             <tr>
-                <td>Name: {{$invoice_data->customer->name}}</td>
-                <td>Name: {{$invoice_data->fieldOfficer->name}}</td>
-                <td>Invoice No: {{$invoice_data->invoice_no}}</td>
+                <td>Summary Dt: {{ date('d-M-Y', strtotime($inv_user_data->delivery_date))}}</td>
+                <td>MPO Name: {{$inv_user_data->fieldOfficer->name}}</td>
+                <td>Delivery Man: {{$inv_user_data->deliveredBy->name}}</td>
             </tr>
             <tr>
-                <td>Address: {{$invoice_data->customer->address}}</td>
-                <td>Mobile: {{$invoice_data->fieldOfficer->mobile}}</td>
-                <td>Invoice Date: {{ date('d-M-Y', strtotime($invoice_data->created_at))}}</td>
+                <td></td>
+                <td>Mobile: {{$inv_user_data->fieldOfficer->mobile}}</td>
+                <td>Mobile: {{$inv_user_data->deliveredBy->mobile}}</td>
             </tr>
+        </table>
+        <table class="table">
             <tr>
-                <td>Mobile: {{$invoice_data->customer->mobile}}</td>
-                <td>Route: {{$invoice_data->customer->route}}</td>
-                <td>Delivery Date: </td>
+                <td>Total Invoice : {{$invoice_data->count()}}</td>
+                <td>Invoices # : {{ $invoice_data->pluck('invoice_no')->implode(', ') }}</td>
+                <td></td>
             </tr>
         </table>
 
-        <table class="items text-center">
+        <table class="items text-center border">
             <tr class="border">
-                <th class="border-start">Product Name</th>
-                <th class="border-start">Pack Size</th>
-                <th class="border-start">Unit TP</th>
-                <th class="border-start">Unit VAT</th>
-                <th class="border-start">QTY</th>
-                <th class="border-start">Total TP</th>
-                <th class="border-start">Total Vat</th>
-                <th class="border-start border-end">Total Price</th>
+                <th class="border-start" rowspan="2">Product ID</th>
+                <th class="border-start" rowspan="2">Product Name</th>
+                <th class="border-start" rowspan="2">Pack Size</th>
+                <th class="border-start" rowspan="2">Unit Price</th>
+                <th class="border-start" rowspan="2">Unit VAT(%)</th>
+                <th class="border-start text-center" colspan="3">Issue</th>
+                <th class="border-start text-center" colspan="3">Return</th>
+                <th class="border-start text-center" rowspan="2">Total Qty</th>
             </tr>
-        @php
-            $sumTotalPrice = 0;
-            $sumVatAmount = 0;
-            $sumTotal = 0;
-        @endphp
-
-        @foreach ($invoice_data->salesMedicines as $medicine_list)
+            <tr class="border">
+                <th class="border-start text-center">Qty</th>
+                <th class="border-start text-center">Bonus</th>
+                <th class="border-start text-center">Total</th>
+                <th class="border-start text-center">Qty</th>
+                <th class="border-start text-center">Bonus</th>
+                <th class="border-start text-center">Total</th>
+            </tr>
             @php
-                $totalPrice = $medicine_list->price * $medicine_list->initial_quantity;
-                $vatAmount = round($totalPrice * $medicine_list->vat / 100, 2);
+                $groupedMedicines = [];
+
+                foreach ($invoice_data as $inv) {
+                    foreach ($inv->salesMedicines as $medicine_list) {
+                        $medicineId = $medicine_list->medicine->id;
+
+                        if (!isset($groupedMedicines[$medicineId])) {
+                            $groupedMedicines[$medicineId] = [
+                                'id' => $medicineId,
+                                'name' => $medicine_list->medicine->name,
+                                'pack_size' => $medicine_list->medicine->pack_size,
+                                'price' => $medicine_list->price,
+                                'vat' => $medicine_list->vat,
+                                'initial_quantity' => 0,
+                                'total' => 0,
+                            ];
+                        }
+                        // Summing up quantities and total amounts
+                        $groupedMedicines[$medicineId]['initial_quantity'] += $medicine_list->initial_quantity;
+                        $groupedMedicines[$medicineId]['total'] += $medicine_list->total;
+                    }
+                    $discount += $inv->dis_amount;
+                    $spl_discount += $inv->spl_dis_amount;
+                }
+
+                // Sort the grouped medicines by product ID (ascending order)
+                ksort($groupedMedicines);
+
+                // Initialize total sum variables
+                $sumTotalPrice = 0;
+                $sumVatAmount = 0;
+                $sumTotal = 0;
             @endphp
-            <tr>
-                <td class="text-start border-dotted border-start">{{$medicine_list->medicine->name}}</td>
-                <td class="border-dotted border-start">{{$medicine_list->medicine->pack_size}}</td>
-                <td class="border-dotted border-start">{{$medicine_list->price}}</td>
-                <td class="border-dotted border-start">{{$medicine_list->vat}}</td>
-                <td class="border-dotted border-start">{{$medicine_list->initial_quantity}}</td>
-                <td class="border-dotted border-start">{{$totalPrice}}</td>
-                <td class="border-dotted border-start">{{$vatAmount}}</td>
-                <td class="border-dotted border-start border-end">{{$medicine_list->total}}</td>
-            </tr>
 
-            @php
-                $sumTotalPrice += $totalPrice;
-                $sumVatAmount += $vatAmount;
-                $sumTotal += $medicine_list->total;
-            @endphp
-        @endforeach
+            @foreach ($groupedMedicines as $medicine)
+                @php
+                    $totalPrice = $medicine['price'] * $medicine['initial_quantity'];
+                    $vatAmount = round($totalPrice * $medicine['vat'] / 100, 2);
 
-            <!-- Total Row -->
-            <tr>
-                <td class="text-start" colspan="5">Note:</td>
-                <td class="border-start">{{$sumTotalPrice}}</td>
-                <td class="border-start">{{$sumVatAmount}}</td>
-                <td class="border-start border-end">{{$sumTotal}}</td>
-            </tr>
+                    // Summing overall totals
+                    $sumTotalPrice += $totalPrice;
+                    $sumVatAmount += $vatAmount;
+                    $sumTotal += $medicine['total'];
+                @endphp
 
-            <tr></tr>
-            <tr>
-                <td colspan="5"></td>
-                <td class="border" colspan="2">Discount on TP ({{$invoice_data->discount+$invoice_data->spl_discount}}%):</td>
-                <td class="border">{{$invoice_data->dis_amount+$invoice_data->spl_dis_amount}}</td>
+                <tr>
+                    <td class="text-start border-dotted border-start">{{ $medicine['id'] }}</td>
+                    <td class="text-start border-dotted border-start">{{ $medicine['name'] }}</td>
+                    <td class="border-dotted border-start">{{ $medicine['pack_size'] }}</td>
+                    <td class="border-dotted border-start">{{ $medicine['price'] }}</td>
+                    <td class="border-dotted border-start">{{ $medicine['vat'] }}</td>
+                    <td class="border-dotted border-start">{{ $medicine['initial_quantity'] }}</td>
+                    <td class="border-dotted border-start"></td>
+                    <td class="border-dotted border-start"></td>
+                    <td class="border-dotted border-start"></td>
+                    <td class="border-dotted border-start"></td>
+                    <td class="border-dotted border-start"></td>
+                    <td class="border-dotted border-start border-end"></td>
+                </tr>
+            @endforeach
+        </table>
+        <table class="table">
+            <tr class="text-start">
+                <td>
+                    <p class="underline text-bold">Return</p>
+                    <div style="width: 100%;">
+                        <span class="text-start" style='width:40%;'>TP:</span>
+                        <span class="text-start" style='width:60%;'></span>
+                    </div>
+                    <div style="width: 100%;">
+                        <span class="text-start" style='width:40%;'>VAT:</span>
+                        <span class="text-start" style='width:60%;'></span>
+                    </div>
+                    <div style="width: 100%;">
+                        <span class="text-start" style='width:40%;'>Discount:</span>
+                        <span class="text-start" style='width:60%;'></span>
+                    </div>
+                    <div style="width: 100%;">
+                        <span class="text-start" style='width:40%;'>Special Dis:</span>
+                        <span class="text-start" style='width:60%;'></span>
+                    </div>
+                    <div style="width: 100%;">
+                        <span class="text-start" style='width:40%;'>Total:</span>
+                        <span class="text-start" style='width:60%;'></span>
+                    </div>
+                </td>
+                <td>
+                    <p class="underline text-bold">Issue</p>
+                    <div style="width: 100%;">
+                        <span class="text-start" style='width:40%;'>TP:</span>
+                        <span class="text-start" style='width:60%;'>{{$sumTotalPrice}}</span>
+                    </div>
+                    <div style="width: 100%;">
+                        <span class="text-start" style='width:40%;'>VAT:</span>
+                        <span class="text-start" style='width:60%;'>{{$sumVatAmount}}</span>
+                    </div>
+                    <div style="width: 100%;">
+                        <span class="text-start" style='width:40%;'>Discount:</span>
+                        <span class="text-start" style='width:60%;'>{{$discount}}</span>
+                    </div>
+                    <div style="width: 100%;">
+                        <span class="text-start" style='width:40%;'>Special Dis:</span>
+                        <span class="text-start" style='width:60%;'>{{$spl_discount}}</span>
+                    </div>
+                    <div style="width: 100%;">
+                        <span class="text-start" style='width:40%;'>Total:</span>
+                        <span class="text-start" style='width:60%;'>{{$sumTotalPrice + $sumVatAmount - $discount - $spl_discount}}</span>
+                    </div>
+                </td>
+                <td>
+                    <p class="underline text-bold">Net Amount</p>
+                    <div style="width: 100%;">
+                        <span class="text-start" style='width:40%;'>TP:</span>
+                        <span class="text-start" style='width:60%;'>{{$sumTotalPrice}}</span>
+                    </div>
+                    <div style="width: 100%;">
+                        <span class="text-start" style='width:40%;'>VAT:</span>
+                        <span class="text-start" style='width:60%;'>{{$sumVatAmount}}</span>
+                    </div>
+                    <div style="width: 100%;">
+                        <span class="text-start" style='width:40%;'>Discount:</span>
+                        <span class="text-start" style='width:60%;'>{{$discount}}</span>
+                    </div>
+                    <div style="width: 100%;">
+                        <span class="text-start" style='width:40%;'>Special Dis:</span>
+                        <span class="text-start" style='width:60%;'>{{$spl_discount}}</span>
+                    </div>
+                    <div style="width: 100%;">
+                        <span class="text-start" style='width:40%;'>Total:</span>
+                        <span class="text-start" style='width:60%;'>{{$sumTotalPrice + $sumVatAmount - $discount - $spl_discount}}</span>
+                    </div>
+                </td>
+                <td></td>
             </tr>
             <tr>
-                <td colspan="5" class="subtitle text-uppercase">IN WORD: taka. {{$grand_total_words}} only</td>
-                <td class="border" colspan="2"><b>Net Payable Amount:</b></td>
-                <td class="border"><b>{{$invoice_data->grand_total}}</b></td>
+                <td colspan="4" class="text-center"><span class="text-italic">Net Payable Amount : </span><span class="text-uppercase">IN WORD: taka. {{ Illuminate\Support\Number::spell($sumTotalPrice + $sumVatAmount - $discount - $spl_discount, locale: 'en')}} only</span> </td>
             </tr>
         </table>
     </div>
+
+    @foreach ($invoice_data as $inv_data)
+        <div class="p-1 h-100">
+            <div>
+                <div style="display: inline-block; width: 45%; float: left;">
+                    <p class="m-0 subtitle ">Sales Office :</p>
+                    <p class="m-0">Address : {{$site_data->site_address}}</p>
+                    <p class="m-0">Mobile : {{$site_data->site_phone}}</p>
+                </div>
+                <div class="title">Invoice</div>
+            </div>
+            <table class="table border">
+                <tr>
+                    <td >Cust ID: {{$inv_data->customer->user_id}}</td>
+                    <td >MPO ID: {{$inv_data->fieldOfficer->user_id}}</td>
+                    <td>Category: {{$inv_data->customer->category}}</td>
+                </tr>
+                <tr>
+                    <td>Name: {{$inv_data->customer->name}}</td>
+                    <td>Name: {{$inv_data->fieldOfficer->name}}</td>
+                    <td>Invoice No: {{$inv_data->invoice_no}}</td>
+                </tr>
+                <tr>
+                    <td>Address: {{$inv_data->customer->address}}</td>
+                    <td>Mobile: {{$inv_data->fieldOfficer->mobile}}</td>
+                    <td>Invoice Date: {{ date('d-M-Y', strtotime($inv_data->created_at))}}</td>
+                </tr>
+                <tr>
+                    <td>Mobile: {{$inv_data->customer->mobile}}</td>
+                    <td>Route: {{$inv_data->customer->route}}</td>
+                    <td>Delivery Date: {{ date('d-M-Y', strtotime($inv_data->delivery_date))}}</td>
+                </tr>
+            </table>
+
+            <table class="items text-center">
+                <tr class="border">
+                    <th class="border-start">Product Name</th>
+                    <th class="border-start">Pack Size</th>
+                    <th class="border-start">Unit TP</th>
+                    <th class="border-start">Unit VAT</th>
+                    <th class="border-start">QTY</th>
+                    <th class="border-start">Total TP</th>
+                    <th class="border-start">Total Vat</th>
+                    <th class="border-start border-end">Total Price</th>
+                </tr>
+                @php
+                    $sumTotalPrice = 0;
+                    $sumVatAmount = 0;
+                    $sumTotal = 0;
+                @endphp
+
+                @foreach ($inv_data->salesMedicines as $medicine_list)
+                    @php
+                        $totalPrice = $medicine_list->price * $medicine_list->initial_quantity;
+                        $vatAmount = round($totalPrice * $medicine_list->vat / 100, 2);
+                    @endphp
+                    <tr>
+                        <td class="text-start border-dotted border-start">{{$medicine_list->medicine->name}}</td>
+                        <td class="border-dotted border-start">{{$medicine_list->medicine->pack_size}}</td>
+                        <td class="border-dotted border-start">{{$medicine_list->price}}</td>
+                        <td class="border-dotted border-start">{{$medicine_list->vat}}</td>
+                        <td class="border-dotted border-start">{{$medicine_list->initial_quantity}}</td>
+                        <td class="border-dotted border-start">{{$totalPrice}}</td>
+                        <td class="border-dotted border-start">{{$vatAmount}}</td>
+                        <td class="border-dotted border-start border-end">{{$medicine_list->total}}</td>
+                    </tr>
+
+                    @php
+                        $sumTotalPrice += $totalPrice;
+                        $sumVatAmount += $vatAmount;
+                        $sumTotal += $medicine_list->total;
+                    @endphp
+                @endforeach
+
+                <!-- Total Row -->
+                <tr>
+                    <td class="text-start" colspan="5">Note:</td>
+                    <td class="border-start">{{$sumTotalPrice}}</td>
+                    <td class="border-start">{{$sumVatAmount}}</td>
+                    <td class="border-start border-end">{{$sumTotal}}</td>
+                </tr>
+
+                <tr></tr>
+                <tr>
+                    <td colspan="5"></td>
+                    <td class="border" colspan="2">Discount on TP ({{$inv_data->discount+$inv_data->spl_discount}}%):</td>
+                    <td class="border">{{$inv_data->dis_amount+$inv_data->spl_dis_amount}}</td>
+                </tr>
+                <tr>
+                    <td colspan="5" class="subtitle text-uppercase">IN WORD: taka. {{ Illuminate\Support\Number::spell($inv_data->grand_total, locale: 'en')}} only</td>
+                    <td class="border" colspan="2"><b>Net Payable Amount:</b></td>
+                    <td class="border"><b>{{$inv_data->grand_total}}</b></td>
+                </tr>
+            </table>
+        </div>
+    @endforeach
 </body>
+<script>
+    window.print();
+</script>
 </html>
 
 

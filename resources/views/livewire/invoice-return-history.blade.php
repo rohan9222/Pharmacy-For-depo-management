@@ -11,43 +11,32 @@
                                         All Medicine Stock List with Invoice NO
                                     </h3> --}}
                                 </div>
-                                <div class="col-3">
-                                    <input id="search" class="form-control" type="search" wire:model.live="search" placeholder="Search" aria-label="Search">
+                            </div>
+                            <div class="row justify-content-end">
+                                <div class="col m-1 p-1">
+                                    <livewire:user-data-manage />
                                 </div>
                             </div>
-                            <table class="table">
-                                <thead>
-                                    <tr>
-                                        <th>SN</th>
-                                        <th>Invoice NO</th>
-                                        <th>Return Date</th>
-                                        <th>Quantity</th>
-                                        <th>Price</th>
-                                        <th>Total</th>
-                                        <th>Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach ($invoices as $invoice)
+
+                            <div class="row mt-3" wire:ignore>
+                                <table class="table" id="returnInvoiceTable">
+                                    <thead>
                                         <tr>
-                                            <td>{{ $loop->iteration }}</td>
-                                            <td>{{ $invoice->invoiceData->invoice_no }}</td>
-                                            <td>{{ \Carbon\Carbon::parse($invoice->return_date)->format('d M Y') }}</td>
-                                            <td>{{ $invoice->quantity }}</td>
-                                            <td>{{ $invoice->price }}</td>
-                                            <td>{{ $invoice->total }}</td>
-                                            <td>
-                                                @can('invoice')
-                                                    <button class="btn btn-sm btn-success" wire:click="invoiceView({{ $invoice->invoice_id }})" @click="isTableData = false, isInvoiceData = true">
-                                                        <i class="bi bi-eye"></i>
-                                                    </button>
-                                                @endcan
-                                            </td>
+                                            <th></th>
+                                            <th>SN</th>
+                                            <th>Invoice NO</th>
+                                            <th>Medicine Name</th>
+                                            <th>Return Date</th>
+                                            <th>Quantity</th>
+                                            <th>Price</th>
+                                            <th>Total</th>
+                                            <th>Action</th>
                                         </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                            {{ $invoices->links() }}
+                                    </thead>
+                                    <tbody>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -55,11 +44,11 @@
         </div>
     </div>
 
-    <div x-show="isInvoiceData" x-transition x-cloak>
+    {{-- <div x-show="isInvoiceData" x-transition x-cloak>
         <button class="btn btn-sm btn-info" wire:click="invoiceView()" @click="isTableData = true, isInvoiceData = false, isReturnData = false">back</button>
         @if ($invoice_data)
-        <div class="container">
-            <div class="row">
+            <div class="container">
+                <div class="row">
                     <div class="col-lg-12">
                         <div class="card">
                             <div class="card-body">
@@ -205,10 +194,10 @@
                                             </tbody>
                                         </table>
                                     </div>
-                                    <div class="d-print-none mt-4">
-                                        <div class="float-end">
-                                            <a href="" class="btn btn-success me-1"><i class="bi bi-printer"></i></a>
-                                        </div>
+                                </div>
+                                <div class="d-print-none mt-4">
+                                    <div class="float-end">
+                                        <button onclick="window.print()" class="btn btn-success me-1"><i class="bi bi-printer"></i></button>
                                     </div>
                                 </div>
                             </div>
@@ -217,5 +206,71 @@
                 </div>
             </div>
         @endif
-    </div>
+    </div> --}}
 </div>
+
+
+@push('scripts')
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var table = $('#returnInvoiceTable').DataTable({
+                processing: true,
+                serverSide: true,
+                order: [[ 1, 'desc' ]],
+                ajax: {
+                    url: "{{ route('return-medicines-table') }}", // Ensure correct route
+                    data: function(d) {
+                        d.manager_id = $('#manager_id').val();
+                        d.sales_manager_id = $('#sales_manager_id').val();
+                        d.field_officer_id = $('#field_officer_id').val();
+                        d.customer_id = $('#customer_id').val();
+                        d.start_date = $('#start_date').val();
+                        d.end_date = $('#end_date').val();
+                    }
+                },
+                columns: [
+                    { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false },
+                    { data: 'DT_RowIndex', name: 'DT_RowIndex' },
+                    { data: 'invoice_no', name: 'invoice_no' },
+                    { data: 'medicine.name', name: 'medicine.name' },
+                    { data: 'return_date', name: 'return_date' },
+                    { data: 'quantity', name: 'quantity' },
+                    { data: 'price', name: 'price' },
+                    { data: 'total', name: 'total' },
+                    { data: 'action', name: 'action', orderable: false, searchable: false },
+                ],
+                columnDefs: [
+                    {
+                        targets: [4],  // Invoice Date and Delivery Date
+                        render: function(data, type, row) {
+                            return moment(data).format('D-MMM-YYYY');  // Format date
+                        }
+                    },
+                    {
+                        orderable: false,
+                        render: DataTable.render.select(),
+                        targets: 0
+                    }
+                ],
+                dom: 'Bfrtip',
+                buttons: [
+                    'pageLength',
+                    'colvis',
+                    'pdf',
+                    'print'
+                ],
+                lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, 'All']],
+                pageLength: 10,
+                select: {
+                    style: 'os',
+                    selector: 'td:first-child'
+                }
+            });
+
+            // Reload table on click of the search button
+            $('#search, .closeModal').click(function () {
+                table.ajax.reload();
+            });
+        });
+    </script>
+@endpush

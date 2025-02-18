@@ -58,9 +58,12 @@ class DeliveryManList extends Component
         $this->validate($this->role());
 
         try {
+            $latestInvoiceNo = User::orderByDesc('user_id')->value('user_id');
+            $user_id = ($latestInvoiceNo) ? ((int) filter_var($latestInvoiceNo, FILTER_SANITIZE_NUMBER_INT) + 1) : 010500;
             User::updateOrCreate(
                 ['id' => $this->customerId],
                 [
+                    'user_id' => $user_id,
                     'name' => $this->name,
                     'email' => $this->email,
                     'password' => Hash::make($this->email.$this->mobile.$this->name),

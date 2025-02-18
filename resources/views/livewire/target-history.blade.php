@@ -3,7 +3,7 @@
         <div class="col-md-12">
             <div class="card border-0 border-r20 mb-3">
                 <div class="card-header bg-transparent border-0">
-                    <h4 class="card-title">Summary List</h4>
+                    <h4 class="card-title">Target History</h4>
                 </div>
                 <div class="card-body">
                     <div class="row m-1">

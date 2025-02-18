@@ -5,7 +5,7 @@
     </x-slot>
 
     <div class="d-flex justify-content-center">
-        <div class="col-8" x-show="!isCustomerProfile" x-transition>
+        <div class="col-10" x-show="!isCustomerProfile" x-transition>
             @if(auth()->user()->can('create-customer') || $customerId)
                 <div class="row">
                     <div class="col">
@@ -66,7 +66,7 @@
                                             <select name="category" id="category" wire:model="category" class="form-control">
                                                 <option value="">Select Category</option>
                                                 <option value="Institution">Institution</option>
-                                                <option value="CASH">CASH</option>
+                                                <option value="General">General</option>
                                             </select>
                                             @error('category') <span class="text-danger">{{ $message }}</span> @enderror
                                         </div>
@@ -135,7 +135,7 @@
             </div>
         </div>
 
-        <div class="col-8" x-show="isCustomerProfile" x-transition x-cloak>
+        <div class="col-10" x-show="isCustomerProfile" x-transition x-cloak>
             <button class="btn btn-sm btn-info" @click="isCustomerProfile = false">back</button>
             @if ($customerData)
                 <div class="row pt-2">
@@ -203,6 +203,11 @@
                                         <li class="mb-75">
                                             <span class="fw-bolder me-25">Address:</span>
                                             <span>{{ $customerData->address }}</span>
+                                        </li>
+                                        <li class="mb-75 d-flex justify-content-end">
+                                            @if ($customerData->total_due > 0)
+                                                <button class="btn btn-info btn-sm" wire:click="partialPay({{ $customerData->id }})" data-bs-toggle="modal" data-bs-target="#duePaymentModal">Pay Now</button>
+                                            @endif
                                         </li>
                                     </ul>
                                 </div>
@@ -278,9 +283,22 @@
                                                                 @error('amount') <span class="text-danger">{{ $message }}</span> @enderror
                                                             </div>
                                                         @endif
+                                                        @if($partialPayment)
+                                                            <div class="form-group">
+                                                                <label class="form-label fw-bold">Due Amount</label>
+                                                                <input type="text" class="form-control"
+                                                                    value="{{ $site_settings->site_currency }}{{ $customerData->total_due}}"
+                                                                    readonly>
+                                                            </div>
+                                                            <div class="form-group mt-2">
+                                                                <label class="form-label fw-bold">Amount</label>
+                                                                <input type="number" wire:model="amount" class="form-control" required>
+                                                                @error('amount') <span class="text-danger">{{ $message }}</span> @enderror
+                                                            </div>
+                                                        @endif
                                                     </div>
                                                     <div class="modal-footer">
-                                                        <button type="submit" class="btn btn-primary btn-sm" wire:click="view({{ $customer->id }})">Pay Now</button>
+                                                        <button type="submit" class="btn btn-primary btn-sm">Pay Now</button>
                                                         <button type="button" class="btn btn-danger btn-sm" data-bs-dismiss="modal">Close</button>
                                                     </div>
                                                 </form>
