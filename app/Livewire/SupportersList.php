@@ -19,14 +19,14 @@ class SupportersList extends Component
 {
     use WithPagination, WithoutUrlPagination;
 
-    public $type, $adminUserData, $site_settings, $invoices, $selectedInvoice, $sales_managers, $field_officers, $customers, $sales_manager_id, $field_officer_id, $customer_id, $target_edit, $sales_target, $start_date, $end_date,      $customerId, $name, $email, $mobile, $address, $balance, $search,  $field_officer_team;
+    public $type, $adminUserData, $site_settings, $invoices, $selectedInvoice, $zses, $tses, $customers, $zse_id, $tse_id, $customer_id, $target_edit, $sales_target, $start_date, $end_date,      $customerId, $name, $email, $mobile, $address, $balance, $search,  $tse_team;
 
 
     public function mount($type)
     {
         $this->type = $type;
         // Validate the type type
-        if (!in_array($type, ['manager', 'sales_manager','field_officer'])) {
+        if (!in_array($type, ['manager', 'zse','tse'])) {
             abort(403, 'Access Denied: Invalid Admin Type');
         }
         return true;
@@ -42,23 +42,23 @@ class SupportersList extends Component
                 if(auth()->user()->hasRole('Manager')) {
                     $admin_user = $admin_user->where('id', auth()->user()->id);
                 }
-            }elseif($this->type == 'sales_manager'){
-                $admin_user = $admin_user->where('role', 'Sales Manager');
+            }elseif($this->type == 'zse'){
+                $admin_user = $admin_user->where('role', 'Zonal Sales Executive');
                 if(auth()->user()->hasRole('Manager')) {
                     $admin_user = $admin_user->where('manager_id', auth()->user()->id);
                 }
-                if(auth()->user()->hasRole('Sales Manager')) {
+                if(auth()->user()->hasRole('Zonal Sales Executive')) {
                     $admin_user = $admin_user->where('id', auth()->user()->id);
                 }
-            }elseif($this->type == 'field_officer'){
-                $admin_user = $admin_user->where('role', 'Field Officer');
+            }elseif($this->type == 'tse'){
+                $admin_user = $admin_user->where('role', 'Territory Sales Executive');
                 if(auth()->user()->hasRole('Manager')) {
                     $admin_user = $admin_user->where('manager_id', auth()->user()->id);
                 }
-                if(auth()->user()->hasRole('Sales Manager')) {
-                    $admin_user = $admin_user->where('sales_manager_id', auth()->user()->id);
+                if(auth()->user()->hasRole('Zonal Sales Executive')) {
+                    $admin_user = $admin_user->where('zse_id', auth()->user()->id);
                 }
-                if(auth()->user()->hasRole('Field Officer')) {
+                if(auth()->user()->hasRole('Territory Sales Executive')) {
                     $admin_user = $admin_user->where('id', auth()->user()->id);
                 }
             }
@@ -96,26 +96,26 @@ class SupportersList extends Component
 
     public function updateInvoiceList($id = null) {
         // Use relationships properly
-        $sales_managers = User::where('role', 'Sales Manager')->where($this->type . '_id', $id);
-        $field_officers = User::where('role', 'Field Officer')->where($this->type . '_id', $id);
+        $zses = User::where('role', 'Zonal Sales Executive')->where($this->type . '_id', $id);
+        $tses = User::where('role', 'Territory Sales Executive')->where($this->type . '_id', $id);
         $customers = User::where('role', 'Customer')->where($this->type . '_id', $id);
 
         $invoices = Invoice::where($this->type . '_id', $id);
-        if($this->sales_manager_id != null){
-            $invoices = $invoices->where('sales_manager_id', $this->sales_manager_id);
-            $field_officers = $field_officers->where('sales_manager_id', $this->sales_manager_id);
-            $customers = $customers->where('sales_manager_id', $this->sales_manager_id);
-            $this->field_officers = $field_officers->get() ?? null;
+        if($this->zse_id != null){
+            $invoices = $invoices->where('zse_id', $this->zse_id);
+            $tses = $tses->where('zse_id', $this->zse_id);
+            $customers = $customers->where('zse_id', $this->zse_id);
+            $this->tses = $tses->get() ?? null;
         }else{
-            $this->field_officer_id = null;
+            $this->tse_id = null;
             $this->customer_id = null;
-            $this->field_officers = [];
+            $this->tses = [];
             $this->customers = [];
         }
 
-        if($this->field_officer_id != null){
-            $invoices = $invoices->where('field_officer_id', $this->field_officer_id);
-            $customers = $customers->where('field_officer_id', $this->field_officer_id);
+        if($this->tse_id != null){
+            $invoices = $invoices->where('tse_id', $this->tse_id);
+            $customers = $customers->where('tse_id', $this->tse_id);
             $this->customers = $customers->get() ?? null;
         }else{
             $this->customer_id = null;
@@ -133,13 +133,13 @@ class SupportersList extends Component
         }
         $this->invoices = $invoices->get() ?? null;
         if($this->type == 'manager'){
-            $this->sales_managers = $sales_managers->get() ?? null;
-        }elseif($this->type == 'sales_manager'){
-            $this->sales_manager_id = $id;
-            $this->field_officers = $field_officers->get() ?? null;
-        }elseif($this->type == 'field_officer'){
-            $this->sales_manager_id = User::find($id)->sales_manager_id;
-            $this->field_officer_id = $id;
+            $this->zses = $zses->get() ?? null;
+        }elseif($this->type == 'zse'){
+            $this->zse_id = $id;
+            $this->tses = $tses->get() ?? null;
+        }elseif($this->type == 'tse'){
+            $this->zse_id = User::find($id)->zse_id;
+            $this->tse_id = $id;
             $this->customers = $customers->get() ?? null;
         }
     }
@@ -173,14 +173,14 @@ class SupportersList extends Component
     //         'mobile' => 'required|numeric|digits:11',
     //         'address' => 'required|string|max:255',
     //         'balance' => 'nullable|numeric',
-    //         'field_officer_team' => 'required_if:customer,Customer',
+    //         'tse_team' => 'required_if:customer,Customer',
 
     //     ];
     // }
     // public function messages()
     // {
     //     return [
-    //         'field_officer_team.required_if' => 'The field officer is required.',
+    //         'tse_team.required_if' => 'The Territory Sales Executive is required.',
     //     ];
     // }
 

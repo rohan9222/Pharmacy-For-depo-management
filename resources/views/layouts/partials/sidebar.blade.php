@@ -33,39 +33,39 @@
                                 </a>
                             </li>
                             <li>
-                                <a href="{{ route('supporter.list', ['type' => 'sales_manager']) }}" class="nav-link link-body-emphasis {{ request()->routeIs('supporter.list') && request('type') === 'sales_manager' ? 'active' : '' }}">
+                                <a href="{{ route('supporter.list', ['type' => 'zse']) }}" class="nav-link link-body-emphasis {{ request()->routeIs('supporter.list') && request('type') === 'zse' ? 'active' : '' }}">
                                     <i class="bi bi-caret-right-fill me-2"></i>
-                                    <span class="sidebar-text">Sales Managers</span>
+                                    <span class="sidebar-text">Zonal Sales Executives</span>
                                 </a>
                             </li>
                             <li>
-                                <a href="{{ route('supporter.list', ['type' => 'field_officer']) }}" class="nav-link link-body-emphasis {{ request()->routeIs('supporter.list') && request('type') === 'field_officer' ? 'active' : '' }}">
+                                <a href="{{ route('supporter.list', ['type' => 'tse']) }}" class="nav-link link-body-emphasis {{ request()->routeIs('supporter.list') && request('type') === 'tse' ? 'active' : '' }}">
                                     <i class="bi bi-caret-right-fill me-2"></i>
-                                    <span class="sidebar-text">Field Officers</span>
-                                </a>
-                            </li>
-                        @endif
-
-                        @if (Auth::user()->role == 'Sales Manager' )
-                            <li>
-                                <a href="{{ route('supporter.list', ['type' => 'sales_manager']) }}" class="nav-link link-body-emphasis {{ request()->routeIs('supporter.list') && request('type') === 'sales_manager' ? 'active' : '' }}">
-                                    <i class="bi bi-caret-right-fill me-2"></i>
-                                    <span class="sidebar-text">Sales Managers</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="{{ route('supporter.list', ['type' => 'field_officer']) }}" class="nav-link link-body-emphasis {{ request()->routeIs('supporter.list') && request('type') === 'field_officer' ? 'active' : '' }}">
-                                    <i class="bi bi-caret-right-fill me-2"></i>
-                                    <span class="sidebar-text">Field Officers</span>
+                                    <span class="sidebar-text">Territory Sales Executives</span>
                                 </a>
                             </li>
                         @endif
 
-                        @if (Auth::user()->role == 'Field Officer' )
+                        @if (Auth::user()->role == 'Zonal Sales Executive' )
                             <li>
-                                <a href="{{ route('supporter.list', ['type' => 'field_officer']) }}" class="nav-link link-body-emphasis {{ request()->routeIs('supporter.list') && request('type') === 'field_officer' ? 'active' : '' }}">
+                                <a href="{{ route('supporter.list', ['type' => 'zse']) }}" class="nav-link link-body-emphasis {{ request()->routeIs('supporter.list') && request('type') === 'zse' ? 'active' : '' }}">
                                     <i class="bi bi-caret-right-fill me-2"></i>
-                                    <span class="sidebar-text">Field Officers</span>
+                                    <span class="sidebar-text">Zonal Sales Executives</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{{ route('supporter.list', ['type' => 'tse']) }}" class="nav-link link-body-emphasis {{ request()->routeIs('supporter.list') && request('type') === 'tse' ? 'active' : '' }}">
+                                    <i class="bi bi-caret-right-fill me-2"></i>
+                                    <span class="sidebar-text">Territory Sales Executives</span>
+                                </a>
+                            </li>
+                        @endif
+
+                        @if (Auth::user()->role == 'Territory Sales Executive' )
+                            <li>
+                                <a href="{{ route('supporter.list', ['type' => 'tse']) }}" class="nav-link link-body-emphasis {{ request()->routeIs('supporter.list') && request('type') === 'tse' ? 'active' : '' }}">
+                                    <i class="bi bi-caret-right-fill me-2"></i>
+                                    <span class="sidebar-text">Territory Sales Executives</span>
                                 </a>
                             </li>
                         @endif

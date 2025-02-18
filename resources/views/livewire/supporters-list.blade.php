@@ -6,6 +6,14 @@
 
     <div class="d-flex justify-content-center">
         <div class="col-10" x-show="!isUserProfile" x-transition>
+            <div class="row">
+                <div class="col-12">
+                    @canany(['create-user', 'edit-user', 'delete-user'])
+                        <a class="btn btn-success col-md mx-1" href="{{ route('users.create') }}">
+                            <i class="fa-solid fa-user-gear"></i>Add User</a>
+                    @endcanany
+                </div>
+            </div>
             <div class="row mt-3">
                 <div class="row justify-content-end">
                     <div class="col-3">
@@ -86,7 +94,7 @@
         </div>
 
         <div class="col-10" x-show="isUserProfile" x-transition x-cloak>
-            <button class="btn btn-sm btn-info" @click="isUserProfile = false; $wire.set('sales_manager_id', ''); $wire.set('field_officer_id', ''); $wire.set('customer_id', '');">back</button>
+            <button class="btn btn-sm btn-info" @click="isUserProfile = false; $wire.set('zse_id', ''); $wire.set('tse_id', ''); $wire.set('customer_id', '');">back</button>
             @if ($adminUserData)
                 <div class="row pt-2">
                     <div class="col-xl-4 col-lg-5 col-md-5 order-1 order-md-0">
@@ -164,18 +172,18 @@
                         <div class="row p-1 mb-1">
                         @if ($type == 'manager')
                             <div class="col-3">
-                                <select class="form-select form-select-sm" wire:change="view({{$adminUserData->id}})" wire:model="sales_manager_id">
-                                    <option value=''>Select Sales Manager</option>
-                                    @foreach ($sales_managers as $sales_manager)
-                                        <option value="{{ $sales_manager->id }}">{{ $sales_manager->name }}</option>
+                                <select class="form-select form-select-sm" wire:change="view({{$adminUserData->id}})" wire:model="zse_id">
+                                    <option value=''>Select Zonal Sales Executive</option>
+                                    @foreach ($zses as $zse)
+                                        <option value="{{ $zse->id }}">{{ $zse->name }}</option>
                                     @endforeach
                                 </select>
                             </div>
                             <div class="col-3">
-                                <select class="form-select form-select-sm" wire:change="view({{$adminUserData->id}})" wire:model="field_officer_id" >
-                                    <option value=''>Select Field Officer</option>
-                                    @foreach ($field_officers ?? [] as $field_officer)
-                                        <option value="{{ $field_officer->id }}">{{ $field_officer->name }}</option>
+                                <select class="form-select form-select-sm" wire:change="view({{$adminUserData->id}})" wire:model="tse_id" >
+                                    <option value=''>Select Territory Sales Executive</option>
+                                    @foreach ($tses ?? [] as $tse)
+                                        <option value="{{ $tse->id }}">{{ $tse->name }}</option>
                                     @endforeach
                                 </select>
                             </div>
@@ -187,12 +195,12 @@
                                     @endforeach
                                 </select>
                             </div>
-                        @elseif ($type == 'sales_manager')
+                        @elseif ($type == 'zse')
                             <div class="col-4">
-                                <select class="form-select form-select-sm" wire:change="view({{$adminUserData->id}})" wire:model="field_officer_id">
-                                    <option value=''>Select Field Officer</option>
-                                    @foreach ($field_officers as $field_officer)
-                                        <option value="{{ $field_officer->id }}">{{ $field_officer->name }}</option>
+                                <select class="form-select form-select-sm" wire:change="view({{$adminUserData->id}})" wire:model="tse_id">
+                                    <option value=''>Select Territory Sales Executive</option>
+                                    @foreach ($tses as $tse)
+                                        <option value="{{ $tse->id }}">{{ $tse->name }}</option>
                                     @endforeach
                                 </select>
                             </div>
@@ -204,7 +212,7 @@
                                     @endforeach
                                 </select>
                             </div>
-                        @elseif ($type == 'field_officer')
+                        @elseif ($type == 'tse')
                             <div class="col-4">
                                 <select class="form-select form-select-sm" wire:change="view({{$adminUserData->id}})" wire:model="customer_id">
                                     <option value=''>Select Customer</option>

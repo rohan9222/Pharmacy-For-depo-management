@@ -35,12 +35,12 @@ class PermissionSeeder extends Seeder
             'create-manager',
             'edit-manager',
             'delete-manager',
-            'create-sales-manager',
-            'edit-sales-manager',
-            'delete-sales-manager',
-            'create-field-officer',
-            'edit-field-officer',
-            'delete-field-officer',
+            'create-zonal-sales-executive',
+            'edit-zonal-sales-executive',
+            'delete-zonal-sales-executive',
+            'create-territory-sales-executive',
+            'edit-territory-sales-executive',
+            'delete-territory-sales-executive',
             'create-customer',
             'edit-customer',
             'delete-customer',
@@ -61,11 +61,11 @@ class PermissionSeeder extends Seeder
             'edit',
             'delete',
             'view'
-         ];
+        ];
 
           // Looping and Inserting Array's Permissions into Permission Table
-         foreach ($permissions as $permission) {
+        foreach ($permissions as $permission) {
             Permission::create(['name' => $permission]);
-          }
+        }
     }
 }

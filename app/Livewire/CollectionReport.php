@@ -24,15 +24,15 @@ class CollectionReport extends Component
         if ($request->ajax()) {
             $query = Invoice::with(['customer:id,name,user_id,mobile', 'deliveredBy:id,name', 'paymentHistory'])->where('paid', '>', 0);
 
-            // Apply filters for manager, sales manager, field officer, customer
+            // Apply filters for manager, Zonal Sales Executive, Territory Sales Executive, customer
             if (!empty($request->manager_id)) {
                 $query->where('manager_id', $request->manager_id);
             }
-            if (!empty($request->sales_manager_id)) {
-                $query->where('sales_manager_id', $request->sales_manager_id);
+            if (!empty($request->zse_id)) {
+                $query->where('zse_id', $request->zse_id);
             }
-            if (!empty($request->field_officer_id)) {
-                $query->where('field_officer_id', $request->field_officer_id);
+            if (!empty($request->tse_id)) {
+                $query->where('tse_id', $request->tse_id);
             }
             if (!empty($request->customer_id)) {
                 $query->where('customer_id', $request->customer_id);

@@ -40,7 +40,7 @@ Route::middleware([
     'verified',
 ])->group(function () {
 // user and role management
-    Route::get('/users/sales-managers', [UserController::class, 'salesManagers'])->name('users.sales-managers');
+    Route::get('/users/zonal-sales-executives', [UserController::class, 'salesManagers'])->name('users.zonal-sales-executives');
     Route::resources([
         'dashboard' => DashboardController::class,
         'roles' => RoleController::class,

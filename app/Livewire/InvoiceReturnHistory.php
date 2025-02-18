@@ -54,13 +54,13 @@ class InvoiceReturnHistory extends Component
                 $data = $data->whereIn('invoice_id', $Minvoice);
             }
 
-            if ($request->sales_manager_id != null) {
-                $SMinvoice = Invoice::where('sales_manager_id', $request->sales_manager_id)->pluck('id');
+            if ($request->zse_id != null) {
+                $SMinvoice = Invoice::where('zse_id', $request->zse_id)->pluck('id');
                 $data = $data->whereIn('invoice_id', $SMinvoice);
             }
 
-            if ($request->field_officer_id != null) {
-                $Finvoice = Invoice::where('field_officer_id', $request->field_officer_id)->pluck('id');
+            if ($request->tse_id != null) {
+                $Finvoice = Invoice::where('tse_id', $request->tse_id)->pluck('id');
                 $data = $data->whereIn('invoice_id', $Finvoice);
             }
 

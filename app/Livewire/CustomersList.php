@@ -17,7 +17,7 @@ class CustomersList extends Component
 {
     use WithPagination, WithoutUrlPagination;
 
-    public $site_settings, $customerId, $name, $email, $mobile, $address, $balance, $supplier_type, $route, $category, $search, $field_officers, $field_officer_team, $customerData, $invoices, $invoiceDue, $selectedInvoice, $partialPayment, $amount;
+    public $site_settings, $customerId, $name, $email, $mobile, $address, $balance, $supplier_type, $route, $category, $search, $tses, $tse_team, $customerData, $invoices, $invoiceDue, $selectedInvoice, $partialPayment, $amount;
 
     // protected $listeners = ['openModal' => 'setInvoice'];
     public function mount()
@@ -34,15 +34,15 @@ class CustomersList extends Component
 
     public function render()
     {
-        $field_officers = User::select('id', 'name')->role('Field Officer');
+        $tses = User::select('id', 'name')->role('Territory Sales Executive');
         if (auth()->user()->hasRole('Manager')) {
-            $field_officers = $field_officers->where('manager_id', auth()->user()->id);
-        } elseif (auth()->user()->hasRole('Sales Manager')) {
-            $field_officers = $field_officers->where('sales_manager_id', auth()->user()->id);
-        } elseif (auth()->user()->hasRole('Field Officer')) {
-            $field_officers = $field_officers->where('id', auth()->user()->id);
+            $tses = $tses->where('manager_id', auth()->user()->id);
+        } elseif (auth()->user()->hasRole('Zonal Sales Executive')) {
+            $tses = $tses->where('zse_id', auth()->user()->id);
+        } elseif (auth()->user()->hasRole('Territory Sales Executive')) {
+            $tses = $tses->where('id', auth()->user()->id);
         }
-        $this->field_officers = $field_officers->get();
+        $this->tses = $tses->get();
         $customers = User::search($this->search)->with('fieldOfficer')->where('role', 'Customer')->paginate(10);
         $this->site_settings = SiteSetting::first();
 
@@ -67,11 +67,11 @@ class CustomersList extends Component
             'balance' => 'nullable|numeric',
             'route' => 'required|string|max:255',
             'category' => 'required|string|max:255',
-            'field_officer_team' => ['required','exists:users,id',
+            'tse_team' => ['required','exists:users,id',
                 function ($attribute, $value, $fail) {
                     $user = User::find($value); // Retrieve the user once to avoid multiple queries
-                    if (!$user || (!$user->sales_manager_id && !$user->manager_id)) {
-                        $fail('This field officer team does not exist or not assigned to any manager and sales manager.');
+                    if (!$user || (!$user->zse_id && !$user->manager_id)) {
+                        $fail('This Territory Sales Executive team does not exist or not assigned to any manager and Zonal Sales Executive.');
                     }
                 }
             ],
@@ -97,9 +97,9 @@ class CustomersList extends Component
                     'role' => 'Customer',
                     'route' => $this->route,
                     'category' => $this->category,
-                    'field_officer_id' => $this->field_officer_team,
-                    'sales_manager_id' => User::where('id', $this->field_officer_team)->first()->sales_manager_id,
-                    'manager_id' => User::where('id', $this->field_officer_team)->first()->manager_id,
+                    'tse_id' => $this->tse_team,
+                    'zse_id' => User::where('id', $this->tse_team)->first()->zse_id,
+                    'manager_id' => User::where('id', $this->tse_team)->first()->manager_id,
                 ]
             );
 
@@ -123,7 +123,7 @@ class CustomersList extends Component
             $this->balance = $customer->balance;
             $this->route = $customer->route;
             $this->category = $customer->category;
-            $this->field_officer_team = $customer->field_officer_id;
+            $this->tse_team = $customer->tse_id;
         }else {
             flash()->error('Something went wrong!');
         }

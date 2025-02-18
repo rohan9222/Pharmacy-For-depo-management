@@ -39,22 +39,22 @@ class SuperAdminSeeder extends Seeder
         //     'user_id' => 010502
         // ]);
 
-        // $sales_manager = User::create([
-        //     'name' => 'Sales Manager',
-        //     'email' => 'sales_manager@gmail.com',
-        //     'password' => Hash::make('sales_manager@gmail.com'),
+        // $zse = User::create([
+        //     'name' => 'Zonal Sales Executive',
+        //     'email' => 'zse@gmail.com',
+        //     'password' => Hash::make('zse@gmail.com'),
         //     'manager_id' => $manager->id,
-        //     'role' => 'Sales Manager',
+        //     'role' => 'Zonal Sales Executive',
         //     'user_id' => 010503
         // ]);
 
-        // $field_officer = User::create([
-        //     'name' => 'Field Officer',
-        //     'email' => 'field_officer@gmail.com',
-        //     'password' => Hash::make('field_officer@gmail.com'),
-        //     'sales_manager_id' => $sales_manager->id,
+        // $tse = User::create([
+        //     'name' => 'Territory Sales Executive',
+        //     'email' => 'tse@gmail.com',
+        //     'password' => Hash::make('tse@gmail.com'),
+        //     'zse_id' => $zse->id,
         //     'manager_id' => $manager->id,
-        //     'role' => 'Field Officer',
+        //     'role' => 'Territory Sales Executive',
         //     'user_id' => 010504
         // ]);
 
@@ -68,8 +68,8 @@ class SuperAdminSeeder extends Seeder
 
         $superAdmin->assignRole('Super Admin');
         // $manager->assignRole('Manager');
-        // $sales_manager->assignRole('Sales Manager');
-        // $field_officer->assignRole('Field Officer');
+        // $zse->assignRole('Zonal Sales Executive');
+        // $tse->assignRole('Territory Sales Executive');
         // $depo_incharge->assignRole('Depo Incharge');
 
     }

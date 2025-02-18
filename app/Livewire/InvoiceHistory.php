@@ -57,12 +57,12 @@ class InvoiceHistory extends Component
                 $data = $data->where('manager_id', $request->manager_id);
             }
 
-            if ($request->sales_manager_id != null) {
-                $data = $data->where('sales_manager_id', $request->sales_manager_id);
+            if ($request->zse_id != null) {
+                $data = $data->where('zse_id', $request->zse_id);
             }
 
-            if ($request->field_officer_id != null) {
-                $data = $data->where('field_officer_id', $request->field_officer_id);
+            if ($request->tse_id != null) {
+                $data = $data->where('tse_id', $request->tse_id);
             }
 
             if ($request->customer_id != null) {

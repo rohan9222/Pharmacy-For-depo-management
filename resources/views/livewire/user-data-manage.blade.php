@@ -5,25 +5,25 @@
                 <div class="row p-1 mb-1">
                     <div class="col">
                         <select class="form-select form-select-sm" id="manager_id" wire:change="updateUserList()" wire:model="manager_id">
-                            <option value=''>Select Sales Manager</option>
+                            <option value=''>Select Zonal Sales Executive</option>
                             @foreach ($managers as $manager)
                                 <option value="{{ $manager->id }}">{{ $manager->name }}</option>
                             @endforeach
                         </select>
                     </div>
                     <div class="col">
-                        <select class="form-select form-select-sm" id="sales_manager_id" wire:change="updateUserList()" wire:model="sales_manager_id">
-                            <option value=''>Select Sales Manager</option>
-                            @foreach ($sales_managers as $sales_manager)
-                                <option value="{{ $sales_manager->id }}">{{ $sales_manager->name }}</option>
+                        <select class="form-select form-select-sm" id="zse_id" wire:change="updateUserList()" wire:model="zse_id">
+                            <option value=''>Select Zonal Sales Executive</option>
+                            @foreach ($zses as $zse)
+                                <option value="{{ $zse->id }}">{{ $zse->name }}</option>
                             @endforeach
                         </select>
                     </div>
                     <div class="col">
-                        <select class="form-select form-select-sm" id="field_officer_id" wire:change="updateUserList()" wire:model="field_officer_id" >
-                            <option value=''>Select Field Officer</option>
-                            @foreach ($field_officers ?? [] as $field_officer)
-                                <option value="{{ $field_officer->id }}">{{ $field_officer->name }}</option>
+                        <select class="form-select form-select-sm" id="tse_id" wire:change="updateUserList()" wire:model="tse_id" >
+                            <option value=''>Select Territory Sales Executive</option>
+                            @foreach ($tses ?? [] as $tse)
+                                <option value="{{ $tse->id }}">{{ $tse->name }}</option>
                             @endforeach
                         </select>
                     </div>
@@ -48,9 +48,9 @@
                     </div>
                 </div>
             @elseif ($type == 'manager')
-            @elseif ($type == 'sales_manager')
+            @elseif ($type == 'zse')
 
-            @elseif ($type == 'field_officer')
+            @elseif ($type == 'tse')
 
             @endif
         </div>

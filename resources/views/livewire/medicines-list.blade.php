@@ -12,7 +12,7 @@
                         <div class="p-1">
                             <!-- Toggle Button -->
                             <button
-                                @click="isOpen = !isOpen; if (!isOpen) { $wire.set('name', ''); $wire.set('generic_name', ''); $wire.set('description', ''); $wire.set('shelf', ''); $wire.set('category_name', ''); $wire.set('medicineId', ''); }"
+                                @click="isOpen = !isOpen; if (!isOpen) { $wire.set('name', ''); $wire.set('generic_name', ''); $wire.set('description', ''); $wire.set('shelf', ''); $wire.set('category_name', ''); $wire.set('medicineId', ''); $wire.set('supplier_name', ''); $wire.set('supplier_price', ''); $wire.set('pack_size', ''); $wire.set('medicineId', ''); $wire.set('price', ''); $wire.set('quantity', ''); $wire.set('image_url', ''); $wire.set('barcode', '') }"
                                 class="btn btn-sm btn-primary"
                                 type="button">
                                 <span x-text="isOpen ? 'Hide This' : 'Add medicine'"></span>
@@ -114,10 +114,14 @@
                                             </div>
                                             @error('vat') <span class="text-danger">{{ $message }}</span> @enderror
                                         </div>
-                                        {{-- <div class="col-3">
-                                            <input type="text" name="quantity" id="quantity" placeholder="Quantity" class="form-control" wire:model="quantity">
-                                            @error('quantity') <span class="text-danger">{{ $message }}</span> @enderror
-                                        </div> --}}
+                                        
+                                        @if (!$medicineId)
+                                            <div class="col-3">
+                                                <input type="text" name="quantity" id="quantity" placeholder="Opening Stock" class="form-control" wire:model="quantity">
+                                                @error('quantity') <span class="text-danger">{{ $message }}</span> @enderror
+                                            </div>
+                                        @endif
+
                                         <div class="col-3">
                                             <select name="status" class="form-control" id="status" wire:model="status">
                                                 <option value="1" selected>Available</option>

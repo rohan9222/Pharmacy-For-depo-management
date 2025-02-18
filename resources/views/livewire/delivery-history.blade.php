@@ -86,18 +86,18 @@
                             </select>
                         </div>
                         <div class="col">
-                            <select class="form-control form-control-sm" wire:change="updateInvoiceList('sales_manager')" wire:model="sales_manager_id">
-                                <option value="">Select Sales Manager</option>
-                                @foreach ($sales_managers ?? [] as $sales_manager)
-                                    <option value="{{ $sales_manager->id }}">{{ $sales_manager->name }}</option>
+                            <select class="form-control form-control-sm" wire:change="updateInvoiceList('zse')" wire:model="zse_id">
+                                <option value="">Select Zonal Sales Executive</option>
+                                @foreach ($zses ?? [] as $zse)
+                                    <option value="{{ $zse->id }}">{{ $zse->name }}</option>
                                 @endforeach
                             </select>
                         </div> --}}
                         <div class="col">
-                            <select class="form-control form-control-sm tom-select p-0" x-init="initTomSelect()" wire:change="updateInvoiceList('field_officer')" wire:model="field_officer_id">
-                                <option value="">Select Field Officer</option>
-                                @foreach ($field_officers ?? [] as $field_officer)
-                                    <option value="{{ $field_officer->id }}">{{ $field_officer->name }}</option>
+                            <select class="form-control form-control-sm tom-select p-0" x-init="initTomSelect()" wire:change="updateInvoiceList('tse')" wire:model="tse_id">
+                                <option value="">Select Territory Sales Executive</option>
+                                @foreach ($tses ?? [] as $tse)
+                                    <option value="{{ $tse->id }}">{{ $tse->name }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -115,7 +115,7 @@
                             <div class="col-7">
                                 <div class="border border-rounded p-2">
                                     @if ($invoices === null)
-                                        <div class="text-danger text-center">!!! Select Field Officer First !!!</div>
+                                        <div class="text-danger text-center">!!! Select Territory Sales Executive First !!!</div>
                                     @elseif ($invoices->isEmpty())
                                         <div class="text-danger text-center">!!! No Invoice Found !!!</div>
                                     @else

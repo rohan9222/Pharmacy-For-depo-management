@@ -8,8 +8,8 @@ use Livewire\Component;
 class UserDataManage extends Component
 {
     public $managers = [], $manager_id;
-    public $sales_managers = [], $sales_manager_id;
-    public $field_officers = [], $field_officer_id;
+    public $zses = [], $zse_id;
+    public $tses = [], $tse_id;
     public $customers = [], $customer_id;
     public $type;
 
@@ -21,10 +21,10 @@ class UserDataManage extends Component
             $this->type = 'super_admin';
         } elseif ($user->hasRole('Manager')) {
             $this->type = 'manager';
-        } elseif ($user->hasRole('Sales Manager')) {
-            $this->type = 'sales_manager';
-        } elseif ($user->hasRole('Field Officer')) {
-            $this->type = 'field_officer';
+        } elseif ($user->hasRole('Zonal Sales Executive')) {
+            $this->type = 'zse';
+        } elseif ($user->hasRole('Territory Sales Executive')) {
+            $this->type = 'tse';
         }
 
         $this->updateUserList();
@@ -35,8 +35,8 @@ class UserDataManage extends Component
         $user = auth()->user();
 
         // Initialize Empty Arrays
-        $this->sales_managers = [];
-        $this->field_officers = [];
+        $this->zses = [];
+        $this->tses = [];
         $this->customers = [];
 
         if ($this->type === 'super_admin') {
@@ -45,25 +45,25 @@ class UserDataManage extends Component
 
         if ($this->type === 'super_admin' || $this->type === 'manager') {
             if ($this->manager_id) {
-                $this->sales_managers = User::where('role', 'Sales Manager')
+                $this->zses = User::where('role', 'Zonal Sales Executive')
                     ->where('manager_id', $this->manager_id)
                     ->get();
             }
         } else {
-            $this->sales_managers = User::where('role', 'Sales Manager')
+            $this->zses = User::where('role', 'Zonal Sales Executive')
                 ->where('manager_id', $user->id)
                 ->get();
         }
 
-        if ($this->sales_manager_id) {
-            $this->field_officers = User::where('role', 'Field Officer')
-                ->where('sales_manager_id', $this->sales_manager_id)
+        if ($this->zse_id) {
+            $this->tses = User::where('role', 'Territory Sales Executive')
+                ->where('zse_id', $this->zse_id)
                 ->get();
         }
 
-        if ($this->field_officer_id) {
+        if ($this->tse_id) {
             $this->customers = User::where('role', 'Customer')
-                ->where('field_officer_id', $this->field_officer_id)
+                ->where('tse_id', $this->tse_id)
                 ->get();
         }
     }

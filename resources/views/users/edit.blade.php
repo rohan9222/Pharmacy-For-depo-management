@@ -81,7 +81,7 @@
                         <label for="roles" class="col-md-4 col-form-label text-md-end text-start">Roles</label>
                         <div class="col-md-6 border @error('roles') border-danger @enderror">
                             @forelse ($roles as $role)
-                                @if ($role!='Super Admin' && $role!='Depo Incharge' && $role!='Manager' && $role!='Sales Manager' && $role!='Field Officer' && $role!='Delivery Man')
+                                @if ($role!='Super Admin' && $role!='Depo Incharge' && $role!='Manager' && $role!='Zonal Sales Executive' && $role!='Territory Sales Executive' && $role!='Delivery Man')
                                     <div class="form-check form-switch">
                                         <input class="form-check-input" name="roles[]" type="checkbox" role="switch" value="{{ $role }}" {{ in_array($role, old('roles', $userRoles ?? [])) ? 'checked' : '' }}>
                                         <label class="form-check-label">{{ $role }}</label>
@@ -89,16 +89,16 @@
                                     @else
                                         @if (
                                             Auth::user()->hasRole('Super Admin') ||
-                                            (Auth::user()->hasRole('Manager') && ($role == 'Manager' || $role == 'Sales Manager' || $role == 'Field Officer')) ||
-                                            (Auth::user()->hasRole('Sales Manager') && ($role == 'Sales Manager' || $role == 'Field Officer')) ||
+                                            (Auth::user()->hasRole('Manager') && ($role == 'Manager' || $role == 'Zonal Sales Executive' || $role == 'Territory Sales Executive')) ||
+                                            (Auth::user()->hasRole('Zonal Sales Executive') && ($role == 'Zonal Sales Executive' || $role == 'Territory Sales Executive')) ||
                                             (Auth::user()->hasRole('Depo Incharge') && ($role == 'Depo Incharge' || $role == 'Delivery Man'))
                                         )
                                         @php
                                             $formattedRole = match ($role) {
                                                 'Super Admin' => 'super-admin-role',
                                                 'Manager' => 'manager-role',
-                                                'Sales Manager' => 'sales-manager-role',
-                                                'Field Officer' => 'field-officer-role',
+                                                'Zonal Sales Executive' => 'zonal-sales-executive-role',
+                                                'Territory Sales Executive' => 'territory-sales-executive-role',
                                                 'Depo Incharge' => 'depo-incharge-role',
                                                 'Delivery Man' => 'delivery-man-role',
                                                 default => '',
@@ -118,7 +118,7 @@
                         </div>
                     </div>
 
-                    <!-- Manager and Sales Manager selection (conditional) -->
+                    <!-- Manager and Zonal Sales Executive selection (conditional) -->
                     <div class="mb-3 row" id="ManagerSelection" style="display: none;">
                         <label for="manager_id" class="col-md-4 col-form-label text-md-end text-start">Select Manager</label>
                         <div class="col-md-6">
@@ -136,18 +136,18 @@
                     </div>
 
                     <div class="mb-3 row" id="SalesManagerSelection" style="display: none;">
-                        <label for="sales_manager_id" class="col-md-4 col-form-label text-md-end text-start">Select Sales Manager</label>
+                        <label for="zse_id" class="col-md-4 col-form-label text-md-end text-start">Select Zonal Sales Executive</label>
                         <div class="col-md-6">
-                            <select class="form-control @error('sales_manager_id') is-invalid @enderror" id="sales_manager_id" name="sales_manager_id">
-                                <!-- Populate sales manager options dynamically -->
-                                <option value="">Select Sales Manager</option>
+                            <select class="form-control @error('zse_id') is-invalid @enderror" id="zse_id" name="zse_id">
+                                <!-- Populate Zonal Sales Executive options dynamically -->
+                                <option value="">Select Zonal Sales Executive</option>
                                 @foreach($salesManagers as $salesManager)
-                                    <option value="{{ $salesManager->id }}" {{ $salesManager->id == $user->sales_manager_id ? 'selected' : '' }}>{{ $salesManager->name }}</option>
+                                    <option value="{{ $salesManager->id }}" {{ $salesManager->id == $user->zse_id ? 'selected' : '' }}>{{ $salesManager->name }}</option>
                                 @endforeach
                             </select>
                         </div>
-                        @if ($errors->has('sales_manager_id'))
-                            <span class="text-danger">{{ $errors->first('sales_manager_id') }}</span>
+                        @if ($errors->has('zse_id'))
+                            <span class="text-danger">{{ $errors->first('zse_id') }}</span>
                         @endif
                     </div>
 
@@ -165,27 +165,27 @@
         document.addEventListener('DOMContentLoaded', function() {
             $(document).ready(function () {
                 // Ensure visibility on page load based on the old values
-                if ($('#sales-manager-role').is(':checked') || $('#field-officer-role').is(':checked')) {
+                if ($('#zonal-sales-executive-role').is(':checked') || $('#territory-sales-executive-role').is(':checked')) {
                     $('#ManagerSelection').show();
                 }
 
-                if ($('#field-officer-role').is(':checked')) {
+                if ($('#territory-sales-executive-role').is(':checked')) {
                     $('#SalesManagerSelection').show();
                 }
 
-                $('#super-admin-role, #depo-incharge-role, #manager-role, #delivery-man-role, #field-officer-role, #sales-manager-role').on('change', function () {
+                $('#super-admin-role, #depo-incharge-role, #manager-role, #delivery-man-role, #territory-sales-executive-role, #zonal-sales-executive-role').on('change', function () {
                     // Uncheck all other checkboxes except the current one
-                    $('#super-admin-role, #depo-incharge-role, #manager-role, #delivery-man-role, #field-officer-role, #sales-manager-role').not(this).prop('checked', false);
+                    $('#super-admin-role, #depo-incharge-role, #manager-role, #delivery-man-role, #territory-sales-executive-role, #zonal-sales-executive-role').not(this).prop('checked', false);
 
                     // Show or hide the Manager selection based on roles
-                    if ($('#sales-manager-role').is(':checked') || $('#field-officer-role').is(':checked')) {
+                    if ($('#zonal-sales-executive-role').is(':checked') || $('#territory-sales-executive-role').is(':checked')) {
                         $('#ManagerSelection').show();
                     } else {
                         $('#ManagerSelection').hide();
                     }
 
-                    // Show or hide the Sales Manager selection based on roles
-                    if ($('#field-officer-role').is(':checked')) {
+                    // Show or hide the Zonal Sales Executive selection based on roles
+                    if ($('#territory-sales-executive-role').is(':checked')) {
                         $('#SalesManagerSelection').show();
                     } else {
                         $('#SalesManagerSelection').hide();
@@ -203,21 +203,21 @@
 
                     if (managerId) {
                         $.ajax({
-                            url: '{{ route('users.sales-managers') }}', // Ensure this route is defined in your routes file
+                            url: '{{ route('users.zonal-sales-executives') }}', // Ensure this route is defined in your routes file
                             data: { manager_id: managerId },
                             method: 'GET',
                             success: function (data) {
                                 console.log(data); // Debugging to see the response data
 
-                                // Clear existing options in sales_manager_id dropdown
-                                $('#sales_manager_id').empty();
+                                // Clear existing options in zse_id dropdown
+                                $('#zse_id').empty();
 
                                 // Add a default option
-                                $('#sales_manager_id').append('<option value="">Select Sales Manager</option>');
+                                $('#zse_id').append('<option value="">Select Zonal Sales Executive</option>');
 
                                 // Populate new options dynamically
                                 $.each(data, function (index, salesManager) {
-                                    $('#sales_manager_id').append('<option value="' + salesManager.id + '">' + salesManager.name + '</option>');
+                                    $('#zse_id').append('<option value="' + salesManager.id + '">' + salesManager.name + '</option>');
                                 });
                             },
                             error: function (xhr) {
@@ -226,8 +226,8 @@
                         });
                     } else {
                         // Clear dropdown if no manager is selected
-                        $('#sales_manager_id').empty();
-                        $('#sales_manager_id').append('<option value="">Select Sales Manager</option>');
+                        $('#zse_id').empty();
+                        $('#zse_id').append('<option value="">Select Zonal Sales Executive</option>');
                     }
                 });
             });

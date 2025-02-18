@@ -13,7 +13,7 @@ use Livewire\Component;
 class DeliveryHistory extends Component
 {
     use WithPagination, WithoutUrlPagination;
-    public $pending_search, $delivered_search, $invoices, $managers, $sales_managers, $field_officers, $customers, $manager_id, $sales_manager_id, $field_officer_id, $customer_id,$delivered_by;
+    public $pending_search, $delivered_search, $invoices, $managers, $zses, $tses, $customers, $manager_id, $zse_id, $tse_id, $customer_id,$delivered_by;
     public $perPage = 15;
     public $selected_invoices = [];
 
@@ -50,41 +50,41 @@ class DeliveryHistory extends Component
     public function updateInvoiceList($type = null) {
         // Use relationships properly
         // $this->managers = User::where('role', 'Manager')->get();
-        // $sales_managers = User::where('role', 'Sales Manager');
-        $this->field_officers = User::where('role', 'Field Officer')->get();
+        // $zses = User::where('role', 'Zonal Sales Executive');
+        $this->tses = User::where('role', 'Territory Sales Executive')->get();
         $customers = User::where('role', 'Customer');
 
         // $invoices = Invoice::where('delivery_status', 'pending');
         // if($this->manager_id != null){
         //     $invoices = $invoices->where('manager_id', $this->manager_id);
-        //     $sales_managers = $sales_managers->where('manager_id', $this->manager_id);
-        //     $field_officers = $field_officers->where('manager_id', $this->manager_id);
+        //     $zses = $zses->where('manager_id', $this->manager_id);
+        //     $tses = $tses->where('manager_id', $this->manager_id);
         //     $customers = $customers->where('manager_id', $this->manager_id);
-        //     $this->field_officers = $field_officers->get() ?? null;
+        //     $this->tses = $tses->get() ?? null;
         // }else{
-        //     $this->sales_manager_id = null;
-        //     $this->field_officer_id = null;
+        //     $this->zse_id = null;
+        //     $this->tse_id = null;
         //     $this->customer_id = null;
-        //     $this->sales_managers = [];
-        //     $this->field_officers = [];
+        //     $this->zses = [];
+        //     $this->tses = [];
         //     $this->customers = [];
         // }
 
-        // if($this->sales_manager_id != null){
-        //     $invoices = $invoices->where('sales_manager_id', $this->sales_manager_id);
-        //     $field_officers = $field_officers->where('sales_manager_id', $this->sales_manager_id);
-        //     $customers = $customers->where('sales_manager_id', $this->sales_manager_id);
-        //     $this->field_officers = $field_officers->get() ?? null;
+        // if($this->zse_id != null){
+        //     $invoices = $invoices->where('zse_id', $this->zse_id);
+        //     $tses = $tses->where('zse_id', $this->zse_id);
+        //     $customers = $customers->where('zse_id', $this->zse_id);
+        //     $this->tses = $tses->get() ?? null;
         // }else{
-        //     $this->field_officer_id = null;
+        //     $this->tse_id = null;
         //     $this->customer_id = null;
-        //     $this->field_officers = [];
+        //     $this->tses = [];
         //     $this->customers = [];
         // }
 
-        if($this->field_officer_id != null){
-            $this->invoices = Invoice::where('delivery_status', 'pending')->where('field_officer_id', $this->field_officer_id)->limit($this->perPage)->get() ?? null;
-            $customers = $customers->where('field_officer_id', $this->field_officer_id);
+        if($this->tse_id != null){
+            $this->invoices = Invoice::where('delivery_status', 'pending')->where('tse_id', $this->tse_id)->limit($this->perPage)->get() ?? null;
+            $customers = $customers->where('tse_id', $this->tse_id);
             $this->customers = $customers->get() ?? null;
         }else{
             $this->invoices = null;
@@ -97,12 +97,12 @@ class DeliveryHistory extends Component
         }
 
         // if($type == 'manager'){
-        //     $this->sales_managers = $sales_managers->get() ?? null;
+        //     $this->zses = $zses->get() ?? null;
         // }else
-        // if($type == 'sales_manager'){
-        //     $this->field_officers = $field_officers->get() ?? null;
+        // if($type == 'zse'){
+        //     $this->tses = $tses->get() ?? null;
         // }else
-        if($type == 'field_officer'){
+        if($type == 'tse'){
             $this->customers = $customers->get() ?? null;
         }
     }

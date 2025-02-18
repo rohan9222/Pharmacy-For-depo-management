@@ -12,8 +12,8 @@ class Invoice extends Model
         'invoice_no',
         'invoice_date',
         'customer_id',
-        'field_officer_id',
-        'sales_manager_id',
+        'tse_id',
+        'zse_id',
         'manager_id',
         'sub_total',
         'vat',
@@ -37,8 +37,8 @@ class Invoice extends Model
         return $query->where('invoice_no', 'like', '%' . $search . '%')
             ->orWhere('invoice_date', 'like', '%' . $search . '%')
             ->orWhere('customer_id', 'like', '%' . $search . '%')
-            ->orWhere('field_officer_id', 'like', '%' . $search . '%')
-            ->orWhere('sales_manager_id', 'like', '%' . $search . '%')
+            ->orWhere('tse_id', 'like', '%' . $search . '%')
+            ->orWhere('zse_id', 'like', '%' . $search . '%')
             ->orWhere('manager_id', 'like', '%' . $search . '%')
             ->orWhere('invoice_no', 'like', '%' . $search . '%')
             ->orWhere('delivery_date', 'like', '%' . $search . '%')
@@ -63,12 +63,12 @@ class Invoice extends Model
 
     public function fieldOfficer()
     {
-        return $this->belongsTo(User::class, 'field_officer_id');
+        return $this->belongsTo(User::class, 'tse_id');
     }
 
     public function salesManager()
     {
-        return $this->belongsTo(User::class, 'sales_manager_id');
+        return $this->belongsTo(User::class, 'zse_id');
     }
 
     public function manager()

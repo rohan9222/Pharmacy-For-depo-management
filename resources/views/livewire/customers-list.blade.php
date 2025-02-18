@@ -45,18 +45,18 @@
                                             @error('balance') <span class="text-danger">{{ $message }}</span> @enderror
                                         </div>
                                         <div class="col-3">
-                                            <select name="field_officer_team" id="field_officer_team" class="form-control" wire:model="field_officer_team">
-                                                <option value="">Select Field Officer</option>
-                                                @foreach ($field_officers as $field_officer)
-                                                    <option value="{{ $field_officer->id }}"
-                                                        {{ isset($field_officer->fieldOfficer) && $field_officer->fieldOfficer->id == $field_officer->id
+                                            <select name="tse_team" id="tse_team" class="form-control" wire:model="tse_team">
+                                                <option value="">Select Territory Sales Executive</option>
+                                                @foreach ($tses as $tse)
+                                                    <option value="{{ $tse->id }}"
+                                                        {{ isset($tse->fieldOfficer) && $tse->fieldOfficer->id == $tse->id
                                                             ? 'selected'
-                                                            : ($field_officer->id == auth()->user()->id ? 'selected' : '') }}>
-                                                        {{ $field_officer->name }}
+                                                            : ($tse->id == auth()->user()->id ? 'selected' : '') }}>
+                                                        {{ $tse->name }}
                                                     </option>
                                                 @endforeach
                                             </select>
-                                            @error('field_officer_team') <span class="text-danger">{{ $message }}</span> @enderror
+                                            @error('tse_team') <span class="text-danger">{{ $message }}</span> @enderror
                                         </div>
                                         <div class="col-3">
                                             <input type="text" class="form-control" id="route" wire:model="route" placeholder="Route" aria-label="Route">
@@ -94,7 +94,7 @@
                             <th>mobile</th>
                             {{-- <th>Balance</th> --}}
                             <th>Address</th>
-                            <th>Field Officer</th>
+                            <th>Territory Sales Executive</th>
                             <th>Route</th>
                             <th>Category</th>
                             <th>Action</th>

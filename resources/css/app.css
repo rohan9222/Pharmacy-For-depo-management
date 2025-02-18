@@ -6,8 +6,8 @@
     display: none;
 }
 
-.fl-wrapper[data-position^=top-] {
-    top: 3.3em !important;
+.fl-wrapper {
+    z-index: 9999 ! important;
 }
 
 

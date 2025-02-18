@@ -17,8 +17,8 @@ return new class extends Migration
             // $table->foreignId('user_id')->constrained()->cascadeOnDelete()->cascadeOnUpdate()->comment('customer list id');
             $table->timestamp('invoice_date')->default(now());
             $table->foreignId('manager_id')->nullable()->constrained('users')->nullOnDelete()->cascadeOnUpdate()->comment('user id who has manager role');
-            $table->foreignId('sales_manager_id')->nullable()->constrained('users')->nullOnDelete()->cascadeOnUpdate()->comment('user id who has sales manager role');
-            $table->foreignId('field_officer_id')->nullable()->constrained('users')->nullOnDelete()->cascadeOnUpdate()->comment('user id who has field officer role');
+            $table->foreignId('zse_id')->nullable()->constrained('users')->nullOnDelete()->cascadeOnUpdate()->comment('user id who has Zonal Sales Executive role');
+            $table->foreignId('tse_id')->nullable()->constrained('users')->nullOnDelete()->cascadeOnUpdate()->comment('user id who has Territory Sales Executive role');
             $table->foreignId('customer_id')->nullable()->constrained('users')->nullOnDelete()->cascadeOnUpdate()->comment('user id who has customer role');
             $table->decimal('sub_total', 11, 2)->default(0.00);
             $table->decimal('discount', 11, 2)->default(0.00)->nullable();
