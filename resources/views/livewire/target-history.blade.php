@@ -90,7 +90,7 @@
                                     <td>{{ $admin_target->userData->name }}</td>
                                     <td>{{ $admin_target->userData->role }}</td>
                                     <td>{{ $admin_target->sales_target }}</td>
-                                    <td>{{ $admin_target->sales_target_achieved }}</td>
+                                    <td>{{ $admin_target->sales_target_achieve }}</td>
                                     <td>{{ $admin_target->target_month }} {{ $admin_target->target_year }}</td>
                                     <td>{!! $admin_target->sales_target_achieved >= $admin_target->sales_target ? '<span class="badge text-bg-success">Completed</span>' : '<span class="badge text-bg-warning">Not Completed</span>' !!}</td>
                                 </tr>

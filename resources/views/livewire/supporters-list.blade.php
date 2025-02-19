@@ -17,13 +17,14 @@
             <div class="row mt-3">
                 <div class="row justify-content-end">
                     <div class="col-3">
-                        <input id="search" class="form-control" type="search" wire:model.live="search" placeholder="Search By Name" aria-label="Search By Name">
+                        <input id="search" class="form-control" type="search" wire:model.live="search" placeholder="Search" aria-label="Search By Name">
                     </div>
                 </div>
                 <table class="table">
                     <thead>
                         <tr>
                             <th>SN</th>
+                            <th>User ID</th>
                             <th>Person Name</th>
                             <th>Email Address</th>
                             <th>mobile</th>
@@ -36,6 +37,7 @@
                         @foreach ($admin_users as $admin_user)
                             <tr>
                                 <td>{{ $loop->iteration }}</td>
+                                <td>{{ $admin_user->user_id }}</td>
                                 <td>{{ $admin_user->name }}</td>
                                 <td>{{ $admin_user->email }}</td>
                                 <td>{{ $admin_user->mobile }}</td>
@@ -138,6 +140,10 @@
                                             <span>{{ $adminUserData->name }}</span>
                                         </li>
                                         <li class="mb-75">
+                                            <span class="fw-bolder me-25">User ID:</span>
+                                            <span>{{ $adminUserData->user_id }}</span>
+                                        </li>
+                                        <li class="mb-75">
                                             <span class="fw-bolder me-25">Phone:</span>
                                             <span>{{ $adminUserData->mobile }}</span>
                                         </li>
@@ -169,7 +175,7 @@
                     </div>
 
                     <div class="col-xl-8 col-lg-7 col-md-7 order-0 order-md-1">
-                        <div class="row p-1 mb-1">
+                        <div class="row p-1 mb-1 g-1">
                         @if ($type == 'manager')
                             <div class="col-3">
                                 <select class="form-select form-select-sm" wire:change="view({{$adminUserData->id}})" wire:model="zse_id">
@@ -222,9 +228,9 @@
                                 </select>
                             </div>
                         @endif
-                            <div class="col-4">
+                            <div class="col-3">
                                 <div class="input-group mb-3">
-                                    <input type="date" class="form-control" placeholder="Start Date" wire:model="start_date">
+                                    <input type="date" class="form-control form-control-sm" placeholder="Start Date" wire:model="start_date">
                                     <span class="input-group-text">To</span>
                                     <input type="date" class="form-control" placeholder="End Date" wire:model="end_date">
                                 </div>
@@ -274,3 +280,4 @@
         </div>
     </div>
 </div>
+

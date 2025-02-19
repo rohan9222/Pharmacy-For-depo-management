@@ -87,7 +87,6 @@ class InvoiceReturnHistory extends Component
         }
     }
 
-
     public function invoiceView($invoiceID = null)
     {
         if($invoiceID) {

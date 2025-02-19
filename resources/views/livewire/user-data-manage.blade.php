@@ -2,7 +2,7 @@
     <div class="col-12 m-1 p-1">
         <div class="row m-1 text-center">
             @if (auth()->user()->role == 'Super Admin')
-                <div class="row p-1 mb-1">
+                <div class="row p-1 mb-1 g-1">
                     <div class="col">
                         <select class="form-select form-select-sm" id="manager_id" wire:change="updateUserList()" wire:model="manager_id">
                             <option value=''>Select Zonal Sales Executive</option>

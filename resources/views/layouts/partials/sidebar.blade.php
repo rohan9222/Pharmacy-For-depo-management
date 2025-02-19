@@ -149,7 +149,7 @@
 
         {{-- Stock Medicines --}}
         <li class="nav-item">
-            <a href="#" class="nav-link link-body-emphasis {{ in_array(request()->route()->getName(), ['stock-medicines', 'stock-medicines-list']) ? 'active' : '' }}" data-bs-toggle="collapse" data-bs-target="#stock-medicines-collapse" aria-expanded="false">
+            <a href="#" class="nav-link link-body-emphasis {{ in_array(request()->route()->getName(), ['stock-medicines', 'stock-medicines-list', 'stock-invoice-list']) ? 'active' : '' }}" data-bs-toggle="collapse" data-bs-target="#stock-medicines-collapse" aria-expanded="false">
                 <i class="bi bi-prescription2"></i>
                 <span class="sidebar-text">Stock Medicines</span>
                 <i class="bi bi-chevron-down ms-auto toggle-icon sidebar-text"></i>
@@ -164,14 +164,21 @@
                                 <span class="sidebar-text">Stock IN</span>
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a href="{{ route('stock-invoice-list') }}" class="nav-link link-body-emphasis {{ request()->routeIs('stock-invoice-list') ? 'active' : '' }}">
+                                <i class="bi bi-caret-right-fill me-2"></i>
+                                <span class="sidebar-text">Stock Invoice List</span>
+                            </a>
+                        </li>
                     @endcanany
                     @canany(['view-medicine-stock'])
                         <li class="nav-item">
                             <a href="{{ route('stock-medicines-list') }}" class="nav-link link-body-emphasis {{ request()->routeIs('stock-medicines-list') ? 'active' : '' }}">
                                 <i class="bi bi-caret-right-fill me-2"></i>
-                                <span class="sidebar-text">Stock List</span>
+                                <span class="sidebar-text">Stock Medicine List</span>
                             </a>
                         </li>
+                        
                     @endcanany
                 </ul>
             </div>

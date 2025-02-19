@@ -137,7 +137,7 @@ class MedicinesList extends Component
             if (empty($this->medicineId)) {
                 $openingStock = new OpeningStock();
                 $openingStock->medicine_id = $newMedicine->id;
-                $openingStock->quantity = $this->quantity;
+                $openingStock->opening_stock = $this->quantity;
                 $openingStock->opening_month = Carbon::now()->format('F');
                 $openingStock->opening_year = Carbon::now()->format('Y');
                 $openingStock->save();

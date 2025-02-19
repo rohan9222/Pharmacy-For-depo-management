@@ -68,13 +68,14 @@
             <div class="row mt-3">
                 <div class="row justify-content-end">
                     <div class="col-3">
-                        <input id="search" class="form-control" type="search" wire:model.live="search" placeholder="Search By Name" aria-label="Search By Name">
+                        <input id="search" class="form-control" type="search" wire:model.live="search" placeholder="Search" aria-label="Search By Name">
                     </div>
                 </div>
                 <table class="table">
                     <thead>
                         <tr>
                             <th>SN</th>
+                            <th>User ID</th>
                             <th>Delivery Man Name</th>
                             <th>Email Address</th>
                             <th>mobile</th>
@@ -87,6 +88,7 @@
                         @foreach ($customers as $customer)
                             <tr>
                                 <td>{{ $loop->iteration }}</td>
+                                <td>{{ $customer->user_id }}</td>
                                 <td>{{ $customer->name }}</td>
                                 <td>{{ $customer->email }}</td>
                                 <td>{{ $customer->mobile }}</td>

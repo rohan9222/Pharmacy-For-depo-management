@@ -54,7 +54,7 @@ class DeliveryHistory extends Component
         $this->tses = User::where('role', 'Territory Sales Executive')->get();
         $customers = User::where('role', 'Customer');
 
-        // $invoices = Invoice::where('delivery_status', 'pending');
+        $invoices = Invoice::where('delivery_status', 'pending')->limit($this->perPage);
         // if($this->manager_id != null){
         //     $invoices = $invoices->where('manager_id', $this->manager_id);
         //     $zses = $zses->where('manager_id', $this->manager_id);
@@ -83,17 +83,17 @@ class DeliveryHistory extends Component
         // }
 
         if($this->tse_id != null){
-            $this->invoices = Invoice::where('delivery_status', 'pending')->where('tse_id', $this->tse_id)->limit($this->perPage)->get() ?? null;
+            $this->invoices = $invoices->where('tse_id', $this->tse_id)->get() ?? null;
             $customers = $customers->where('tse_id', $this->tse_id);
             $this->customers = $customers->get() ?? null;
         }else{
-            $this->invoices = null;
+            $this->invoices = $invoices->get() ?? null;
             $this->customer_id = null;
             $this->customers = [];
         }
 
         if($this->customer_id != null){
-            $this->invoices = Invoice::where('delivery_status', 'pending')->where('customer_id', $this->customer_id)->limit($this->perPage)->get() ?? null;
+            $this->invoices = $invoices->where('customer_id', $this->customer_id)->get() ?? null;
         }
 
         // if($type == 'manager'){

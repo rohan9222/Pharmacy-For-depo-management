@@ -152,7 +152,7 @@
                 <div class="row mt-3 table-responsive">
                     <div class="row justify-content-end mb-1">
                         <div class="col-3">
-                            <input id="search" class="form-control" type="search" wire:model.live="search" placeholder="Search By Name" aria-label="Search By Name">
+                            <input id="search" class="form-control" type="search" wire:model.live="search" placeholder="Search" aria-label="Search">
                         </div>
                     </div>
                     <table class="table table-bordered table-sm table-responsive">

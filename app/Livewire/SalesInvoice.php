@@ -414,7 +414,7 @@ class SalesInvoice extends Component
                 // }
                 $stockList = StockList::where('medicine_id', $medicine['medicine_id'])
                     ->where('quantity', '>', 0) // Only consider stocks with positive quantity
-                    ->orderBy('expiry_date', 'desc')
+                    ->orderBy('expiry_date', 'asc')
                     ->get();
                 $remainingQuantity = $medicine['quantity'];
                 foreach ($stockList as $stock) {

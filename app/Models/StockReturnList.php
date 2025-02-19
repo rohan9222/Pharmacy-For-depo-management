@@ -6,11 +6,13 @@ use App\Models\Medicine;
 
 use Illuminate\Database\Eloquent\Model;
 
-class StockList extends Model
+class StockReturnList extends Model
 {
     protected $fillable = [
         'medicine_id',
         'stock_invoice_id',
+        'stock_list_id',
+        'return_date',
         'batch_number',
         'expiry_date',
         'initial_quantity',
@@ -27,11 +29,6 @@ class StockList extends Model
     public function medicine()
     {
         return $this->belongsTo(Medicine::class);
-    }
-
-    public function stockReturnList()
-    {
-        return $this->hasMany(StockReturnList::class, 'stock_list_id');
     }
 
     public function scopeSearch($query, $search)

@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\{DashboardController,UserProfileController};
 use App\Http\Controllers\Admin\{RoleController,UserController};
 use App\Http\Controllers\makepdf\{MakeInvoiceController,MakeSummaryController,MakeReportController};
-use App\Livewire\{SupportersList,CustomersList,DeliveryManList,SupplierList,MedicinesList,CategoryList, PackSizeList, StockMedicines,StockMedicinesList,SalesInvoice,InvoiceHistory,DeliveryHistory,InvoiceReturnHistory,SiteSettings,TargetHistory,DueInvoiceList,CollectionReport};
+use App\Livewire\{SupportersList,CustomersList,DeliveryManList,SupplierList,MedicinesList,CategoryList, PackSizeList, StockMedicines,StockInvoiceList,StockMedicinesList,SalesInvoice,InvoiceHistory,DeliveryHistory,InvoiceReturnHistory,SiteSettings,TargetHistory,DueInvoiceList,CollectionReport};
 
 
 Route::get('/', function () {
@@ -62,6 +62,7 @@ Route::middleware([
 // medicine management
     Route::get('/medicines', MedicinesList::class)->name('medicines');
     Route::get('/stock-medicines', StockMedicines::class)->name('stock-medicines');
+    Route::get('/stock-invoice-list', StockInvoiceList::class)->name('stock-invoice-list');
     Route::get('/stock-medicines-list', StockMedicinesList::class)->name('stock-medicines-list');
 
 // pos

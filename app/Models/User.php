@@ -90,6 +90,7 @@ class User extends Authenticatable
     public function scopeSearch($query, $search)
     {
         return $query->where('name', 'like', '%' . $search . '%')
+            ->orWhere('user_id', 'like', '%' . $search . '%')
             ->orWhere('email', 'like', '%' . $search . '%')
             ->orWhere('mobile', 'like', '%' . $search . '%')
             ->orWhere('balance', 'like', '%' . $search . '%')

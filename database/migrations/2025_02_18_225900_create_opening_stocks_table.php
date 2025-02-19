@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('opening_stocks', function (Blueprint $table) {
             $table->id();
             $table->foreignId('medicine_id')->constrained()->cascadeOnDelete()->cascadeOnUpdate();
-            $table->integer('quantity');
+            $table->integer('opening_stock')->default(0);
             $table->string('opening_month',50);
             $table->smallInteger('opening_year');
             $table->timestamps();

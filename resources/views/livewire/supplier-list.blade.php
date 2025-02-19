@@ -66,7 +66,7 @@
             <div class="row mt-3">
                 <div class="row justify-content-end">
                     <div class="col-3">
-                        <input id="search" class="form-control" type="search" wire:model.live="search" placeholder="Search By Name" aria-label="Search By Name">
+                        <input id="search" class="form-control" type="search" wire:model.live="search" placeholder="Search" aria-label="Search By Name">
                     </div>
                 </div>
                 <table class="table">

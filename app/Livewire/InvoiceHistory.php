@@ -258,6 +258,8 @@ class InvoiceHistory extends Component
 
             flash()->success('Return Medicine Successfully!');
             DB::commit();
+            $this->return_medicine = '';
+            $this->return_quantity = '';
         }catch(\Exception $e){
             flash()->error($e->getMessage());
         }
