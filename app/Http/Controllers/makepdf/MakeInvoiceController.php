@@ -28,8 +28,8 @@ class MakeInvoiceController extends Controller
         $site_data = SiteSetting::first();
         $data = [
             'date' => date('m/d/Y'), // Fixed date format
-            'pdf_title' => $site_data->site_name,
-            'pdf_logo' => url($site_data->site_logo),
+            'pdf_title' => 'Impex Pharma',
+            'pdf_logo' => url('img/logo.png'),
             'invoice_data' => $invoice_data,
             'grand_total_words' =>  Number::spell($invoice_data->grand_total, locale: 'en'), // Corrected
             'site_data' => $site_data
@@ -49,8 +49,8 @@ class MakeInvoiceController extends Controller
         $site_data = SiteSetting::first();
         $data = [
             'date' => date('m/d/Y'), // Fixed date format
-            'pdf_title' => $site_data->site_name,
-            'pdf_logo' => url($site_data->site_logo),
+            'pdf_title' => 'Impex Pharma',
+            'pdf_logo' => url('img/logo.png'),
             'invoice_data' => $invoice_data,
             'grand_total_words' =>  Number::spell($invoice_data->grand_total, locale: 'en'), // Corrected
             'site_data' => $site_data,
@@ -68,8 +68,8 @@ class MakeInvoiceController extends Controller
         $site_data = SiteSetting::first();
         $data = [
             'date' => date('m/d/Y'), // Fixed date format
-            'pdf_title' => $site_data->site_name,
-            'pdf_logo' => url($site_data->site_logo),
+            'pdf_title' => 'Impex Pharma',
+            'pdf_logo' => url('img/logo.png'),
             'invoice_data' => $invoice_data,
             'grand_total_words' =>  Number::spell($invoice_data->grand_total, locale: 'en'), // Corrected
             'site_data' => $site_data,

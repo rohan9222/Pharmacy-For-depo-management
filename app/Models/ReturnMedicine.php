@@ -12,7 +12,9 @@ class ReturnMedicine extends Model
         'sales_medicine_id',
         'quantity',
         'price',
+        'vat',
         'total',
+        'return_date',
     ];
 
     // Defining relationships

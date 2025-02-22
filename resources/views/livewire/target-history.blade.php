@@ -25,14 +25,14 @@
                                         @endforeach
                                     </select>
                                 </div>
-                                <div class="col-4">
+                                {{-- <div class="col-4">
                                     <select class="form-select form-select-sm" wire:change="updateUserList()" wire:model="tse_id" >
                                         <option value=''>Select Territory Sales Executive</option>
                                         @foreach ($tses ?? [] as $tse)
                                             <option value="{{ $tse->id }}">{{ $tse->name }}</option>
                                         @endforeach
                                     </select>
-                                </div>
+                                </div> --}}
                             </div>
                         @elseif ($type == 'manager')
                             <div class="row p-1 mb-1">
@@ -44,14 +44,14 @@
                                         @endforeach
                                     </select>
                                 </div>
-                                <div class="col-4">
+                                {{-- <div class="col-4">
                                     <select class="form-select form-select-sm" wire:change="updateUserList()" wire:model="tse_id" >
                                         <option value=''>Select Territory Sales Executive</option>
                                         @foreach ($tses ?? [] as $tse)
                                             <option value="{{ $tse->id }}">{{ $tse->name }}</option>
                                         @endforeach
                                     </select>
-                                </div>
+                                </div> --}}
                             </div>
                         @elseif ($type == 'zse')
                             <div class="row p-1 mb-1">

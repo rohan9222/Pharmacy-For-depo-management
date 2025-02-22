@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('stock_invoice_id')->constrained()->cascadeOnDelete()->cascadeOnUpdate();
             $table->foreignId('payment_methods_id')->nullable()->constrained()->nullOnDelete()->cascadeOnUpdate();
             $table->decimal('amount', 11, 2)->default(0.00);
-            $table->string('date')->nullable()->default(now());
+            $table->string('date')->nullable()->default(DB::raw('CURRENT_TIMESTAMP'));
             $table->timestamps();
         });
     }

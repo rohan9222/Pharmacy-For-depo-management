@@ -131,6 +131,7 @@ class UserController extends Controller
                 $input['role'] = reset($filteredRoles);
             }
         }
+        $input['route'] = $request->territory;
 
         $user = User::create($input);
         $user->assignRole($request->roles);
@@ -181,7 +182,8 @@ class UserController extends Controller
             'fieldOfficers' => User::select('id', 'name')->role('Territory Sales Executive')->get(),
             'teams' => Team::select('id', 'name')->get(),
             'roles' => Role::pluck('name')->all(),
-            'userRoles' => $user->roles->pluck('name')->all()
+            'userRoles' => $user->roles->pluck('name')->all(),
+            'territories' => User::select('route')->distinct()->pluck('route') ?? [],
         ]);
     }
 

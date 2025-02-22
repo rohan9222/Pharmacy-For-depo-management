@@ -232,7 +232,8 @@ class InvoiceHistory extends Component
                 'sales_medicine_id' => $sales_medicine->id,
                 'quantity' => $this->return_quantity,
                 'price' => $sales_medicine->price,
-                'total' => $this->return_quantity * $sales_medicine->price,
+                'vat' => $sales_medicine->price * $sales_medicine->vat/100,
+                'total' => ($this->return_quantity * $sales_medicine->price) + ($this->return_quantity * $sales_medicine->price * $sales_medicine->vat/100),
                 'return_date' => $this->return_date,
             ])->save();
 

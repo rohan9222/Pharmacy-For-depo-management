@@ -34,11 +34,46 @@
                             @endif
                         </div>
                     </div>
+                    
+                    <div class="mb-3 row">
+                        <label for="address" class="col-md-4 col-form-label text-md-end text-start">Address</label>
+                        <div class="col-md-6">
+                            <input type="address" class="form-control @error('address') is-invalid @enderror" id="address" name="address" placeholder="Address" value="{{ $user->address }}">
+                            @if ($errors->has('address'))
+                                <span class="text-danger">{{ $errors->first('address') }}</span>
+                            @endif
+                        </div>
+                    </div>
 
+                    <div class="mb-3 row">
+                        <label for="territory" class="col-md-4 col-form-label text-md-end text-start">Territory</label>
+                        <div class="col-md-6">
+                            <input type="territory" list="territories" class="form-control @error('territory') is-invalid @enderror" id="territory" name="territory" placeholder="Territory" value="{{ $user->route }}">
+                            <datalist id="territories">
+                                @foreach ($territories as $territory)
+                                    <option value="{{ $territory }}">{{ $territory }}</option>
+                                @endforeach
+                            </datalist>
+                            @if ($errors->has('territory'))
+                                <span class="text-danger">{{ $errors->first('territory') }}</span>
+                            @endif
+                        </div>
+                    </div>
+
+                    <div class="mb-3 row">
+                        <label for="mobile" class="col-md-4 col-form-label text-md-end text-start">Mobile</label>
+                        <div class="col-md-6">
+                          <input type="mobile" class="form-control @error('mobile') is-invalid @enderror" id="mobile" name="mobile" placeholder="Mobile" value="{{ $user->mobile }}">
+                            @if ($errors->has('mobile'))
+                                <span class="text-danger">{{ $errors->first('mobile') }}</span>
+                            @endif
+                        </div>
+                    </div>
+                    
                     <div class="mb-3 row">
                         <label for="password" class="col-md-4 col-form-label text-md-end text-start">Password</label>
                         <div class="col-md-6">
-                          <input type="password" class="form-control @error('password') is-invalid @enderror" id="password" name="password">
+                          <input type="password" class="form-control @error('password') is-invalid @enderror" id="password" name="password" placeholder="Password">
                             @if ($errors->has('password'))
                                 <span class="text-danger">{{ $errors->first('password') }}</span>
                             @endif
@@ -48,7 +83,7 @@
                     <div class="mb-3 row">
                         <label for="password_confirmation" class="col-md-4 col-form-label text-md-end text-start">Confirm Password</label>
                         <div class="col-md-6">
-                          <input type="password" class="form-control" id="password_confirmation" name="password_confirmation">
+                          <input type="password" class="form-control" id="password_confirmation" name="password_confirmation" placeholder="Confirm Password">
                         </div>
                     </div>
 {{--

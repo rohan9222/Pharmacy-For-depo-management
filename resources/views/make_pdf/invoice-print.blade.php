@@ -75,7 +75,7 @@
             <table class="table border">
                 <tr>
                     <td >Cust ID: {{$invoice_data->customer->user_id}}</td>
-                    <td >MPO ID: {{$invoice_data->fieldOfficer->user_id}}</td>
+                    <td >TSE ID: {{$invoice_data->fieldOfficer->user_id}}</td>
                     <td>Category: {{$invoice_data->customer->category}}</td>
                 </tr>
                 <tr>

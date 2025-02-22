@@ -28,6 +28,15 @@
                         </thead>
                         <tbody class="text-center">
                         </tbody>
+                        <tfoot>
+                            <tr>
+                                <th colspan="6" style="text-align:right">Total:</th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                            </tr>
+                        </tfoot>
                     </table>
                 </div>
             </div>
@@ -54,7 +63,7 @@
                 }
             },
             columns: [
-                { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false },
+                { data: null, defaultContent: '', orderable: false, className: 'select-checkbox' },
                 { data: 'DT_RowIndex', name: 'DT_RowIndex' },
                 { data: 'invoice_no', name: 'invoice_no' },
                 { data: 'invoice_date', name: 'invoice_date' },
@@ -90,7 +99,23 @@
             select: {
                 style: 'os',
                 selector: 'td:first-child'
+            },
+            footerCallback: function (row, data, start, end, display) {
+                let api = this.api();
+                let intVal = function (i) {
+                    return typeof i === 'string' ? parseFloat(i.replace(/[\$,]/g, '')) || 0 : i;
+                };
+                function total(rowValue){
+                    let total = api.column(rowValue).data().reduce((a, b) => intVal(a) + intVal(b), 0);
+                    let pageTotal = api.column(rowValue, { page: 'current' }).data().reduce((a, b) => intVal(a) + intVal(b), 0);
+
+                    $(api.column(rowValue).footer()).html( 'Page Total: ' +pageTotal.toFixed(2) + '<br> (Grand Total: ' + total.toFixed(2) + ')');
+                }
+                total(7);
+                total(8);
+                total(9);
             }
+
         });
 
         // Reload table on click of the search button

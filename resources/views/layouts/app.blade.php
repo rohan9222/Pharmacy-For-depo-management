@@ -6,6 +6,7 @@
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
         <title>{{ config('app.name', 'ImpexPharma') }}</title>
+        <link rel="shortcut icon" href="{{ asset('img/favicon.ico') }}" type="image/x-icon">
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
@@ -85,6 +86,13 @@
             .sidebar.collapsed .sidebar-text {
                 display: none;
             }
+            .sidebar.collapsed .sidebar-logo {
+                width: 100% !important;
+            }
+
+            .sidebar.collapsed:hover .sidebar-logo {
+                width: 25% !important;
+            }
 
             .sidebar.collapsed:hover .sidebar-text {
                 display: inline;
@@ -130,7 +138,6 @@
         @livewireStyles
     </head>
     <body class="font-sans antialiased">
-        <x-banner />
         {{-- old code --}}
         {{-- <div class="min-h-screen bg-gray-100 dark:bg-gray-900">
             <div id="sidebar" class="sidebar">

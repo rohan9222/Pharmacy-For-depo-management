@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\{DashboardController,UserProfileController};
 use App\Http\Controllers\Admin\{RoleController,UserController};
 use App\Http\Controllers\makepdf\{MakeInvoiceController,MakeSummaryController,MakeReportController};
-use App\Livewire\{SupportersList,CustomersList,DeliveryManList,SupplierList,MedicinesList,CategoryList, PackSizeList, StockMedicines,StockInvoiceList,StockMedicinesList,SalesInvoice,InvoiceHistory,DeliveryHistory,InvoiceReturnHistory,SiteSettings,TargetHistory,DueInvoiceList,CollectionReport};
+use App\Livewire\{SupportersList,CustomersList,DeliveryManList,SupplierList,MedicinesList,CategoryList, PackSizeList, StockMedicines,StockInvoiceList,StockMedicinesList,SalesInvoice,InvoiceHistory,DeliveryHistory,InvoiceReturnHistory,SiteSettings,TargetHistory,DueInvoiceList,CollectionReport,ReportGenerate};
 
 
 Route::get('/', function () {
@@ -94,5 +94,12 @@ Route::middleware([
     Route::get('/invoice/return/print/{invoice}', [MakeInvoiceController::class,'invoiceReturnPrint'])->name('invoice.return.print');
     Route::get('/invoice/{invoice}', [MakeInvoiceController::class,'invoicePDF'])->name('invoice.pdf');
     Route::get('/summary/{id}', [MakeSummaryController::class,'summaryPDF'])->name('summary.pdf');
-    Route::get('/report/{report}', [MakeReportController::class,'reportPDF'])->name('report.pdf');
+
+    // Route::get('/report', ReportGenerate::class)->name('report.index');
+    
+    Route::get('/report', [MakeReportController::class,'index'])->name('report.index');
+    Route::get('/report/daily/sales-collection', function () {abort(404);});
+    Route::post('/report/daily/sales-collection', [MakeReportController::class,'dailySalesCollection'])->name('report.daily.sales.collection');
+    Route::get('/report/stock/statement', function () {abort(404);});
+    Route::post('/report/stock/statement', [MakeReportController::class,'stockStatement'])->name('report.stock.statement');
 });

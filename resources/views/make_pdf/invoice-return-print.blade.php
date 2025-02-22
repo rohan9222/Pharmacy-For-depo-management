@@ -75,7 +75,7 @@
             <table class="table border">
                 <tr>
                     <td >Cust ID: {{$invoice_data->customer->user_id}}</td>
-                    <td >MPO ID: {{$invoice_data->fieldOfficer->user_id}}</td>
+                    <td >TSE ID: {{$invoice_data->fieldOfficer->user_id}}</td>
                     <td>Category: {{$invoice_data->customer->category}}</td>
                 </tr>
                 <tr>
@@ -167,6 +167,7 @@
                         <th class="border-end">Return Date</th>
                         <th class="border-end">Quantity</th>
                         <th class="border-end">Price</th>
+                        <th class="border-end">Vat</th>
                         <th class="border-end">Total</th>
                     </tr>
                 </thead>
@@ -178,6 +179,7 @@
                             <td class="border-end">{{ \Carbon\Carbon::parse($salesReturnMedicine->return_date)->format('d M Y') }}</td>
                             <td class="border-end">{{ $salesReturnMedicine->quantity }}</td>
                             <td class="border-end">{{ $salesReturnMedicine->price }}</td>
+                            <td class="border-end">{{ $salesReturnMedicine->vat }}</td>
                             <td class="border-end">{{ $salesReturnMedicine->total }}</td>
                         </tr>
                     @endforeach

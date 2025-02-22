@@ -125,4 +125,8 @@ class User extends Authenticatable
         return $this->hasMany(TargetReport::class);
     }
 
+    public function invoiceData(){
+        return $this->hasMany(Invoice::class , 'customer_id');
+    }
+
 }

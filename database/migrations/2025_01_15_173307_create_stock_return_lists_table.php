@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('medicine_id')->nullable()->constrained()->restrictOnDelete()->cascadeOnUpdate();
             $table->foreignId('stock_invoice_id')->nullable()->constrained()->cascadeOnDelete()->cascadeOnUpdate();
             $table->foreignId('stock_list_id')->nullable()->constrained()->nullOnDelete()->cascadeOnUpdate();
-            $table->timestamp('return_date')->default(now());
+            $table->timestamp('return_date')->default(DB::raw('CURRENT_TIMESTAMP'))->nullable();
             $table->string('batch_number', 50)->nullable();
             $table->timestamp('expiry_date')->nullable();
             $table->integer('quantity')->default(1);

@@ -9,13 +9,6 @@
         <!-- Navigation Links -->
         <div class="collapse navbar-collapse" id="navbarNav">
             <button id="toggleSidebar" class="btn btn-sm btn-light ms-2"><i class="bi bi-arrow-left-square"></i></button>
-            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                <li class="nav-item">
-                    <a class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}" href="{{ route('dashboard.index') }}">
-                        {{ __('Dashboard') }}
-                    </a>
-                </li>
-            </ul>
 
             <ul class="navbar-nav ms-auto">
                 @if (Laravel\Jetstream\Jetstream::hasTeamFeatures())
