@@ -23,7 +23,7 @@
             {{-- Supporters --}}
             {{-- @if (Auth::user()->hasRole('Super Admin') || Auth::user()->hasPermissionTo('admin-role')) --}}
                 <li class="nav-item">
-                    <a href="#" class="nav-link link-body-emphasis {{ request()->routeIs('supporter.list') ? 'active' : '' }}" data-bs-toggle="collapse" data-bs-target="#admin-collapse" aria-expanded="false">
+                    <a href="#" class="nav-link link-body-emphasis {{ in_array(request()->route()->getName(), ['product-target-manage', 'supporter.list']) ? 'active' : '' }}" data-bs-toggle="collapse" data-bs-target="#admin-collapse" aria-expanded="false">
                         <i class="bi bi-people me-2"></i>
                         <span class="sidebar-text">Admin Panel Report</span>
                         <i class="bi bi-chevron-down ms-auto toggle-icon sidebar-text"></i>
@@ -72,6 +72,15 @@
                                     <a href="{{ route('supporter.list', ['type' => 'tse']) }}" class="nav-link link-body-emphasis {{ request()->routeIs('supporter.list') && request('type') === 'tse' ? 'active' : '' }}">
                                         <i class="bi bi-caret-right-fill me-2"></i>
                                         <span class="sidebar-text">Territory Sales Executives</span>
+                                    </a>
+                                </li>
+                            @endif
+
+                            @if (Auth::user()->hasRole('Super Admin') || Auth::user()->role == 'Manager' || Auth::user()->hasRole('Depo Incharge') || Auth::user()->hasRole('Zonal Sales Executive'))
+                                <li>
+                                    <a href="{{ route('product-target-manage') }}" class="nav-link link-body-emphasis {{ request()->routeIs('product-target-manage') ? 'active' : '' }}">
+                                        <i class="bi bi-caret-right-fill me-2"></i>
+                                        <span class="sidebar-text">Product Target Manage</span>
                                     </a>
                                 </li>
                             @endif
@@ -192,7 +201,7 @@
 
             {{-- sales Medicines --}}
             <li class="nav-item">
-                <a href="#" class="nav-link link-body-emphasis {{ in_array(request()->route()->getName(), ['sales-medicines', 'sales-medicines-list']) ? 'active' : '' }}" data-bs-toggle="collapse" data-bs-target="#sales-medicines-collapse" aria-expanded="false">
+                <a href="#" class="nav-link link-body-emphasis {{ in_array(request()->route()->getName(), ['pos', 'sales-medicines-list','sales-delivery-history','return-medicines-list']) ? 'active' : '' }}" data-bs-toggle="collapse" data-bs-target="#sales-medicines-collapse" aria-expanded="false">
                     <i class="bi bi-receipt"></i>
                     <span class="sidebar-text">Sales Medicines</span>
                     <i class="bi bi-chevron-down ms-auto toggle-icon sidebar-text"></i>
@@ -245,25 +254,25 @@
                     <ul class="ms-4 btn-toggle-nav list-unstyled fw-normal pb-1 small">
                         @can('view-report')
                             <li class="nav-item">
-                                <a href="{{ route('target-history') }}" class="nav-link link-body-emphasis">
+                                <a href="{{ route('target-history') }}" class="nav-link link-body-emphasis {{ request()->routeIs('target-history') ? 'active' : '' }}">
                                     <i class="bi bi-caret-right-fill me-2"></i>
                                     <span class="sidebar-text">Target History</span>
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a href="{{ route('due-list') }}" class="nav-link link-body-emphasis">
+                                <a href="{{ route('due-list') }}" class="nav-link link-body-emphasis {{ request()->routeIs('due-list') ? 'active' : '' }}">
                                     <i class="bi bi-caret-right-fill me-2"></i>
                                     <span class="sidebar-text">Due List</span>
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a href="{{ route('collection-list') }}" class="nav-link link-body-emphasis">
+                                <a href="{{ route('collection-list') }}" class="nav-link link-body-emphasis {{ request()->routeIs('collection-list') ? 'active' : '' }}">
                                     <i class="bi bi-caret-right-fill me-2"></i>
                                     <span class="sidebar-text">Collection Report</span>
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a href="{{ route('report.index') }}" class="nav-link link-body-emphasis">
+                                <a href="{{ route('report.index') }}" class="nav-link link-body-emphasis {{ request()->routeIs('report.index') ? 'active' : '' }}">
                                     <i class="bi bi-caret-right-fill me-2"></i>
                                     <span class="sidebar-text">Others Report</span>
                                 </a>
@@ -276,7 +285,7 @@
     {{-- site-settings --}}
             @if (Auth::user()->hasRole('Super Admin'))
                 <li class="nav-item">
-                    <a href="{{ route('site-settings') }}" class="nav-link link-body-emphasis">
+                    <a href="{{ route('site-settings') }}" class="nav-link link-body-emphasis {{ request()->routeIs('site-settings') ? 'active' : '' }}">
                         <i class="bi bi-gear me-2"></i>
                         <span class="sidebar-text">Site Settings</span>
                     </a>

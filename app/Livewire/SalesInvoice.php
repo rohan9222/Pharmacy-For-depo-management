@@ -11,7 +11,7 @@ use App\Models\Category;
 use App\Models\SiteSetting;
 use App\Models\PaymentHistory;
 use App\Models\DiscountValue;
-use App\Models\user;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
@@ -145,6 +145,7 @@ class SalesInvoice extends Component
         // This method is triggered when the customer is updated
         $this->calculateTotals();
     }
+
     public function calculateTotals()
     {
         // Initialize totals
@@ -245,6 +246,7 @@ class SalesInvoice extends Component
         $this->stockMedicines = array_values($this->stockMedicines);
         $this->calculateTotals();
     }
+
     public function increaseQuantity($index, $quantity = 1)
     {
         // Get the medicine details from the database
@@ -289,7 +291,6 @@ class SalesInvoice extends Component
         // Recalculate totals
         $this->calculateTotals();
     }
-
 
     public function updatedStockMedicines($value, $key)
     {

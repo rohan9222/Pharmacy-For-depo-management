@@ -68,14 +68,14 @@
                             $c_collection = (clone $c_invoice_data)->sum('paid');
                             $c_due = (clone $c_invoice_data)->sum('due');
 
-                            $c_dise_total += $c_dise;
-                            $c_vat_total += $c_vat;
-                            $c_sales_return_total += $c_sales_return;
-                            $c_tp_total += $c_tp;
-                            $c_actual_total += $c_actual;
-                            $c_collection_total += $c_collection;
-                            $c_due_total += $c_due;
-                            $c_mon_total += $c_mon;
+                            $c_dise_total += round($c_dise);
+                            $c_vat_total += round($c_vat);
+                            $c_sales_return_total += round($c_sales_return);
+                            $c_tp_total += round($c_tp);
+                            $c_actual_total += round($c_actual);
+                            $c_collection_total += round($c_collection);
+                            $c_due_total += round($c_due);
+                            $c_mon_total += round($c_mon);
 
                             $l_mon = (clone $invoice_data)->whereBetween('invoice_date', [$start_date->copy()->subDays(30),$start_date])->count();
 
@@ -95,15 +95,15 @@
                         <td>{{ Carbon\Carbon::parse($under_user->created_at)->format('d M Y') }}</td>
                         <td>{{ $c_mon }}</td>
                         <td>{{ $l_mon }}</td>
-                        <td>{{ $sales_target }}</td>
-                        <td>{{ $c_dise }}</td>
-                        <td>{{ $c_vat }}</td>
-                        <td>{{ $c_sales_return }}</td>
-                        <td>{{ $c_tp }}</td>
-                        <td>{{ $c_actual }}</td>
-                        <td>{{ $c_collection }}</td>
-                        <td>{{ $c_due }}</td>
-                        <td>{{($c_tp / $sales_target) * 100}} %</td>
+                        <td>{{ round($sales_target) }}</td>
+                        <td>{{ round($c_dise) }}</td>
+                        <td>{{ round($c_vat) }}</td>
+                        <td>{{ round($c_sales_return) }}</td>
+                        <td>{{ round($c_tp) }}</td>
+                        <td>{{ round($c_actual) }}</td>
+                        <td>{{ round($c_collection) }}</td>
+                        <td>{{ round($c_due) }}</td>
+                        <td>{{$sales_target == 0 ? 0 : ($c_tp / $sales_target) * 100}}</td>
                     </tr>
                 @endforeach
 
@@ -116,7 +116,7 @@
                     <td>{{ Carbon\Carbon::parse($user_data->created_at)->format('d M Y') }}</td>
                     <td>{{ $c_mon_total }}</td>
                     <td>{{ $l_mon_total }}</td>
-                    <td>{{ $sales_target_total }}</td>
+                    <td>{{ round($sales_target_total) }}</td>
                     <td>{{ $c_dise_total }}</td>
                     <td>{{ $c_vat_total }}</td>
                     <td>{{ $c_sales_return_total }}</td>
@@ -124,7 +124,7 @@
                     <td>{{ $c_actual_total }}</td>
                     <td>{{ $c_collection_total }}</td>
                     <td>{{ $c_due_total }}</td>
-                    <td>{{($c_tp_total / $sales_target_total) * 100}} %</td>
+                    <td>{{$sales_target_total == 0 ? 0 : ($c_tp_total / $sales_target_total) * 100}}</td>
                 </tr>
                 <tr style="border:none;">
                     <td colspan="14" style="height: 10px;"></td>

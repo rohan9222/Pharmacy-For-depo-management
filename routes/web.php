@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\{DashboardController,UserProfileController};
 use App\Http\Controllers\Admin\{RoleController,UserController};
 use App\Http\Controllers\makepdf\{MakeInvoiceController,MakeSummaryController,MakeReportController};
-use App\Livewire\{SupportersList,CustomersList,DeliveryManList,SupplierList,MedicinesList,CategoryList, PackSizeList, StockMedicines,StockInvoiceList,StockMedicinesList,SalesInvoice,InvoiceHistory,DeliveryHistory,InvoiceReturnHistory,SiteSettings,TargetHistory,DueInvoiceList,CollectionReport,ReportGenerate};
+use App\Livewire\{SupportersList,CustomersList,DeliveryManList,SupplierList,MedicinesList,CategoryList, PackSizeList, StockMedicines,StockInvoiceList,StockMedicinesList,SalesInvoice,InvoiceHistory,DeliveryHistory,InvoiceReturnHistory,SiteSettings,TargetHistory,DueInvoiceList,CollectionReport,ReportGenerate,ProductTarget};
 
 
 Route::get('/', function () {
@@ -51,6 +51,7 @@ Route::middleware([
     Route::get('/customers', CustomersList::class)->name('customers');
     Route::get('/delivery-man', DeliveryManList::class)->name('delivery-man');
     Route::get('/admin-person/{type}', SupportersList::class)->name('supporter.list');
+    Route::get('/product-target/manage', ProductTarget::class)->name('product-target-manage');
 
 // supplier management
     Route::get('/suppliers', SupplierList::class)->name('suppliers');
@@ -100,6 +101,8 @@ Route::middleware([
     Route::get('/report', [MakeReportController::class,'index'])->name('report.index');
     Route::get('/report/daily/sales-collection', function () {abort(404);});
     Route::post('/report/daily/sales-collection', [MakeReportController::class,'dailySalesCollection'])->name('report.daily.sales.collection');
+    Route::get('/report/daily/product-sales-report', function () {abort(404);});
+    Route::post('/report/daily/product-sales-report', [MakeReportController::class,'productSalesReport'])->name('report.daily.product.sales.report');
     Route::get('/report/stock/statement', function () {abort(404);});
     Route::post('/report/stock/statement', [MakeReportController::class,'stockStatement'])->name('report.stock.statement');
 });

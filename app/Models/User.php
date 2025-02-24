@@ -46,6 +46,7 @@ class User extends Authenticatable
         'category',
         'password',
         'product_target',
+        'product_target_data',
         'sales_target',
         'tse_id',
         'zse_id',
