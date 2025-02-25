@@ -26,7 +26,7 @@
             </tr>
             <tr>
                 <th>Factory/Depo</th>
-                <th>Gross Return</th>
+                <th>Transfer</th>
                 <th>Sales Qty</th>
                 <th>Sales Value</th>
                 <th>Qty</th>
@@ -123,7 +123,7 @@
     $dateTime = now()->format("d/m/Y, h:i A");
 
     $header = "<div style='text-align:center;'>
-                <h1 class='fw-bolder border-bottom m-0 text-italic'>$pdf_title</h1>
+                <!--<h1 class='fw-bolder border-bottom m-0 text-italic'>$pdf_title</h1>-->
                 <h5 class='fw-bolder border-bottom m-0'>
                     Stock Statement From : " . $report_date->copy()->startOfMonth()->format('d M Y') . " to " . $report_date->copy()->format('d M Y') . "
                 </h5>

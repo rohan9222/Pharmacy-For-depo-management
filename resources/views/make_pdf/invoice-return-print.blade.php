@@ -64,12 +64,12 @@
     <div class="a4">
         <div class="p-1">
             <div>
-                <div style="display: inline-block; width: 45%; float: left;">
-                    <p class="m-0 subtitle ">Sales Office :</p>
-                    <p class="m-0">Address : {{$site_data->site_address}}</p>
-                    <p class="m-0">Mobile : {{$site_data->site_phone}}</p>
-                </div>
-                <div class="title">Invoice</div>
+                <!--<div style="display: inline-block; width: 45%; float: left;">-->
+                <!--    <p class="m-0 subtitle ">Sales Office :</p>-->
+                <!--    <p class="m-0">Address : {{$site_data->site_address}}</p>-->
+                <!--    <p class="m-0">Mobile : {{$site_data->site_phone}}</p>-->
+                <!--</div>-->
+                <div class="title" style="text-align: center; width: 10%; margin: auto;">Invoice</div>
             </div>
             {{-- {{ dd($invoice_data) }} --}}
             <table class="table border">
@@ -239,7 +239,7 @@
     $mpdf = new \Mpdf\Mpdf($conf);
     $dateTime = date("d/m/Y,  h:i A", time());
     $html = "<div style='width:100%; text-align:center;'>
-                <div style='font-size:18px;text-align:center'><h2 style='margin:0; background-color:#cff4fc'>$pdf_title</h2></div>
+                <!--<div style='font-size:18px;text-align:center'><h2 style='margin:0; background-color:#cff4fc'>$pdf_title</h2></div>-->
             </div>";
 
         $mpdf->SetHTMLHeader($html);

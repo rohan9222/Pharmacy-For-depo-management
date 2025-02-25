@@ -15,12 +15,12 @@
 <body class="a4">
     <div class="p-1">
         <div>
-            <div style="display: inline-block; width: 45%; float: left;">
-                <p class="m-0 subtitle ">Sales Office :</p>
-                <p class="m-0">Address : {{$site_data->site_address}}</p>
-                <p class="m-0">Mobile : {{$site_data->site_phone}}</p>
-            </div>
-            <div class="title">Invoice</div>
+            <!--<div style="display: inline-block; width: 45%; float: left;">-->
+            <!--    <p class="m-0 subtitle ">Sales Office :</p>-->
+            <!--    <p class="m-0">Address : {{$site_data->site_address}}</p>-->
+            <!--    <p class="m-0">Mobile : {{$site_data->site_phone}}</p>-->
+            <!--</div>-->
+            <div class="title" style="text-align: center;">Invoice</div>
         </div>
         {{-- {{ dd($invoice_data) }} --}}
         <table class="table border">
@@ -128,18 +128,18 @@
     $mpdf = new \Mpdf\Mpdf($conf);
     $dateTime = date("d/m/Y,  h:i A", time());
     $html = "
-        <div style='width:100%; text-align:center; margin-bottom: 20px;'>
-            <table style='margin: 0 auto;'>
-                <tr>
-                    <td style='vertical-align: middle;'>
-                        <img src='$pdf_logo' alt='' style='width: 50px;'>
-                    </td>
-                    <td style='vertical-align: middle; padding-left: 10px;'>
-                        <h1 style='margin: 0; text-transform: uppercase; font-style: italic;'>$pdf_title</h1>
-                    </td>
-                </tr>
-            </table>
-        </div>
+        <!--<div style='width:100%; text-align:center; margin-bottom: 20px;'>-->
+        <!--    <table style='margin: 0 auto;'>-->
+        <!--        <tr>-->
+        <!--            <td style='vertical-align: middle;'>-->
+        <!--                <img src='$pdf_logo' alt='' style='width: 50px;'>-->
+        <!--            </td>-->
+        <!--            <td style='vertical-align: middle; padding-left: 10px;'>-->
+                        <!--<h1 style='margin: 0; text-transform: uppercase; font-style: italic;'>$pdf_title</h1>-->
+        <!--            </td>-->
+        <!--        </tr>-->
+        <!--    </table>-->
+        <!--</div>-->
     ";
 
         $mpdf->SetHTMLHeader($html);

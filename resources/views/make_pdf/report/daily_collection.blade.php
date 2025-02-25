@@ -206,7 +206,7 @@
     $dateTime = now()->format("d/m/Y, h:i A");
 
     $header = "<div style='text-align:center;'>
-                <h1 class='fw-bolder border-bottom m-0 text-italic'>$pdf_title</h1>
+                <!--<h1 class='fw-bolder border-bottom m-0 text-italic'>$pdf_title</h1>-->
                 <h5 class='fw-bolder border-bottom m-0'>
                     ZSE/TSE Wise Sales & Collection Statement 
                     Period: " . $start_date->format('d M Y') . " to " . $end_date->format('d M Y') . "

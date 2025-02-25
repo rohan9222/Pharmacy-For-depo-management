@@ -63,7 +63,7 @@
                     <td>{{ $sales_medicines->sum('quantity') }}</td>
                     <td>{{ $target_medicine->total }}</td>
                     <td>{{ round($sales_medicines->sum('quantity') * $target_medicine->price) }}</td>
-                    <td>{{ $sales_medicines->sum('quantity') / $target_medicine->quantity * 100 }}</td>
+                    <td>{{ round($sales_medicines->sum('quantity') / $target_medicine->quantity * 100,2) }}</td>
                 </tr>
             @endforeach
 
@@ -91,7 +91,7 @@
     $dateTime = now()->format("d/m/Y, h:i A");
 
     $header = "<div style='text-align:center;'>
-                <h1 class='fw-bolder border-bottom m-0 text-italic'>$pdf_title</h1>
+                <!--<h1 class='fw-bolder border-bottom m-0 text-italic'>$pdf_title</h1>-->
                 <h5 class='fw-bolder border-bottom m-0'>
                     Statement Period: " . $start_date->format('d M Y') . " to " . $end_date->format('d M Y') . "
                 </h5>

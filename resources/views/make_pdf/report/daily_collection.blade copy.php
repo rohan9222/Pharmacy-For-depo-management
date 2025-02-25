@@ -201,7 +201,7 @@
     $dateTime = date("d/m/Y,  h:i A", time());
     $html = "<div style='width:100%; text-align:center;'>
                 <div style='font-size:18px;text-align:center'>
-                    <h3 class='fw-bolder border-bottom m-0'>$pdf_title</h3>
+                    <!--<h3 class='fw-bolder border-bottom m-0'>$pdf_title</h3>-->
                     <h6 class='fw-bolder border-bottom m-0'>ZSE/TSE Wise Sales & Callection  Statement Period: $start_date to $end_date</h4>
                 </div>
             </div>";

@@ -38,9 +38,9 @@ class ProductTarget extends Component
     public function render()
     {
         if(auth()->user()->hasRole('Super Admin') || auth()->user()->hasRole('Depo Incharge')){
-            $this->users = User::where('role', 'Manager')->get();
+            $this->users = User::whereIn('role', ['Manager','Zonal Sales Executive','Territory Sales Executive'])->get();
         }elseif(auth()->user()->hasRole('Manager')){
-            $this->users = User::where('role', 'Zonal Sales Executive')->where('manager_id', auth()->user()->id)->get();
+            $this->users = User::whereIn('role', ['Zonal Sales Executive','Territory Sales Executive'])->where('manager_id', auth()->user()->id)->get();
         }elseif(auth()->user()->hasRole('Zonal Sales Executive')){
             $this->users = User::where('role', 'Territory Sales Executive')->where('zse_id', auth()->user()->id)->get();
         }
