@@ -24,7 +24,7 @@
             </tr>
             <tr>
                 <td>Name Of : </td>
-                <td>{{ $user_data_all->name }}</td>
+                <td>{{ $user_data_all->name }} ({{ $user_data_all->user_id }})</td>
             </tr>
         </table>
         <table class="items text-center table-border" style="font-size: 12px">
@@ -40,180 +40,33 @@
 
             @php
                 $count = 1;
-                $target_medicines = json_decode($user_data_all->product_target_data);
+                $target_medicines = json_decode($sales_target_total->product_target_data);
             @endphp
             @foreach ($target_medicines as $target_medicine)
-            {{-- @dd($target_medicine); --}}
                 @php
                     $roleShort = rolesConvertShort($user_data_all->role);
-                    $invoice_data = App\Models\Invoice::where($roleShort . '_id', $user_data_all->id);
-                    $c_invoice_data = (clone $invoice_data)->whereBetween('invoice_date', [$start_date->format('Y-m-d'), $end_date->format('Y-m-d')]);
-                    // $c_mon = (clone $c_invoice_data)->count();
-                    // $c_dise = (clone $c_invoice_data)->sum('dis_amount') + (clone $c_invoice_data)->sum('spl_dis_amount');
-                    // $c_vat = (clone $c_invoice_data)->sum('vat');
-                    // $c_sales_return = App\Models\ReturnMedicine::whereIn('invoice_id', $invoice_data->pluck('id'))->whereBetween('return_date', [$start_date->format('Y-m-d'), $end_date->format('Y-m-d')])->sum('total');
-                    // $c_tp = (clone $c_invoice_data)->sum('sub_total');
-                    // $c_actual = $c_tp + $c_vat;
-                    // $c_collection = (clone $c_invoice_data)->sum('paid');
-                    // $c_due = (clone $c_invoice_data)->sum('due');
+                    $invoice_data = App\Models\Invoice::where($roleShort . '_id', $user_data_all->id)
+                                ->whereBetween('invoice_date', [$start_date->format('Y-m-d'), $end_date->format('Y-m-d')])
+                                ->pluck('id')
+                                ->toArray();
+
+                    $sales_medicines = App\Models\SalesMedicine::whereIn('invoice_id', $invoice_data)
+                                ->where('medicine_id', $target_medicine->medicine_id)
+                                ->get();
+
+                    // $total_sales_target = $target_medicines->sum('total');
                 @endphp
                 <tr>
                     <td>{{ $count++ }}</td>
                     <td>{{ $target_medicine->medicine_name }}</td>
                     <td>{{ $target_medicine->quantity }}</td>
-                    <td>{{ $target_medicine->product_sales }}</td>
-                    <td>{{ $target_medicine->price }}</td>
-                    <td>{{ $target_medicine->product_sales_value }}</td>
-                    <td>{{ $target_medicine->achieve }}</td>
+                    <td>{{ $sales_medicines->sum('quantity') }}</td>
+                    <td>{{ $target_medicine->total }}</td>
+                    <td>{{ round($sales_medicines->sum('quantity') * $target_medicine->price) }}</td>
+                    <td>{{ $sales_medicines->sum('quantity') / $target_medicine->quantity * 100 }}</td>
                 </tr>
             @endforeach
 
-            {{-- @php
-                $count = 1;
-            @endphp
-            @foreach ($user_data_all as $user_data)
-                @php
-                    $under_users = App\Models\User::where(rolesConvertShort($user_data->role) . '_id', $user_data->id)
-                        ->where('role', underRole($user_data->role))
-                        ->get();
-                    $sales_target_total = App\Models\TargetReport::where('user_id', $user_data->id)
-                            ->where('target_month', $end_date->format('F'))
-                            ->where('target_year', $end_date->format('Y'))
-                            ->value('sales_target') ?? 0;
-                    $c_mon_total = $c_dise_total = $c_vat_total = $c_sales_return_total = $c_tp_total = $c_actual_total = $c_collection_total = $c_due_total = $l_mon_total = 0;
-                @endphp
-                
-                @foreach ($under_users as $under_user)
-                    @php
-                        $roleShort = rolesConvertShort($under_user->role);
-                        $c_mon = $l_mon = $c_dise = $c_vat = $c_sales_return = $c_tp = $c_actual = $c_collection = $c_due = 0;
-
-                        if ($roleShort) {
-                            $invoice_data = App\Models\Invoice::where($roleShort . '_id', $under_user->id);
-                            $c_invoice_data = (clone $invoice_data)->whereBetween('invoice_date', [$start_date->format('Y-m-d'), $end_date->format('Y-m-d')]);
-                            $c_mon = (clone $c_invoice_data)->count();
-                            $c_dise = (clone $c_invoice_data)->sum('dis_amount') + (clone $c_invoice_data)->sum('spl_dis_amount');
-                            $c_vat = (clone $c_invoice_data)->sum('vat');
-                            $c_sales_return = App\Models\ReturnMedicine::whereIn('invoice_id', $invoice_data->pluck('id'))->whereBetween('return_date', [$start_date->format('Y-m-d'), $end_date->format('Y-m-d')])->sum('total');
-                            $c_tp = (clone $c_invoice_data)->sum('sub_total');
-                            $c_actual = $c_tp + $c_vat;
-                            $c_collection = (clone $c_invoice_data)->sum('paid');
-                            $c_due = (clone $c_invoice_data)->sum('due');
-
-                            $c_dise_total += round($c_dise);
-                            $c_vat_total += round($c_vat);
-                            $c_sales_return_total += round($c_sales_return);
-                            $c_tp_total += round($c_tp);
-                            $c_actual_total += round($c_actual);
-                            $c_collection_total += round($c_collection);
-                            $c_due_total += round($c_due);
-                            $c_mon_total += round($c_mon);
-
-                            $l_mon = (clone $invoice_data)->whereBetween('invoice_date', [$start_date->copy()->subDays(30),$start_date])->count();
-
-                            $l_mon_total += $l_mon;
-                            $sales_target = App\Models\TargetReport::where('user_id', $under_user->id)
-                            ->where('target_month', $end_date->format('F'))
-                            ->where('target_year', $end_date->format('Y'))
-                            ->value('sales_target') ?? 0 ;
-                        }
-                    @endphp
-                    <tr>
-                        <td>{{ $count++ }}</td>
-                        <td>{{ $under_user->user_id }}</td>
-                        <td>{{ $under_user->name }}</td>
-                        <td>{{ $under_user->route }}</td>
-                        <td>{{ rolesConvert($under_user->role) }}</td>
-                        <td>{{ Carbon\Carbon::parse($under_user->created_at)->format('d M Y') }}</td>
-                        <td>{{ $c_mon }}</td>
-                        <td>{{ $l_mon }}</td>
-                        <td>{{ round($sales_target) }}</td>
-                        <td>{{ round($c_dise) }}</td>
-                        <td>{{ round($c_vat) }}</td>
-                        <td>{{ round($c_sales_return) }}</td>
-                        <td>{{ round($c_tp) }}</td>
-                        <td>{{ round($c_actual) }}</td>
-                        <td>{{ round($c_collection) }}</td>
-                        <td>{{ round($c_due) }}</td>
-                        <td>{{$sales_target == 0 ? 0 : ($c_tp / $sales_target) * 100}}</td>
-                    </tr>
-                @endforeach
-
-                <tr style="background-color: #f1f598cc;">
-                    <td></td>
-                    <td>{{ $user_data->user_id }}</td>
-                    <td>{{ $user_data->name }}</td>
-                    <td>{{ $user_data->route }}</td>
-                    <td>{{ rolesConvert($user_data->role) }}</td>
-                    <td>{{ Carbon\Carbon::parse($user_data->created_at)->format('d M Y') }}</td>
-                    <td>{{ $c_mon_total }}</td>
-                    <td>{{ $l_mon_total }}</td>
-                    <td>{{ round($sales_target_total) }}</td>
-                    <td>{{ $c_dise_total }}</td>
-                    <td>{{ $c_vat_total }}</td>
-                    <td>{{ $c_sales_return_total }}</td>
-                    <td>{{ $c_tp_total }}</td>
-                    <td>{{ $c_actual_total }}</td>
-                    <td>{{ $c_collection_total }}</td>
-                    <td>{{ $c_due_total }}</td>
-                    <td>{{$sales_target_total == 0 ? 0 : ($c_tp_total / $sales_target_total) * 100}}</td>
-                </tr>
-                <tr style="border:none;">
-                    <td colspan="14" style="height: 10px;"></td>
-                </tr>
-                
-                @php
-                    $c_dise_grand_total += $c_dise_total;
-                    $c_vat_grand_total += $c_vat_total;
-                    $c_sales_return_grand_total += $c_sales_return_total;
-                    $c_tp_grand_total += $c_tp_total;
-                    $c_actual_grand_total += $c_actual_total;
-                    $c_collection_grand_total += $c_collection_total;
-                    $c_due_grand_total += $c_due_total;
-                    $c_mon_grand_total += $c_mon_total;
-                    $l_mon_grand_total += $$l_mon_total;
-                @endphp
-            @endforeach
-
-            @if ($manager_data)    
-                <tr style="background-color: #f5918acc;">
-                    <td></td>
-                    <td>{{$manager_data->user_id}}</td>
-                    <td>{{$manager_data->name}}</td>
-                    <td>{{$manager_data->route}}</td>
-                    <td>{{$manager_data->role}}</td>
-                    <td>{{Carbon\Carbon::parse($manager_data->created_at)->format('d M Y')}}</td>
-                    
-                    <td>{{ $c_mon_grand_total }}</td>
-                    <td>{{ $l_mon_grand_total }}</td>
-                    <td>{{ App\Models\TargetReport::where('user_id', $manager_data->id)
-                        ->where('target_month', $end_date->format('F'))
-                        ->where('target_year', $end_date->format('Y'))
-                        ->value('sales_target') ?? 0 }}</td>
-                    <td>{{ $c_dise_grand_total }}</td>
-                    <td>{{ $c_vat_grand_total }}</td>
-                    <td>{{ $c_sales_return_grand_total }}</td>
-                    <td>{{ $c_tp_grand_total }}</td>
-                    <td>{{ $c_actual_grand_total }}</td>
-                    <td>{{ $c_collection_grand_total }}</td>
-                    <td>{{ $c_due_grand_total }}</td>
-                    <td></td>
-                </tr>
-            @endif
-            <tr style="background-color: #77e5edcc;">
-                <td colspan="6">Depo Total</td>
-                <td>{{ $c_mon_grand_total }}</td>
-                <td>{{ $l_mon_grand_total }}</td>
-                <td></td>
-                <td>{{ $c_dise_grand_total }}</td>
-                <td>{{ $c_vat_grand_total }}</td>
-                <td>{{ $c_sales_return_grand_total }}</td>
-                <td>{{ $c_tp_grand_total }}</td>
-                <td>{{ $c_actual_grand_total }}</td>
-                <td>{{ $c_collection_grand_total }}</td>
-                <td>{{ $c_due_grand_total }}</td>
-                <td></td>
-            </tr> --}}
         </table>
     </div>
 </body>

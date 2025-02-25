@@ -99,13 +99,11 @@ class MakeReportController extends Controller
         // dd($request->user_id);
         if($request->user_id){
             $user_data_all = User::find($request->user_id);
-            $sales_target_total = TargetReport::where('user_id', $user_data->id)
-                            ->where('target_month', Carbon::parse($request->start_date)->format('F'))
-                            ->where('target_year', Carbon::parse($request->end_date)->format('Y'))
-                            ->value('product_target','product_target_data') ?? 0;
-
+            $sales_target_total = TargetReport::where('user_id', $user_data_all->id)
+                        ->where('target_month', Carbon::parse($request->start_date)->format('F'))
+                        ->where('target_year', Carbon::parse($request->start_date)->format('Y'))
+                        ->first();
         }
-// dd($user_data_all->name);
         $site_data = SiteSetting::first();
         $data = [
             'date' => date('m/d/Y'), // Fixed date format
