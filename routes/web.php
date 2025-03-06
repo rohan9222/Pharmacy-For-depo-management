@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\{DashboardController,UserProfileController};
 use App\Http\Controllers\Admin\{RoleController,UserController};
 use App\Http\Controllers\makepdf\{MakeInvoiceController,MakeSummaryController,MakeReportController};
-use App\Livewire\{SupportersList,CustomersList,DeliveryManList,SupplierList,MedicinesList,CategoryList, PackSizeList, StockMedicines,StockInvoiceList,StockMedicinesList,SalesInvoice,InvoiceHistory,DeliveryHistory,InvoiceReturnHistory,SiteSettings,TargetHistory,DueInvoiceList,CollectionReport,ReportGenerate,ProductTarget};
+use App\Livewire\{SupportersList,CustomersList,DeliveryManList,SupplierList,MedicinesList,CategoryList, PackSizeList, StockMedicines,StockInvoiceList,StockMedicinesList,SalesInvoice,InvoiceHistory,DeliveryHistory,InvoiceReturnHistory,SiteSettings,TargetHistory,DueInvoiceList,CollectionReport,ReportGenerate,ProductTarget,CustomerDueList};
 
 
 Route::get('/', function () {
@@ -87,6 +87,8 @@ Route::middleware([
     Route::get('/target-history', TargetHistory::class)->name('target-history');
     Route::get('/due-list-table', [DueInvoiceList::class, 'invoiceDueList'])->name('due-list-table');
     Route::get('/due-list', DueInvoiceList::class)->name('due-list');
+    Route::get('/customer-due-list-table', [CustomerDueList::class, 'customerDueList'])->name('customer-due-list-table');
+    Route::get('/customer-due-list', CustomerDueList::class)->name('customer-due-list');
     Route::get('/collection-list-table', [CollectionReport::class, 'invoiceCollectionList'])->name('collection-list-table');
     Route::get('/collection-list', CollectionReport::class)->name('collection-list');
 
@@ -105,4 +107,5 @@ Route::middleware([
     Route::post('/report/daily/product-sales-report', [MakeReportController::class,'productSalesReport'])->name('report.daily.product.sales.report');
     Route::get('/report/stock/statement', function () {abort(404);});
     Route::post('/report/stock/statement', [MakeReportController::class,'stockStatement'])->name('report.stock.statement');
+    Route::get('/medicine/print/qr-code', [MakeReportController::class,'printQrCode'])->name('medicine.print.qr-code');
 });

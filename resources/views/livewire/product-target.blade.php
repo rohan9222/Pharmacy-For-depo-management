@@ -1,5 +1,5 @@
 <div class="row">
-    <div class="col-md-5 card z-2">
+    <div class="col-md-5 card">
         <div class="row px-4 py-1 slick-category" wire:ignore>
             <div class="btn btn-outline-success btn-sm" wire:click="medicinesCategory(null)" >All</div>
             @foreach ($category_lists as $category_list)
@@ -64,10 +64,6 @@
                     <input type="date" class="form-control" wire:model.live.debounce.1000ms="invoice_date">
                     @error('invoice_date') <span class="text-danger">{{ $message }}</span> @enderror
                 </div>
-                {{-- <div class="col-4">
-                    <label for="invoice_no" class="form-label">Invoice No</label>
-                    <input type="text" class="form-control" wire:model.live.debounce.1000ms="invoice_no" readonly>
-                </div> --}}
                 <div class="col-6">
                     <label for="customer" class="form-label">{{ auth()->user()->role == 'Super Admin' || auth()->user()->role == 'Depo Incharge' ? 'Manager List' : (auth()->user()->role == 'Manager' ? 'Zone Sales Executive List' : (auth()->user()->role == 'Zone Sales Executive' ? 'Territory Sales Executive List' : 'User List'))
                         }}</label>
@@ -108,7 +104,7 @@
                                 <td>
                                     <div class="d-flex">
                                         <a class="btn btn-sm btn-outline-danger" wire:click="decreaseQuantity({{ $index }})"><i class="bi bi-dash-lg"></i></a>
-                                        <input type="number" class="form-control form-control-sm  text-center p-0" wire:model.live.debounce.1000ms="stockMedicines.{{ $index }}.quantity">
+                                        <input type="number" class="form-control form-control-sm  text-center p-0" wire:model.live.debounce.1000ms="stockMedicines.{{ $index }}.quantity" style="min-width: 50px">
                                         <a class="btn btn-sm btn-outline-success" wire:click="increaseQuantity({{ $index }})"><i class="bi bi-plus-lg"></i></a>
                                     </div>
                                     @error("stockMedicines.{$index}.quantity") <span class="text-danger">{{ $message }}</span> @enderror

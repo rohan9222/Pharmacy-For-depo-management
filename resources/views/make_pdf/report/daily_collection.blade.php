@@ -26,7 +26,7 @@
                 <th rowspan="2">Total Vat</th>
                 <th rowspan="2">Sales Return</th>
                 <th rowspan="2">Total TP Sales</th>
-                <th rowspan="2">Actual Sales<br>(TP+Vat)</th>
+                <th rowspan="2">Actual Sales<br>(TP+Vat-Dise)</th>
                 <th rowspan="2">Total Collection</th>
                 <th rowspan="2">Net Due</th>
                 <th rowspan="2">Target Achieved</th>
@@ -62,9 +62,11 @@
                             $c_mon = (clone $c_invoice_data)->count();
                             $c_dise = (clone $c_invoice_data)->sum('dis_amount') + (clone $c_invoice_data)->sum('spl_dis_amount');
                             $c_vat = (clone $c_invoice_data)->sum('vat');
+                            $c_dis_amount = (clone $c_invoice_data)->sum('dis_amount');
+                            $c_spl_dis_amount = (clone $c_invoice_data)->sum('spl_dis_amount');
                             $c_sales_return = App\Models\ReturnMedicine::whereIn('invoice_id', $invoice_data->pluck('id'))->whereBetween('return_date', [$start_date->format('Y-m-d'), $end_date->format('Y-m-d')])->sum('total');
                             $c_tp = (clone $c_invoice_data)->sum('sub_total');
-                            $c_actual = $c_tp + $c_vat;
+                            $c_actual = $c_tp + $c_vat - ($c_dis_amount + $c_spl_dis_amount);
                             $c_collection = (clone $c_invoice_data)->sum('paid');
                             $c_due = (clone $c_invoice_data)->sum('due');
 
@@ -230,7 +232,7 @@
     $mpdf->WriteHTML($stylesheet, \Mpdf\HTMLParserMode::HEADER_CSS);
     $mpdf->WriteHTML($content, \Mpdf\HTMLParserMode::HTML_BODY);
     $mpdf->SetDisplayMode('fullpage');
-    $mpdf->SetWatermarkImage(public_path('img/logo.png')); // Path to watermark image
+    // $mpdf->SetWatermarkImage(public_path('img/logo.png')); // Path to watermark image
     $mpdf->showWatermarkImage = true;
     $mpdf->Output();
 @endphp

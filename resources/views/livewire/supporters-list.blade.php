@@ -16,43 +16,45 @@
             </div>
             <div class="row mt-3">
                 <div class="row justify-content-end">
-                    <div class="col-3">
+                    <div class="col-sm-6 col-lg-3">
                         <input id="search" class="form-control" type="search" wire:model.live="search" placeholder="Search" aria-label="Search By Name">
                     </div>
                 </div>
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th>SN</th>
-                            <th>User ID</th>
-                            <th>Person Name</th>
-                            <th>Email Address</th>
-                            <th>mobile</th>
-                            <th>Address</th>
-                            <th>Target</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach ($admin_users as $admin_user)
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
                             <tr>
-                                <td>{{ $loop->iteration }}</td>
-                                <td>{{ $admin_user->user_id }}</td>
-                                <td>{{ $admin_user->name }}</td>
-                                <td>{{ $admin_user->email }}</td>
-                                <td>{{ $admin_user->mobile }}</td>
-                                <td>{{ $admin_user->address }}</td>
-                                <td>{{ $admin_user->sales_target }}</td>
-                                <td>
-                                    @if(Auth::user()->hasRole('Super Admin') || Auth::user()->hasRole('Depo Incharge'))
-                                        <button class="btn btn-sm btn-info" wire:click="edit({{ $admin_user->id }})" @click="isOpen = true"><i class="bi bi-pencil-square"></i></button>
-                                    @endif
-                                    <button class="btn btn-sm btn-primary" wire:click="view({{ $admin_user->id }})" @click="isUserProfile = true, isUserList = false" ><i class="bi bi-eye"></i></button>
-                                </td>
+                                <th>SN</th>
+                                <th>User ID</th>
+                                <th>Person Name</th>
+                                <th>Email Address</th>
+                                <th>mobile</th>
+                                <th>Address</th>
+                                <th>Target</th>
+                                <th>Action</th>
                             </tr>
-                        @endforeach
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            @foreach ($admin_users as $admin_user)
+                                <tr>
+                                    <td>{{ $loop->iteration }}</td>
+                                    <td>{{ $admin_user->user_id }}</td>
+                                    <td>{{ $admin_user->name }}</td>
+                                    <td>{{ $admin_user->email }}</td>
+                                    <td>{{ $admin_user->mobile }}</td>
+                                    <td>{{ $admin_user->address }}</td>
+                                    <td>{{ $admin_user->sales_target }}</td>
+                                    <td>
+                                        @if(Auth::user()->hasRole('Super Admin') || Auth::user()->hasRole('Depo Incharge'))
+                                            <button class="btn btn-sm btn-info" wire:click="edit({{ $admin_user->id }})" @click="isOpen = true"><i class="bi bi-pencil-square"></i></button>
+                                        @endif
+                                        <button class="btn btn-sm btn-primary" wire:click="view({{ $admin_user->id }})" @click="isUserProfile = true, isUserList = false" ><i class="bi bi-eye"></i></button>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
                 @if ($target_edit && $sales_target !== '')
                     <div class="modal fade show d-block" tabindex="-1" role="dialog">
                         <div class="modal-dialog">
@@ -99,7 +101,7 @@
             <button class="btn btn-sm btn-info" @click="isUserProfile = false; $wire.set('zse_id', ''); $wire.set('tse_id', ''); $wire.set('customer_id', '');">back</button>
             @if ($adminUserData)
                 <div class="row pt-2">
-                    <div class="col-xl-4 col-lg-5 col-md-5 order-1 order-md-0">
+                    <div class="col-xl-4 col-lg-5 col-md-5">
                         <div class="card border-0 shadow">
                             <div class="card-body">
                                 <div class="user-avatar-section">
@@ -174,10 +176,10 @@
                         </div>
                     </div>
 
-                    <div class="col-xl-8 col-lg-7 col-md-7 order-0 order-md-1">
+                    <div class="col-xl-8 col-lg-7 col-md-7">
                         <div class="row p-1 mb-1 g-1">
                         @if ($type == 'manager')
-                            <div class="col-3">
+                            <div class="col-lg-3 col-md-6">
                                 <select class="form-select form-select-sm" wire:change="view({{$adminUserData->id}})" wire:model="zse_id">
                                     <option value=''>Select Zonal Sales Executive</option>
                                     @foreach ($zses as $zse)
@@ -185,7 +187,7 @@
                                     @endforeach
                                 </select>
                             </div>
-                            <div class="col-3">
+                            <div class="col-lg-3 col-md-6">
                                 <select class="form-select form-select-sm" wire:change="view({{$adminUserData->id}})" wire:model="tse_id" >
                                     <option value=''>Select Territory Sales Executive</option>
                                     @foreach ($tses ?? [] as $tse)
@@ -193,7 +195,7 @@
                                     @endforeach
                                 </select>
                             </div>
-                            <div class="col-3">
+                            <div class="col-lg-3 col-md-6">
                                 <select class="form-select form-select-sm" wire:change="view({{$adminUserData->id}})" wire:model="customer_id">
                                     <option value=''>Select Customer</option>
                                     @foreach ($customers ?? [] as $customer)
@@ -228,7 +230,7 @@
                                 </select>
                             </div>
                         @endif
-                            <div class="col-3">
+                            <div class="col-lg-3 col-md-6">
                                 <div class="input-group mb-3">
                                     <input type="date" class="form-control form-control-sm" placeholder="Start Date" wire:model="start_date">
                                     <span class="input-group-text">To</span>

@@ -10,6 +10,8 @@ use App\Models\Medicine;
 use App\Models\TargetReport;
 use Redirect,Response;
 use PDF;
+use DNS1D; // For 1D barcodes
+use DNS2D; // For 2D barcodes (QR codes)
 use Illuminate\Support\Number;
 use Carbon\Carbon;  
 
@@ -37,6 +39,16 @@ class MakeReportController extends Controller
         $user_lists = User::whereIn('role', ['Manager', 'Zonal Sales Executive', 'Territory Sales Executive'])->get();
         $managers = User::where('role', 'Manager')->get();
         return view('make_pdf.report.index', compact('managers', 'user_lists'));
+    }
+
+    public function printQrCode(){
+        $medicines = Medicine::all();
+
+        foreach ($medicines as $medicine) {
+            $medicine->barcode_image = 'data:image/png;base64,' . DNS1D::getBarcodePNG($medicine->barcode, 'PHARMA', 2, 50);
+        }
+        
+        return view('make_pdf.print.qr-code', compact('medicines'));
     }
 
     public function dailySalesCollection(Request $request){

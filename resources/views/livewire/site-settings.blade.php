@@ -1,9 +1,17 @@
 <div>
     <div class="content-wrapper container-xxl p-0">
-        <div class="content-header row"></div>
+        <div class="content-header row">
+            <div class="content-header-left col-md-9 col-12 mb-2">
+                <div class="row breadcrumbs-top text-center">
+                    <div class="col-12">
+                        <h2 class="content-header-title float-start mb-0">Full Site Settings</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
         <div class="content-body">
-            <div class="row">
-                <div class="col-8">
+            <div class="row g-2">
+                <div class="col-sm-12 col-md-6 col-lg-8">
                     <div class="card">
                         <div class="card-header">
                             <h4 class="card-title">Edit Settings</h4>
@@ -146,7 +154,7 @@
                     </div>
                 </div>
 
-                <div class="col-4">
+                <div class="col-sm-12 col-md-6 col-lg-4">
                     <div class="card">
                         <div class="card-header">
                             <table class="table table-striped table-bordered" x-data="{ isOpen1: false }">

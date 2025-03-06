@@ -4,7 +4,7 @@
             <div class="card card-body" style="position: unset;">
                 <div class="row">
                     <div class="col-12 mb-2">
-                        <h3 class="text-center">Collection Report</h3>
+                        <h3 class="text-center">Due Customer History</h3>
                     </div>
                     <div class="col-12">
                         <livewire:user-data-manage />
@@ -16,19 +16,26 @@
                             <tr>
                                 <th></th>
                                 <th>SN</th>
-                                <th>Invoice NO</th>
-                                <th>Invoice Date</th>
                                 <th>Customer ID</th>
                                 <th>Customer Name</th>
                                 <th>Customer Mobile</th>
+                                <th>Invoice List</th>
                                 <th>Total</th>
-                                <th>Paid List</th>
-                                <th>Total Paid</th>
+                                <th>Paid</th>
                                 <th>Due</th>
                             </tr>
                         </thead>
                         <tbody class="text-center">
                         </tbody>
+                        <tfoot>
+                            <tr>
+                                <th colspan="5" style="text-align:right">Total:</th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                            </tr>
+                        </tfoot>
                     </table>
                 </div>
             </div>
@@ -44,7 +51,7 @@
             serverSide: true,
             order: [[ 1, 'desc' ]],
             ajax: {
-                url: "{{ route('collection-list-table') }}", // Ensure correct route
+                url: "{{ route('customer-due-list-table') }}", // Ensure correct route
                 data: function(d) {
                     d.manager_id = $('#manager_id').val();
                     d.zse_id = $('#zse_id').val();
@@ -55,34 +62,23 @@
                 }
             },
             columns: [
-                { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false },
+                { data: null, defaultContent: '', orderable: false, className: 'select-checkbox' },
                 { data: 'DT_RowIndex', name: 'DT_RowIndex' },
+                { data: 'user_id', name: 'user_id' },
+                { data: 'name', name: 'name' },
+                { data: 'mobile', name: 'mobile' },
                 { data: 'invoice_no', name: 'invoice_no' },
-                { data: 'invoice_date', name: 'invoice_date' },
-                { data: 'customer.user_id', name: 'customer.user_id' },
-                { data: 'customer.name', name: 'customer.name' },
-                { data: 'customer.mobile', name: 'customer.mobile' },
-                { data: 'grand_total', name: 'grand_total' },
-                {
-                    data: 'payment_history',
-                    name: 'payment_history',
-                    render: function(data) {
-                        if (data) {
-                            return data.split('<br>').map(entry => `<span class="bg-info">${entry}</span>`).join('<br>');
-                        }
-                        return 'No Payments';
-                    }
-                },
-                { data: 'paid', name: 'paid' },
-                { data: 'due', name: 'due' },
+                { data: 'invoice_total', name: 'invoice_total' },
+                { data: 'invoice_paid', name: 'invoice_paid' },
+                { data: 'invoice_due', name: 'invoice_due' },
             ],
             columnDefs: [
-                {
-                    targets: [3],  // Invoice Date and Delivery Date
-                    render: function(data, type, row) {
-                        return moment(data).format('D-MMM-YYYY');  // Format date
-                    }
-                },
+                // {
+                //     targets: [3],  // Invoice Date and Delivery Date
+                //     render: function(data, type, row) {
+                //         return moment(data).format('D-MMM-YYYY');  // Format date
+                //     }
+                // },
                 {
                     orderable: false,
                     render: DataTable.render.select(),
@@ -93,25 +89,31 @@
             buttons: [
                 'pageLength',
                 'colvis',
-                {
-                    extend: 'print',
-                    exportOptions: {
-                        columns: ':visible'
-                    }
-                },
-                {
-                    extend: 'pdf',
-                    exportOptions: {
-                        columns: ':visible'
-                    }
-                }
+                'pdf',
+                'print'
             ],
             lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, 'All']],
             pageLength: 10,
             select: {
                 style: 'os',
                 selector: 'td:first-child'
+            },
+            footerCallback: function (row, data, start, end, display) {
+                let api = this.api();
+                let intVal = function (i) {
+                    return typeof i === 'string' ? parseFloat(i.replace(/[\$,]/g, '')) || 0 : i;
+                };
+                function total(rowValue){
+                    let total = api.column(rowValue).data().reduce((a, b) => intVal(a) + intVal(b), 0);
+                    let pageTotal = api.column(rowValue, { page: 'current' }).data().reduce((a, b) => intVal(a) + intVal(b), 0);
+
+                    $(api.column(rowValue).footer()).html( 'Page Total: ' +pageTotal.toFixed(2) + '<br> (Grand Total: ' + total.toFixed(2) + ')');
+                }
+                total(6);
+                total(7);
+                total(8);
             }
+
         });
 
         // Reload table on click of the search button

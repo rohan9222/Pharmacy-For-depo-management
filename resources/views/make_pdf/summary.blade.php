@@ -499,7 +499,7 @@
     $mpdf->SetHTMLHeader($html);
     $mpdf->SetTopMargin(20);
     $mpdf->AddPage();
-    $mpdf->SetWatermarkImage(public_path('img/logo.png'), 0.1); // Path to watermark image
+    // $mpdf->SetWatermarkImage(public_path('img/logo.png'), 0.1); // Path to watermark image
     $mpdf->showWatermarkImage = true;
 
     $mpdf->SetHTMLFooter("

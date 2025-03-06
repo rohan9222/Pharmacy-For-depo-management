@@ -17,6 +17,11 @@ class DeliveryHistory extends Component
     public $perPage = 15;
     public $selected_invoices = [];
 
+    public function mount() {
+        if(!auth()->user()->hasPermissionTo('delivery-report') && !auth()->user()->hasRole('Super Admin')) {
+            abort(403);
+        }
+    }
 
     public function render()
     {

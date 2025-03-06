@@ -5,49 +5,52 @@
                 <div class="collapse multi-collapse show" id="multiCollapseExample2">
                     <div class="card card-body" style="position: unset;">
                         <div class="row mt-3">
-                            <div class="row justify-content-end">
-                                <div class="col m-1 p-1">
+                            <div class="row">
+                                <div class="col">
                                     <h3 class="text-center">
                                         All Medicine Stock List with Invoice NO
                                     </h3>
                                 </div>
-                                <div class="col-3">
+                            </div>
+                            <div class="row justify-content-end p-1">
+                                <div class="col-lg-3 col-md-4 col-sm-6 col-12">
                                     <input id="search" class="form-control" type="search" wire:model.live="search" placeholder="Search" aria-label="Search By Name">
                                 </div>
                             </div>
-                            <table class="table">
-                                <thead>
-                                    <tr>
-                                        <th>SN</th>
-                                        <th>Invoice NO</th>
-                                        <th>Invoice Date</th>
-                                        <th>Total</th>
-                                        <th>Paid</th>
-                                        <th>Due</th>
-                                        <th>Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach ($stock_invoices as $stock_invoice)
+                            <div class="table-responsive">
+                                <table class="table">
+                                    <thead>
                                         <tr>
-                                            <td>{{ $loop->iteration }}</td>
-                                            <td>{{ $stock_invoice->invoice_no }}</td>
-                                            <td>{{ \Carbon\Carbon::parse($stock_invoice->invoice_date)->format('d M Y') }}</td>
-                                            <td>{{ $stock_invoice->total }}</td>
-                                            <td>{{ $stock_invoice->paid }}</td>
-                                            <td>{{ $stock_invoice->due }}</td>
-                                            <td>
-                                                <button class="btn btn-sm btn-info" wire:click="invoiceView({{ $stock_invoice->id }})" @click="isTableData = false, isInvoiceData = true">view invoice</button>
-                                                @can('return-medicine')
-                                                    <button class="btn btn-sm btn-warning" wire:click="returnStockMedicine({{ $stock_invoice->id }})" @click="isTableData = false, isInvoiceData = true"><i class="bi bi-arrow-counterclockwise"></i></button>
-                                                @endcan
-                                            </td>
+                                            <th>SN</th>
+                                            <th>Invoice NO</th>
+                                            <th>Invoice Date</th>
+                                            <th>Total</th>
+                                            <th>Paid</th>
+                                            <th>Due</th>
+                                            <th>Action</th>
                                         </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-
-                            {{ $stock_invoices->links() }}
+                                    </thead>
+                                    <tbody>
+                                        @foreach ($stock_invoices as $stock_invoice)
+                                            <tr>
+                                                <td>{{ $loop->iteration }}</td>
+                                                <td>{{ $stock_invoice->invoice_no }}</td>
+                                                <td>{{ \Carbon\Carbon::parse($stock_invoice->invoice_date)->format('d M Y') }}</td>
+                                                <td>{{ $stock_invoice->total }}</td>
+                                                <td>{{ $stock_invoice->paid }}</td>
+                                                <td>{{ $stock_invoice->due }}</td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-info" wire:click="invoiceView({{ $stock_invoice->id }})" @click="isTableData = false, isInvoiceData = true">view invoice</button>
+                                                    @can('return-medicine')
+                                                        <button class="btn btn-sm btn-warning" wire:click="returnStockMedicine({{ $stock_invoice->id }})" @click="isTableData = false, isInvoiceData = true"><i class="bi bi-arrow-counterclockwise"></i></button>
+                                                    @endcan
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                                {{ $stock_invoices->links() }}
                         </div>
                     </div>
                 </div>

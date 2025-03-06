@@ -201,6 +201,16 @@ class SalesInvoice extends Component
         $this->due_amount = round(max($this->grand_total - $this->paid_amount, 0), 2);
     }
 
+    public function updatedSearch()
+    {
+        $med = Medicine::where('barcode', $this->search)->first();
+        if ($med) {
+            $this->addMedicine($med->id);
+            $this->search = '';
+        }
+    }
+    
+
     public function addMedicine($index)
     {
         $medicine = Medicine::find($index);
@@ -235,6 +245,8 @@ class SalesInvoice extends Component
 
             // Recalculate totals
             $this->calculateTotals();
+            
+            $this->dispatch('focusInput');
         } else {
             session()->flash('error', 'Medicine not found!'); // Flash message if no medicine is found
         }

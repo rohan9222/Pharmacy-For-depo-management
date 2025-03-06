@@ -1,4 +1,4 @@
-<div id="sidebar" class="z-3 sidebar shadow-sm d-flex flex-column p-3 bg-body-tertiary">
+<div id="sidebar" class="d-none d-lg-block z-3 sidebar shadow-sm d-flex flex-column p-3 bg-body-tertiary">
     {{-- <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
     </button>
@@ -21,7 +21,7 @@
             </li>
 
             {{-- Supporters --}}
-            {{-- @if (Auth::user()->hasRole('Super Admin') || Auth::user()->hasPermissionTo('admin-role')) --}}
+            @if (Auth::user()->hasRole('Super Admin') || Auth::user()->hasPermissionTo('admin-role'))
                 <li class="nav-item">
                     <a href="#" class="nav-link link-body-emphasis {{ in_array(request()->route()->getName(), ['product-target-manage', 'supporter.list']) ? 'active' : '' }}" data-bs-toggle="collapse" data-bs-target="#admin-collapse" aria-expanded="false">
                         <i class="bi bi-people me-2"></i>
@@ -87,7 +87,7 @@
                         </ul>
                     </div>
                 </li>
-            {{-- @endif --}}
+            @endif
 
             <li class="nav-item">
                 <a href="#" class="nav-link link-body-emphasis {{ in_array(request()->route()->getName(), ['suppliers', 'customers', 'delivery-man']) ? 'active' : '' }}" data-bs-toggle="collapse" data-bs-target="#supporter-collapse" aria-expanded="false">
@@ -227,25 +227,26 @@
                             </li>
 
                             <li class="nav-item">
-                                <a href="{{ route('sales-delivery-history') }}" class="nav-link link-body-emphasis {{ request()->routeIs('sales-delivery-history') ? 'active' : '' }}">
-                                    <i class="bi bi-caret-right-fill me-2"></i>
-                                    <span class="sidebar-text">Delivery List</span>
-                                </a>
-                            </li>
-
-                            <li class="nav-item">
                                 <a href="{{ route('return-medicines-list') }}" class="nav-link link-body-emphasis {{ request()->routeIs('return-medicines-list') ? 'active' : '' }}">
                                     <i class="bi bi-caret-right-fill me-2"></i>
                                     <span class="sidebar-text">Return History</span>
                                 </a>
                             </li>
                         @endcanany
+                        @can('delivery-history')
+                            <li class="nav-item">
+                                <a href="{{ route('sales-delivery-history') }}" class="nav-link link-body-emphasis {{ request()->routeIs('sales-delivery-history') ? 'active' : '' }}">
+                                    <i class="bi bi-caret-right-fill me-2"></i>
+                                    <span class="sidebar-text">Delivery List</span>
+                                </a>
+                            </li>
+                        @endcan
                     </ul>
                 </div>
             </li>
     {{-- all target and reports --}}
             <li class="nav-item">
-                <a href="#" class="nav-link link-body-emphasis {{ in_array(request()->route()->getName(), ['target-history', 'due-list', 'collection-list','report.index']) ? 'active' : '' }}" data-bs-toggle="collapse" data-bs-target="#report-collapse" aria-expanded="false">
+                <a href="#" class="nav-link link-body-emphasis {{ in_array(request()->route()->getName(), ['target-history', 'customer-due-list','due-list', 'collection-list','report.index']) ? 'active' : '' }}" data-bs-toggle="collapse" data-bs-target="#report-collapse" aria-expanded="false">
                     <i class="bi bi-graph-up"></i>
                     <span class="sidebar-text">Reports</span>
                     <i class="bi bi-chevron-down ms-auto toggle-icon sidebar-text"></i>
@@ -266,18 +267,26 @@
                                 </a>
                             </li>
                             <li class="nav-item">
+                                <a href="{{ route('customer-due-list') }}" class="nav-link link-body-emphasis {{ request()->routeIs('customer-due-list') ? 'active' : '' }}">
+                                    <i class="bi bi-caret-right-fill me-2"></i>
+                                    <span class="sidebar-text">Customer Due List</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
                                 <a href="{{ route('collection-list') }}" class="nav-link link-body-emphasis {{ request()->routeIs('collection-list') ? 'active' : '' }}">
                                     <i class="bi bi-caret-right-fill me-2"></i>
                                     <span class="sidebar-text">Collection Report</span>
                                 </a>
                             </li>
+                        @endcan
+                        @if (Auth::user()->hasRole('Super Admin') || Auth::user()->hasRole('Depo Incharge'))
                             <li class="nav-item">
                                 <a href="{{ route('report.index') }}" class="nav-link link-body-emphasis {{ request()->routeIs('report.index') ? 'active' : '' }}">
                                     <i class="bi bi-caret-right-fill me-2"></i>
                                     <span class="sidebar-text">Others Report</span>
                                 </a>
                             </li>
-                        @endcan
+                        @endif
                     </ul>
                 </div>
             </li>

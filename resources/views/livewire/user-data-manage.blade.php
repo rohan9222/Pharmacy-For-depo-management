@@ -3,7 +3,7 @@
         <div class="row m-1 text-center">
             @if (auth()->user()->role == 'Super Admin')
                 <div class="row p-1 mb-1 g-1">
-                    <div class="col">
+                    <div class="col-sm-6 col-md-6 col-lg">
                         <select class="form-select form-select-sm" name="manager_id" id="manager_id" wire:change="updateUserList()" wire:model="manager_id">
                             <option value=''>Select Manager</option>
                             @foreach ($managers as $manager)
@@ -11,7 +11,7 @@
                             @endforeach
                         </select>
                     </div>
-                    <div class="col">
+                    <div class="col-sm-6 col-md-6 col-lg">
                         <select class="form-select form-select-sm" name="zse_id" id="zse_id" wire:change="updateUserList()" wire:model="zse_id">
                             <option value=''>Select Zonal Sales Executive</option>
                             @foreach ($zses as $zse)
@@ -19,7 +19,7 @@
                             @endforeach
                         </select>
                     </div>
-                    <div class="col">
+                    <div class="col-sm-6 col-md-6 col-lg">
                         <select class="form-select form-select-sm" name="tse_id" id="tse_id" wire:change="updateUserList()" wire:model="tse_id" >
                             <option value=''>Select Territory Sales Executive</option>
                             @foreach ($tses ?? [] as $tse)
@@ -27,7 +27,7 @@
                             @endforeach
                         </select>
                     </div>
-                    <div class="col">
+                    <div class="col-sm-6 col-md-6 col-lg">
                         <select class="form-select form-select-sm" name="customer_id" id="customer_id" wire:change="updateUserList()" wire:model="customer_id" >
                             <option value=''>Select Customer</option>
                             @foreach ($customers ?? [] as $customer)
@@ -35,7 +35,7 @@
                             @endforeach
                         </select>
                     </div>
-                    <div class="col">
+                    <div class="col-sm-6 col-md-6 col-lg">
                         <div id="reportrange" class="form-control form-control-sm" wire:ignore>
                             <i class="bi bi-calendar"></i>&nbsp;
                             <span></span> <i class="bi bi-caret-down"></i>
@@ -43,13 +43,14 @@
                             <input type="hidden" name="end_date" id="end_date" />
                         </div>
                     </div>
-                    <div class="col">
+                    <div class="col-sm-6 col-md-6 col-lg">
                         <button type="submit" class="btn btn-primary btn-sm" id="search">Search</button>
                     </div>
                 </div>
             @elseif ($type == 'manager')
                 <div class="row p-1 mb-1 g-1">
-                    <div class="col">
+                    <input type="hidden" name="manager_id" id="manager_id" value="{{ auth()->user()->id }}" hidden>
+                    <div class="col-sm-6 col-md-6 col-lg">
                         <select class="form-select form-select-sm" name="zse_id" id="zse_id" wire:change="updateUserList()" wire:model="zse_id">
                             <option value=''>Select Zonal Sales Executive</option>
                             @foreach ($zses as $zse)
@@ -57,7 +58,7 @@
                             @endforeach
                         </select>
                     </div>
-                    <div class="col">
+                    <div class="col-sm-6 col-md-6 col-lg">
                         <select class="form-select form-select-sm" name="tse_id" id="tse_id" wire:change="updateUserList()" wire:model="tse_id" >
                             <option value=''>Select Territory Sales Executive</option>
                             @foreach ($tses ?? [] as $tse)
@@ -65,7 +66,7 @@
                             @endforeach
                         </select>
                     </div>
-                    <div class="col">
+                    <div class="col-sm-6 col-md-6 col-lg">
                         <select class="form-select form-select-sm" name="customer_id" id="customer_id" wire:change="updateUserList()" wire:model="customer_id" >
                             <option value=''>Select Customer</option>
                             @foreach ($customers ?? [] as $customer)
@@ -73,7 +74,7 @@
                             @endforeach
                         </select>
                     </div>
-                    <div class="col">
+                    <div class="col-sm-6 col-md-6 col-lg">
                         <div id="reportrange" class="form-control form-control-sm" wire:ignore>
                             <i class="bi bi-calendar"></i>&nbsp;
                             <span></span> <i class="bi bi-caret-down"></i>
@@ -81,13 +82,14 @@
                             <input type="hidden" name="end_date" id="end_date" />
                         </div>
                     </div>
-                    <div class="col">
+                    <div class="col-sm-6 col-md-6 col-lg">
                         <button type="submit" class="btn btn-primary btn-sm" id="search">Search</button>
                     </div>
                 </div>
             @elseif ($type == 'zse')
+                <input type="hidden" name="zse_id" id="zse_id" value="{{ auth()->user()->id }}" hidden>
                 <div class="row p-1 mb-1 g-1">
-                    <div class="col">
+                    <div class="col-sm-6 col-md-6 col-lg">
                         <select class="form-select form-select-sm" name="tse_id" id="tse_id" wire:change="updateUserList()" wire:model="tse_id" >
                             <option value=''>Select Territory Sales Executive</option>
                             @foreach ($tses ?? [] as $tse)
@@ -95,7 +97,7 @@
                             @endforeach
                         </select>
                     </div>
-                    <div class="col">
+                    <div class="col-sm-6 col-md-6 col-lg">
                         <select class="form-select form-select-sm" name="customer_id" id="customer_id" wire:change="updateUserList()" wire:model="customer_id" >
                             <option value=''>Select Customer</option>
                             @foreach ($customers ?? [] as $customer)
@@ -103,7 +105,7 @@
                             @endforeach
                         </select>
                     </div>
-                    <div class="col">
+                    <div class="col-sm-6 col-md-6 col-lg">
                         <div id="reportrange" class="form-control form-control-sm" wire:ignore>
                             <i class="bi bi-calendar"></i>&nbsp;
                             <span></span> <i class="bi bi-caret-down"></i>
@@ -111,13 +113,14 @@
                             <input type="hidden" name="end_date" id="end_date" />
                         </div>
                     </div>
-                    <div class="col">
+                    <div class="col-sm-6 col-md-6 col-lg">
                         <button type="submit" class="btn btn-primary btn-sm" id="search">Search</button>
                     </div>
                 </div>
             @elseif ($type == 'tse')
+                <input type="hidden" name="tse_id" id="tse_id" value="{{ auth()->user()->id }}" hidden>
                 <div class="row p-1 mb-1 g-1">
-                    <div class="col">
+                    <div class="col-sm-6 col-md-6 col-lg">
                         <select class="form-select form-select-sm" name="customer_id" id="customer_id" wire:change="updateUserList()" wire:model="customer_id" >
                             <option value=''>Select Customer</option>
                             @foreach ($customers ?? [] as $customer)
@@ -125,7 +128,7 @@
                             @endforeach
                         </select>
                     </div>
-                    <div class="col">
+                    <div class="col-sm-6 col-md-6 col-lg">
                         <div id="reportrange" class="form-control form-control-sm" wire:ignore>
                             <i class="bi bi-calendar"></i>&nbsp;
                             <span></span> <i class="bi bi-caret-down"></i>
@@ -133,7 +136,7 @@
                             <input type="hidden" name="end_date" id="end_date" />
                         </div>
                     </div>
-                    <div class="col">
+                    <div class="col-sm-6 col-md-6 col-lg">
                         <button type="submit" class="btn btn-primary btn-sm" id="search">Search</button>
                     </div>
                 </div>

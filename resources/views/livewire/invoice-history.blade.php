@@ -13,7 +13,7 @@
                                 <livewire:user-data-manage />
                             </div>
                         </div>
-                        <div class="row mt-3" wire:ignore>
+                        <div class="row mt-3 table-responsive" wire:ignore>
                             <table class="table" id="invoiceTable">
                                 <thead>
                                     <tr>
@@ -61,7 +61,7 @@
                             </div>
                             <div class="form-group mt-2">
                                 <label class="form-label fw-bold">Amount</label>
-                                <input type="number" wire:model="amount" class="form-control" required>
+                                <input type="text" wire:model="amount" class="form-control" required>
                                 @error('amount') <span class="text-danger">{{ $message }}</span> @enderror
                             </div>
                         @endif
@@ -74,7 +74,7 @@
                             </div>
                             <div class="form-group mt-2">
                                 <label class="form-label fw-bold">Amount</label>
-                                <input type="number" wire:model="amount" class="form-control" required>
+                                <input type="text" wire:model="amount" class="form-control" required>
                                 @error('amount') <span class="text-danger">{{ $message }}</span> @enderror
                             </div>
                         @endif
@@ -189,6 +189,7 @@
         var table = $('#invoiceTable').DataTable({
             processing: true,
             serverSide: true,
+            // responsive: true,
             order: [[ 1, 'desc' ]],
             ajax: {
                 url: "{{ route('sales-medicines-table') }}", // Ensure correct route

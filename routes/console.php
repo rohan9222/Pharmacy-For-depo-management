@@ -22,6 +22,8 @@ Schedule::call(function () {
             'manager_id' => $user->manager_id ?? null,
             'zse_id' => $user->zse_id ?? null,
             'tse_id' => $user->tse_id ?? null,
+            'product_target' => $user->product_target ?? 0,
+            'product_target_data' => $user->product_target_data ?? null,
             'sales_target' => $user->sales_target ?? 0,
             'target_month' => Carbon::now()->format('F'),
             'target_year' => Carbon::now()->format('Y')
@@ -33,7 +35,7 @@ Schedule::call(function () {
     Medicine::all()->each(function ($medicine) {
         OpeningStock::create([
             'medicine_id' => $medicine->id,
-            'opening_stock' => $medicine->stock,
+            'opening_stock' => $medicine->quantity,
             'stock_month' => Carbon::now()->format('F'),
             'stock_year' => Carbon::now()->format('Y')
         ]);

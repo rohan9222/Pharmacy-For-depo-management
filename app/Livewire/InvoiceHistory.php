@@ -80,7 +80,7 @@ class InvoiceHistory extends Component
                     $action = '';
 
                     // Check if the invoice has a due amount
-                    if ($row->due > 0) {
+                    if ($row->due > 0 && auth()->user()->can('make-payment')) {
                         $action .= '
                             <button wire:click="setInvoice('.$row->id.')"
                                 class="btn btn-primary btn-sm"

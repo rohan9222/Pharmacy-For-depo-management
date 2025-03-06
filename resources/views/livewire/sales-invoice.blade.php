@@ -1,5 +1,5 @@
 <div class="row">
-    <div class="col-md-5 card z-2">
+    <div class="col-md-5 card">
         <div class="row px-4 py-1 slick-category" wire:ignore>
             <div class="btn btn-outline-success btn-sm" wire:click="medicinesCategory(null)" >All</div>
             @foreach ($category_lists as $category_list)
@@ -15,7 +15,7 @@
 
         <div class="row px-4 py-1">
             <div class="col-12">
-                <input id="search" class="form-control from-control-sm" type="search" wire:model.live="search" placeholder="Search By Name" aria-label="Search By Name">
+                <input id="search" class="form-control from-control-sm" type="search" wire:model.live="search" placeholder="Search By Name" aria-label="Search By Name" autofocus>
             </div>
             <div class="col-12 mt-1">
                 {{$category == '' ?  'All' : $category}} Medicines List ({{ count($medicines) }})
@@ -120,7 +120,7 @@
                                 <td>
                                     <div class="d-flex">
                                         <a class="btn btn-sm btn-outline-danger" wire:click="decreaseQuantity({{ $index }})"><i class="bi bi-dash-lg"></i></a>
-                                        <input type="number" class="form-control form-control-sm  text-center p-0" wire:model.live.debounce.1000ms="stockMedicines.{{ $index }}.quantity">
+                                        <input type="number" class="form-control form-control-sm  text-center p-0" wire:model.live.debounce.1000ms="stockMedicines.{{ $index }}.quantity" style="min-width: 50px">
                                         <a class="btn btn-sm btn-outline-success" wire:click="increaseQuantity({{ $index }})"><i class="bi bi-plus-lg"></i></a>
                                     </div>
                                     @error("stockMedicines.{$index}.quantity") <span class="text-danger">{{ $message }}</span> @enderror
@@ -185,39 +185,43 @@
                             <td>
                                 <div class="input-group w-75 ">
                                     {{-- <input type="text" placeholder="Spacial Discount Price" class="form-control form-control-sm" wire:model.live.debounce.1000ms="discount" disabled readonly> --}}
-                                    <input type="text" placeholder="Spacial Discount Price" class="form-control form-control-sm" value="{{$discount}}" disabled readonly>
+                                    <input type="text" placeholder="Discount Price" class="form-control form-control-sm" value="{{$discount}}" disabled readonly>
                                     <span class="input-group-text bg-info bg-opacity-10">{{$discount_amount}}৳</span>
                                 </div>
                                 @error('discount') <span class="text-danger">{{ $message }}</span> @enderror
                             </td>
                         </tr>
-                        <tr>
-                            <th>Spacial Discount (%)</th>
-                            <th>:</th>
-                            <td>
-                                <div class="input-group w-75 ">
-                                    <input type="text" placeholder="Spacial Discount Price" class="form-control form-control-sm" wire:model.live.debounce.1000ms="spl_discount" >
-                                    <span class="input-group-text bg-info bg-opacity-10">{{$spl_discount_amount}}৳</span>
-                                </div>
-                                @error('spl_discount') <span class="text-danger">{{ $message }}</span> @enderror
-                            </td>
-                        </tr>
+                        @if (auth()->user()->role != 'Territory Sales Executive')
+                            <tr>
+                                <th>Spacial Discount (%)</th>
+                                <th>:</th>
+                                <td>
+                                    <div class="input-group w-75 ">
+                                        <input type="text" placeholder="Spacial Discount Price" class="form-control form-control-sm" wire:model.live.debounce.1000ms="spl_discount" >
+                                        <span class="input-group-text bg-info bg-opacity-10">{{$spl_discount_amount}}৳</span>
+                                    </div>
+                                    @error('spl_discount') <span class="text-danger">{{ $message }}</span> @enderror
+                                </td>
+                            </tr>
+                        @endif
                         <tr>
                             <th>Grand Total</th>
                             <th>:</th>
                             <td>{{$grand_total}}</td>
                         </tr>
-                        <tr>
-                            <th>Paid Amount</th>
-                            <th>:</th>
-                            <td>
-                                <div class="input-group w-75">
-                                    <input type="text" placeholder="Paid Amount" class="form-control form-control-sm" wire:model.live.debounce.1000ms="paid_amount">
-                                    <span class="input-group-text bg-info bg-opacity-10">৳</span>
-                                </div>
-                                @error('paid_amount') <span class="text-danger">{{ $message }}</span> @enderror
-                            </td>
-                        </tr>
+                        @if (auth()->user()->role != 'Territory Sales Executive')
+                            <tr>
+                                <th>Paid Amount</th>
+                                <th>:</th>
+                                <td>
+                                    <div class="input-group w-75">
+                                        <input type="text" placeholder="Paid Amount" class="form-control form-control-sm" wire:model.live.debounce.1000ms="paid_amount">
+                                        <span class="input-group-text bg-info bg-opacity-10">৳</span>
+                                    </div>
+                                    @error('paid_amount') <span class="text-danger">{{ $message }}</span> @enderror
+                                </td>
+                            </tr>
+                        @endif
                         <tr>
                             <th>Total Due</th>
                             <th>:</th>
@@ -332,8 +336,12 @@
                 slidesToShow: 6,
                 slidesToScroll: 1
             });
+            // Listen for the 'focusInput' event from Livewire
+            Livewire.on('focusInput', () => {
+                // Set focus to the search input after form submission
+                document.getElementById('search').focus();
+            });
         });
     </script>
 @endpush
-
 

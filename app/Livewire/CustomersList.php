@@ -37,13 +37,17 @@ class CustomersList extends Component
         $tses = User::select('id', 'name')->role('Territory Sales Executive');
         if (auth()->user()->hasRole('Manager')) {
             $tses = $tses->where('manager_id', auth()->user()->id);
+            $customers = User::search($this->search)->where('manager_id', auth()->user()->id)->with('fieldOfficer')->where('role', 'Customer')->paginate(10);
         } elseif (auth()->user()->hasRole('Zonal Sales Executive')) {
             $tses = $tses->where('zse_id', auth()->user()->id);
+            $customers = User::search($this->search)->where('zse_id', auth()->user()->id)->with('fieldOfficer')->where('role', 'Customer')->paginate(10);
         } elseif (auth()->user()->hasRole('Territory Sales Executive')) {
             $tses = $tses->where('id', auth()->user()->id);
+            $customers = User::search($this->search)->where('tse_id', auth()->user()->id)->with('fieldOfficer')->where('role', 'Customer')->paginate(10);
+        }else {
+            $customers = User::search($this->search)->with('fieldOfficer')->where('role', 'Customer')->paginate(10);
         }
         $this->tses = $tses->get();
-        $customers = User::search($this->search)->with('fieldOfficer')->where('role', 'Customer')->paginate(10);
         $this->site_settings = SiteSetting::first();
 
         return view('livewire.customers-list', ['customers' => $customers])->layout('layouts.app');

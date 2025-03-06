@@ -18,7 +18,7 @@
                                 </div>
                             </div>
 
-                            <div class="row mt-3" wire:ignore>
+                            <div class="row mt-3 table-responsive" wire:ignore>
                                 <table class="table" id="returnInvoiceTable">
                                     <thead>
                                         <tr>

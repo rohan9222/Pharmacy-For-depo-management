@@ -13,7 +13,7 @@
                     @method('POST')
                     @csrf
                     <div class="row p-3 g-1">
-                        <div class="col">
+                        <div class="col-sm-6 col-md-4 col-lg">
                             <select class="form-select form-select-sm" name="manager_id" id="manager_id" wire:change="updateUserList()">
                                 <option value=''>Select Manager</option>
                                 @foreach ($managers as $manager)
@@ -21,7 +21,7 @@
                                 @endforeach
                             </select>
                         </div>
-                        <div class="col">
+                        <div class="col-sm-6 col-md-4 col-lg">
                             <div id="reportrange" class="form-control form-control-sm" wire:ignore>
                                 <i class="bi bi-calendar"></i>&nbsp;
                                 <span></span> <i class="bi bi-caret-down"></i>
@@ -29,7 +29,7 @@
                                 <input type="hidden" name="end_date" id="end_date" />
                             </div>
                         </div>
-                        <div class="col">
+                        <div class="col-sm-6 col-md-4 col-lg">
                             <button type="submit" class="btn btn-primary btn-sm" id="search">Search</button>
                         </div>
                     </div>
@@ -44,7 +44,7 @@
                     @method('POST')
                     @csrf
                     <div class="row p-3 g-1">
-                        <div class="col">
+                        <div class="col-sm-6 col-md-4 col-lg">
                             <select class="form-select form-select-sm tom-select p-0" name="user_id" id="user_id" >
                                 <option value=''>Select User</option>
                                 @foreach ($user_lists as $user_list)
@@ -52,7 +52,7 @@
                                 @endforeach
                             </select>
                         </div>
-                        <div class="col">
+                        <div class="col-sm-6 col-md-4 col-lg">
                             <div id="product-reportrange" class="form-control form-control-sm" wire:ignore>
                                 <i class="bi bi-calendar"></i>&nbsp;
                                 <span></span> <i class="bi bi-caret-down"></i>
@@ -60,7 +60,7 @@
                                 <input type="hidden" name="end_date" id="product-end_date" />
                             </div>
                         </div>
-                        <div class="col">
+                        <div class="col-sm-6 col-md-4 col-lg">
                             <button type="submit" class="btn btn-primary btn-sm" id="search">Search</button>
                         </div>
                     </div>
@@ -75,17 +75,17 @@
                     @method('POST')
                     @csrf
                     <div class="row g-3 p-3 align-items-center">
-                        <div class="col">
+                        <div class="col-sm-6 col-md-4 col-lg">
                             <label for="reportdate" class="form-label">Select Date</label>
                         </div>
-                        <div class="col">
+                        <div class="col-sm-6 col-md-4 col-lg">
                             <div id="reportdate" class="form-control form-control-sm">
                                 <i class="bi bi-calendar"></i>&nbsp;
                                 <span></span> <i class="bi bi-caret-down"></i>
                                 <input type="hidden" name="reportdate" id="report_date" />
                             </div>
                         </div>
-                        <div class="col">
+                        <div class="col-sm-6 col-md-4 col-lg">
                             <button type="submit" class="btn btn-primary btn-sm" id="search">Search</button>
                         </div>
                     </div>

@@ -114,7 +114,7 @@
     $mpdf->WriteHTML($stylesheet, \Mpdf\HTMLParserMode::HEADER_CSS);
     $mpdf->WriteHTML($content, \Mpdf\HTMLParserMode::HTML_BODY);
     $mpdf->SetDisplayMode('fullpage');
-    $mpdf->SetWatermarkImage(public_path('img/logo.png')); // Path to watermark image
+    // $mpdf->SetWatermarkImage(public_path('img/logo.png')); // Path to watermark image
     $mpdf->showWatermarkImage = true;
     $mpdf->Output();
 @endphp

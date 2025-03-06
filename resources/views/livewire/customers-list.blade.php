@@ -81,55 +81,58 @@
 
             <div class="row mt-3">
                 <div class="row justify-content-end">
-                    <div class="col-3">
+                    <div class="col-lg-6 col-md-6 col-sm-6">
                         <input id="search" class="form-control" type="search" wire:model.live="search" placeholder="Search" aria-label="Search By Name">
                     </div>
                 </div>
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th>SN</th>
-                            <th>Customer ID</th>
-                            <th>customer Name</th>
-                            <th>Email Address</th>
-                            <th>mobile</th>
-                            {{-- <th>Balance</th> --}}
-                            <th>Address</th>
-                            <th>Territory Sales Executive</th>
-                            <th>Route</th>
-                            <th>Category</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach ($customers as $customer)
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
                             <tr>
-                                <td>{{ $loop->iteration }}</td>
-                                <td>{{ $customer->user_id }}</td>
-                                <td>{{ $customer->name }}</td>
-                                <td>{{ $customer->email }}</td>
-                                <td>{{ $customer->mobile }}</td>
-                                {{-- <td>{{ $customer->balance }}</td> --}}
-                                <td>{{ $customer->address }}</td>
-                                <td>{{ $customer->fieldOfficer->name ?? 'N/A' }}</td>
-                                <td>{{ $customer->route ?? 'N/A' }}</td>
-                                <td>{{ $customer->category ?? 'N/A' }}</td>
-                                <td>
-                                    @can('view-customer')
-                                        <button class="btn btn-sm btn-primary" wire:click="view({{ $customer->id }})" @click="isCustomerProfile = true, isCustomerList = false" ><i class="bi bi-eye"></i></button>
-                                    @endcan
-                                    @can('edit-customer')
-                                        <button class="btn btn-sm btn-info" wire:click="edit({{ $customer->id }})" @click="isOpen = true"><i class="bi bi-pencil-square"></i></button>
-                                    @endcan
-
-                                    @can('delete-customer')
-                                        <button class="btn btn-sm btn-danger" wire:click="delete({{ $customer->id }})"><i class="bi bi-trash"></i></button>
-                                    @endcan
-                                </td>
+                                <th>SN</th>
+                                <th>Customer ID</th>
+                                <th>customer Name</th>
+                                <th>Email Address</th>
+                                <th>mobile</th>
+                                {{-- <th>Balance</th> --}}
+                                <th>Address</th>
+                                <th>Territory Sales Executive</th>
+                                <th>Route</th>
+                                <th>Category</th>
+                                <th>Action</th>
                             </tr>
-                        @endforeach
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            @foreach ($customers as $customer)
+                                <tr>
+                                    <td>{{ $loop->iteration }}</td>
+                                    <td>{{ $customer->user_id }}</td>
+                                    <td>{{ $customer->name }}</td>
+                                    <td>{{ $customer->email }}</td>
+                                    <td>{{ $customer->mobile }}</td>
+                                    {{-- <td>{{ $customer->balance }}</td> --}}
+                                    <td>{{ $customer->address }}</td>
+                                    <td>{{ $customer->fieldOfficer->name ?? 'N/A' }}</td>
+                                    <td>{{ $customer->route ?? 'N/A' }}</td>
+                                    <td>{{ $customer->category ?? 'N/A' }}</td>
+                                    <td>
+                                        @can('view-customer')
+                                            <button class="btn btn-sm btn-primary" wire:click="view({{ $customer->id }})" @click="isCustomerProfile = true, isCustomerList = false" ><i class="bi bi-eye"></i></button>
+                                        @endcan
+
+                                        @can('edit-customer')
+                                            <button class="btn btn-sm btn-info" wire:click="edit({{ $customer->id }})" @click="isOpen = true"><i class="bi bi-pencil-square"></i></button>
+                                        @endcan
+    
+                                        @can('delete-customer')
+                                            <button class="btn btn-sm btn-danger" wire:click="delete({{ $customer->id }})"><i class="bi bi-trash"></i></button>
+                                        @endcan
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
             </div>
 
             <div class="pagination">
@@ -141,7 +144,7 @@
             <button class="btn btn-sm btn-info" @click="isCustomerProfile = false">back</button>
             @if ($customerData)
                 <div class="row pt-2">
-                    <div class="col-xl-4 col-lg-5 col-md-5 order-1 order-md-0">
+                    <div class="col-xl-4 col-lg-5 col-md-5">
                         <div class="card border-0 shadow">
                             <div class="card-body">
                                 <div class="user-avatar-section">
@@ -211,7 +214,7 @@
                                             <span>{{ $customerData->address }}</span>
                                         </li>
                                         <li class="mb-75 d-flex justify-content-end">
-                                            @if ($customerData->total_due > 0)
+                                            @if ($customerData->total_due > 0 && auth()->user()->can('make-payment'))
                                                 <button class="btn btn-info btn-sm" wire:click="partialPay({{ $customerData->id }})" data-bs-toggle="modal" data-bs-target="#duePaymentModal">Pay Now</button>
                                             @endif
                                         </li>
@@ -221,7 +224,7 @@
                         </div>
                     </div>
 
-                    <div class="col-xl-8 col-lg-7 col-md-7 order-0 order-md-1">
+                    <div class="col-xl-8 col-lg-7 col-md-7">
                         <div class="card">
                             <div class="card-header">
                                 <h4>Customer Invoice</h4>
@@ -246,7 +249,7 @@
                                                     <td>{{ $site_settings->site_currency }}{{ $invoice->paid }}</td>
                                                     <td>{{ $site_settings->site_currency }}{{ $invoice->due }}</td>
                                                     <td>
-                                                        @if ($invoice->due > 0)
+                                                        @if ($invoice->due > 0 && auth()->user()->can('make-payment'))
                                                             <button wire:click="setInvoice({{ $invoice->id }}, {{ $customerData->id }})"
                                                                 class="btn btn-primary btn-sm"
                                                                 data-bs-toggle="modal"
@@ -285,7 +288,7 @@
                                                             </div>
                                                             <div class="form-group mt-2">
                                                                 <label class="form-label fw-bold">Amount</label>
-                                                                <input type="number" wire:model="amount" class="form-control" required>
+                                                                <input type="text" wire:model="amount" class="form-control" required>
                                                                 @error('amount') <span class="text-danger">{{ $message }}</span> @enderror
                                                             </div>
                                                         @endif
@@ -298,7 +301,7 @@
                                                             </div>
                                                             <div class="form-group mt-2">
                                                                 <label class="form-label fw-bold">Amount</label>
-                                                                <input type="number" wire:model="amount" class="form-control" required>
+                                                                <input type="text" wire:model="amount" class="form-control" required>
                                                                 @error('amount') <span class="text-danger">{{ $message }}</span> @enderror
                                                             </div>
                                                         @endif
