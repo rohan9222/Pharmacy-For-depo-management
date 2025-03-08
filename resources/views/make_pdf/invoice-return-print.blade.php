@@ -125,13 +125,13 @@
                     <td class="border-dotted border-start">{{$medicine_list->initial_quantity}}</td>
                     <td class="border-dotted border-start">{{$totalPrice}}</td>
                     <td class="border-dotted border-start">{{$vatAmount}}</td>
-                    <td class="border-dotted border-start border-end">{{$medicine_list->total}}</td>
+                    <td class="border-dotted border-start border-end">{{round($medicine_list->total)}}</td>
                 </tr>
 
                 @php
                     $sumTotalPrice += $totalPrice;
                     $sumVatAmount += $vatAmount;
-                    $sumTotal += $medicine_list->total;
+                    $sumTotal += round($medicine_list->total);
                 @endphp
             @endforeach
 
@@ -147,12 +147,12 @@
                 <tr>
                     <td colspan="5"></td>
                     <td class="border" colspan="2">Discount on TP ({{$invoice_data->discount+$invoice_data->spl_discount}}%):</td>
-                    <td class="border">{{$invoice_data->dis_amount+$invoice_data->spl_dis_amount}}</td>
+                    <td class="border">{{round($invoice_data->dis_amount+$invoice_data->spl_dis_amount)}}</td>
                 </tr>
                 <tr>
                     <td colspan="5" class="subtitle text-uppercase">IN WORD: taka. {{$grand_total_words}} only</td>
                     <td class="border" colspan="2"><b>Net Payable Amount:</b></td>
-                    <td class="border"><b>{{$invoice_data->grand_total}}</b></td>
+                    <td class="border"><b>{{round($invoice_data->grand_total)}}</b></td>
                 </tr>
             </table>
         </div>
@@ -172,6 +172,9 @@
                     </tr>
                 </thead>
                 <tbody>
+                    @php
+                        $sumReturnTotal = 0;
+                    @endphp
                     @foreach ($invoice_data->salesReturnMedicines as $salesReturnMedicine)
                         <tr class="border">
                             <td class="border-end">{{ $loop->iteration }}</td>
@@ -180,9 +183,22 @@
                             <td class="border-end">{{ $salesReturnMedicine->quantity }}</td>
                             <td class="border-end">{{ $salesReturnMedicine->price }}</td>
                             <td class="border-end">{{ $salesReturnMedicine->vat }}</td>
-                            <td class="border-end">{{ $salesReturnMedicine->total }}</td>
+                            <td class="border-end">{{ round($salesReturnMedicine->total) }}</td>
                         </tr>
+                        @php
+                            $sumReturnTotal += round($salesReturnMedicine->total);
+                        @endphp
                     @endforeach
+
+                    <tr class="border">
+                        <td colspan="6" class="border-end">Total Return</td>
+                        <td class="border-end">{{$sumReturnTotal}}</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3" class="border-end">Payable Amount</td>
+                        <td colspan="3" class="border-end text-center">{{round($invoice_data->grand_total)}} - {{$sumReturnTotal}}</td>
+                        <td class="border-end"><b>{{$sumReturnTotal > ($invoice_data->grand_total) ? 0 : round($invoice_data->grand_total)-$sumReturnTotal}}</b></td>
+                    </tr>
                 </tbody>
             </table>
         </div>
@@ -216,8 +232,7 @@
     </div>
 </body>
 <script>
-    window.print();
-
+    // window.print();
 </script>
 </html>
 

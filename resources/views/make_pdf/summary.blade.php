@@ -45,8 +45,7 @@
         <table class="table">
             <tr>
                 <td>Total Invoice : {{$invoice_data->count()}}</td>
-                <td>Invoices # : {{ $invoice_data->pluck('invoice_no')->implode(', ') }}</td>
-                <td></td>
+                <td colspan="2">Invoices # : {{ $invoice_data->pluck('invoice_no')->implode(', ') }}</td>
             </tr>
         </table>
 
@@ -121,13 +120,13 @@
                     <td class="border-dotted border-start">{{ $medicine['pack_size'] }}</td>
                     <td class="border-dotted border-start">{{ $medicine['price'] }}</td>
                     <td class="border-dotted border-start">{{ $medicine['vat'] }}</td>
-                    <td class="border-dotted border-start">{{ $medicine['initial_quantity'] }}</td>
                     <td class="border-dotted border-start"></td>
                     <td class="border-dotted border-start"></td>
                     <td class="border-dotted border-start"></td>
                     <td class="border-dotted border-start"></td>
                     <td class="border-dotted border-start"></td>
-                    <td class="border-dotted border-start border-end"></td>
+                    <td class="border-dotted border-start"></td>
+                    <td class="border-dotted border-start border-end">{{ $medicine['initial_quantity'] }}</td>
                 </tr>
             @endforeach
         </table>
@@ -176,7 +175,7 @@
                     </div>
                     <div style="width: 100%;">
                         <span class="text-start" style='width:40%;'>Total:</span>
-                        <span class="text-start" style='width:60%;'>{{$sumTotalPrice + $sumVatAmount - $discount - $spl_discount}}</span>
+                        <span class="text-start" style='width:60%;'>{{round($sumTotalPrice + $sumVatAmount - $discount - $spl_discount)}}</span>
                     </div>
                 </td>
                 <td>
@@ -199,13 +198,13 @@
                     </div>
                     <div style="width: 100%;">
                         <span class="text-start" style='width:40%;'>Total:</span>
-                        <span class="text-start" style='width:60%;'>{{$sumTotalPrice + $sumVatAmount - $discount - $spl_discount}}</span>
+                        <span class="text-start" style='width:60%;'>{{round($sumTotalPrice + $sumVatAmount - $discount - $spl_discount)}}</span>
                     </div>
                 </td>
                 <td></td>
             </tr>
             <tr>
-                <td colspan="4" class="text-center"><span class="text-italic">Net Payable Amount : </span><span class="text-uppercase">IN WORD: taka. {{ Illuminate\Support\Number::spell($sumTotalPrice + $sumVatAmount - $discount - $spl_discount, locale: 'en')}} only</span> </td>
+                <td colspan="4" class="text-center"><span class="text-italic">Net Payable Amount : </span><span class="text-uppercase">IN WORD: taka. {{ Illuminate\Support\Number::spell(round($sumTotalPrice + $sumVatAmount - $discount - $spl_discount), locale: 'en')}} only</span> </td>
             </tr>
         </table>
     </div>
@@ -243,12 +242,11 @@
         <table class="table">
             <tr>
                 <td>Total Invoice : {{$invoice_data->count()}}</td>
-                <td>Invoices # : {{ $invoice_data->pluck('invoice_no')->implode(', ') }}</td>
-                <td></td>
+                <td colspan="2">Invoices # : {{ $invoice_data->pluck('invoice_no')->implode(', ') }}</td>
             </tr>
         </table>
 
-        <table class="items text-center border">
+        <table class="items text-center">
             <tr class="border">
                 <th class="border-start" style="width: 10%">Code</th>
                 <th class="border-start" style="width: 50%">Customer Name</th>
@@ -257,26 +255,73 @@
                 <th class="border-start" style="width: 10%">Return Amount</th>
                 <th class="border-start" style="width: 10%">Collection</th>
             </tr>
+
+            @php
+                $sumGrandTotal = 0;
+                $sumTotalCollection = 0;
+                $counter = 0; // Track the count
+                $totalInvoices = count($invoice_data); // Get total count
+            @endphp
+
             @foreach ($invoice_data as $invoice)
+                @if ($totalInvoices <= 13)
+                    @if ($counter == 13)
+                        @for ($i = 0; $i < 5; $i++)
+                            <tr style="border=0;"><td colspan="6">&nbsp;</td></tr>
+                        @endfor
+                    @endif
+                @endif
+                @if ($totalInvoices >= 13 && $totalInvoices <= 30)
+                    @if ($counter == 10)
+                        @for ($i = 0; $i < 11; $i++)
+                            <tr style="border=0;"><td colspan="6">&nbsp;</td></tr>
+                        @endfor
+                    @elseif ($counter > 10 && ($counter - 10) % 17 == 0) 
+                        @for ($i = 0; $i < 8; $i++)
+                            <tr style="border=0;"><td colspan="6">&nbsp;</td></tr>
+                        @endfor
+                    @endif
+                @endif
+                @if ($totalInvoices > 30)
+                    @if ($counter == 10)
+                        @for ($i = 0; $i < 10; $i++)
+                            <tr style="border=0;"><td colspan="6">&nbsp;</td></tr>
+                        @endfor
+                    @elseif ($counter > 10 && ($counter - 10) % 17 == 0) 
+                        @for ($i = 0; $i < 8; $i++)
+                            <tr style="border=0;"><td colspan="6">&nbsp;</td></tr>
+                        @endfor
+                    @endif
+                @endif
+
+                {{-- Invoice Row --}}
                 <tr class="border">
-                    <td class="border-start">{{$invoice->customer->user_id}}</td>
-                    <td class="border-start text-start">{{$invoice->customer->name}}<br><span style="font-size: 11px;">Address : {{$invoice->customer->address}}</span><br><span style="font-size: 11px;">Mobile :{{$invoice->customer->mobile}}</span></td>
-                    <td class="border-start">{{$site_data->site_invoice_prefix.($site_data->site_invoice_prefix ? '-' : '')}}{{$invoice->invoice_no}}</td>
-                    <td class="border-start">{{$invoice->grand_total}}</td>
+                    <td class="border-start">{{ $invoice->customer->user_id }}</td>
+                    <td class="border-start text-start">
+                        {{ $invoice->customer->name }}<br>
+                        <span style="font-size: 11px;">Address : {{ $invoice->customer->address }}</span><br>
+                        <span style="font-size: 11px;">Mobile : {{ $invoice->customer->mobile }}</span>
+                    </td>
+                    <td class="border-start">{{ $site_data->site_invoice_prefix . ($site_data->site_invoice_prefix ? '-' : '') }}{{ $invoice->invoice_no }}</td>
+                    <td class="border-start">{{ round($invoice->grand_total) }}</td>
                     <td class="border-start"></td>
-                    <td class="border-start">{{$invoice->paid}}</td>
+                    <td class="border-start">{{ $invoice->paid }}</td>
                 </tr>
+
                 @php
-                    $sumGrandTotal += $invoice->grand_total;
+                    $sumGrandTotal += round($invoice->grand_total);
                     $sumTotalCollection += $invoice->paid;
+                    $counter++; // Increment the counter
                 @endphp
             @endforeach
-            <tr>
+
+            <tr class="border">
                 <td class="border-start" colspan="3"> <b>Total</b> </td>
                 <td class="border-start"><b>{{$sumGrandTotal}}</b></td>
                 <td class="border-start">-</td>
                 <td class="border-start"><b>{{$sumTotalCollection}}</b></td>
             </tr>
+
         </table>
         {{-- <table class="table">
             <tr class="text-start">
@@ -323,7 +368,7 @@
                     </div>
                     <div style="width: 100%;">
                         <span class="text-start" style='width:40%;'>Total:</span>
-                        <span class="text-start" style='width:60%;'>{{$sumTotalPrice + $sumVatAmount - $discount - $spl_discount}}</span>
+                        <span class="text-start" style='width:60%;'>{{round($sumTotalPrice + $sumVatAmount - $discount - $spl_discount)}}</span>
                     </div>
                 </td>
                 <td>
@@ -346,16 +391,20 @@
                     </div>
                     <div style="width: 100%;">
                         <span class="text-start" style='width:40%;'>Total:</span>
-                        <span class="text-start" style='width:60%;'>{{$sumTotalPrice + $sumVatAmount - $discount - $spl_discount}}</span>
+                        <span class="text-start" style='width:60%;'>{{round($sumTotalPrice + $sumVatAmount - $discount - $spl_discount)}}</span>
                     </div>
                 </td>
                 <td></td>
             </tr>
             <tr>
-                <td colspan="4" class="text-center"><span class="text-italic">Net Payable Amount : </span><span class="text-uppercase">IN WORD: taka. {{ Illuminate\Support\Number::spell($sumTotalPrice + $sumVatAmount - $discount - $spl_discount, locale: 'en')}} only</span> </td>
+                <td colspan="4" class="text-center"><span class="text-italic">Net Payable Amount : </span><span class="text-uppercase">IN WORD: taka. {{ Illuminate\Support\Number::spell(round($sumTotalPrice + $sumVatAmount - $discount - $spl_discount), locale: 'en')}} only</span> </td>
             </tr>
         </table> --}}
     </div>
+
+    @if ($invoice_data->count() > 13)
+        <div class="h-100 p-1"></div>
+    @endif
 
     {{-- Individual Invoice --}}
     @foreach ($invoice_data as $inv_data)
@@ -446,9 +495,9 @@
                     <td class="border">{{$inv_data->dis_amount+$inv_data->spl_dis_amount}}</td>
                 </tr>
                 <tr>
-                    <td colspan="5" class="subtitle text-uppercase">IN WORD: taka. {{ Illuminate\Support\Number::spell($inv_data->grand_total, locale: 'en')}} only</td>
+                    <td colspan="5" class="subtitle text-uppercase">IN WORD: taka. {{ Illuminate\Support\Number::spell(round($inv_data->grand_total), locale: 'en')}} only</td>
                     <td class="border" colspan="2"><b>Net Payable Amount:</b></td>
-                    <td class="border"><b>{{$inv_data->grand_total}}</b></td>
+                    <td class="border"><b>{{round($inv_data->grand_total)}}</b></td>
                 </tr>
             </table>
         </div>

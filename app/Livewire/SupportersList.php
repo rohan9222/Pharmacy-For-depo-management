@@ -131,7 +131,7 @@ class SupportersList extends Component
         if($this->end_date){
             $invoices = $invoices->where('invoice_date', '>', $this->end_date);
         }
-        $this->invoices = $invoices->get() ?? null;
+        $this->invoices = $invoices->latest()->limit(200)->get() ?? null;
         if($this->type == 'manager'){
             $this->zses = $zses->get() ?? null;
         }elseif($this->type == 'zse'){

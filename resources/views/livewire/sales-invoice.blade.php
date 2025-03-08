@@ -267,10 +267,10 @@
                             <input class="form-control" type="address" id="address" wire:model="address" placeholder="address" aria-label="address">
                             @error('address') <span class="text-danger">{{ $message }}</span> @enderror
                         </div>
-                        <div class="col-3">
+                        {{-- <div class="col-3">
                             <input class="form-control" type="number" id="balance" wire:model="balance" placeholder="Balance" aria-label="Balance">
                             @error('balance') <span class="text-danger">{{ $message }}</span> @enderror
-                        </div>
+                        </div> --}}
                         <div class="col-3">
                             <select name="tse_team" id="tse_team" class="form-control" wire:model="tse_team">
                                 <option value="">Select Territory Sales Executive</option>

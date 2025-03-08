@@ -11,6 +11,22 @@
                     <h4>Delivery History</h4>
                 </div>
                 <div class="card-body">
+                    <div class="row p-2">
+                        <div class="col-4">
+                            <select class="form-control form-control-sm" wire:model="filter_delivered_by">
+                                <option value="">Delivery Man</option>
+                                @foreach ($delivery_man_lists ?? [] as $delivery_man)
+                                    <option value="{{ $delivery_man->id }}">{{ $delivery_man->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-4">
+                            <input type="date" class="form-control form-control-sm" wire:model="filter_delivered_date">
+                        </div>
+                        <div class="col-4">
+                            <button type="button" class="btn btn-sm btn-primary" wire:click="getDeliveredInvoices">Search</button>
+                        </div>
+                    </div>
                     <div class="row justify-content-end">
                         <div class="col-3">
                             <input id="search" class="form-control" type="search" wire:model.live="delivered_search" placeholder="Search" aria-label="Search">
@@ -94,7 +110,7 @@
                             </select>
                         </div> --}}
                         <div class="col">
-                            <select class="form-control form-control-sm tom-select p-0" x-init="initTomSelect()" wire:change="updateInvoiceList('tse')" wire:model="tse_id">
+                            <select class="form-control form-control-sm tom-select p-0" x-init="$nextTick(() => initTomSelect())"  wire:change="tseIdUpdate()" wire:model="tse_id">
                                 <option value="">Select Territory Sales Executive</option>
                                 @foreach ($tses ?? [] as $tse)
                                     <option value="{{ $tse->id }}">{{ $tse->name }}</option>
@@ -102,7 +118,7 @@
                             </select>
                         </div>
                         <div class="col">
-                            <select class="form-control form-control-sm tom-select p-0" x-init="initTomSelect()" wire:change="updateInvoiceList()"  wire:model="customer_id">
+                            <select class="form-control form-control-sm tom-select p-0"  x-init="$nextTick(() => initTomSelect())"  wire:change="customerIdUpdate()" wire:model="customer_id">
                                 <option value="">Select Customer</option>
                                 @foreach ($customers ?? [] as $customer)
                                     <option value="{{ $customer->id }}">{{ $customer->name }}</option>

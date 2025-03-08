@@ -158,18 +158,41 @@
                                                         @error('return_medicine') <span class="text-danger">{{ $message }}</span> @enderror
                                                     </div>
                                                 </div>
-                                                <div class="col-sm-6 col-md-3">
+                                                <div class="col-sm-6 col-md-2">
                                                     <div class="mb-3">
                                                         <label for="return_quantity" class="form-label">Return Quantity</label>
                                                         <input type="number" class="form-control" wire:model="return_quantity">
                                                         @error('return_quantity') <span class="text-danger">{{ $message }}</span> @enderror
                                                     </div>
                                                 </div>
-                                                <div class="col-sm-6 col-md-3">
+                                                <div class="col-sm-3 col-md-2">
                                                     <div class="mb-3 mt-2">
                                                         <button type="submit" class="btn btn-primary btn-sm mt-4">Submit</button>
                                                     </div>
                                                 </div>
+                                                <div class="col-sm-3 col-md-2">
+                                                    <div class="mb-3 mt-2">
+                                                        <!-- Button trigger modal -->
+                                                        <span class="btn btn-sm btn-info mt-4" data-bs-toggle="modal" data-bs-target="#returnModal">
+                                                            Full Return
+                                                        </span>
+                                                        
+                                                        <!-- Modal -->
+                                                        <div class="modal fade" id="returnModal" tabindex="-1" aria-labelledby="returnModalLabel" aria-hidden="true">
+                                                            <div class="modal-dialog">
+                                                                <div class="modal-content">
+                                                                    <div class="modal-body text-danger">
+                                                                        Are You Confirm To Return This Full Invoice
+                                                                    </div>
+                                                                    <div class="modal-footer">
+                                                                        <span class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Cancel</span>
+                                                                        <span class="btn btn-sm btn-danger" data-bs-dismiss="modal" wire:click="confirmFullReturn({{ $invoice_data->id }})">Confirm</span>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>                                              
                                             </div>
                                         </form>
                                     </div>

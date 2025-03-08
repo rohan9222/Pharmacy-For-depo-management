@@ -203,6 +203,59 @@ class InvoiceHistory extends Component
         }
     }
 
+    public function confirmFullReturn($invoiceId)
+    {
+        $invoice = Invoice::find($invoiceId);
+
+        if ($invoice) {
+            DB::beginTransaction();
+            try{
+                $medicines = SalesMedicine::where('invoice_id', $invoiceId)->get();
+                foreach ($medicines as $medicine) {
+                    if($medicine->quantity > 0) {
+                        ReturnMedicine::create([
+                            'invoice_id' => $medicine->invoice_id,
+                            'medicine_id' => $medicine->medicine_id,
+                            'sales_medicine_id' => $medicine->id,
+                            'quantity' => $medicine->quantity,
+                            'price' => $medicine->price,
+                            'vat' => $medicine->price * $medicine->vat/100,
+                            'total' => ($medicine->quantity * $medicine->price) + ($medicine->quantity * $medicine->price * $medicine->vat/100),
+                            'return_date' => $this->return_date,
+                        ])->save();
+
+                        Medicine::where('id', $medicine->medicine_id)->increment('quantity', $medicine->quantity);
+
+                        $stockList = StockList::where('medicine_id', $medicine->medicine_id)
+                            ->where('initial_quantity', '>', 0)
+                            ->orderBy('expiry_date', 'asc')
+                            ->get();
+
+                        foreach ($stockList as $stock) {
+                            if ($stock->quantity < $medicine->quantity) {
+                                $medicine->quantity -= $stock->quantity;
+                                StockList::where('id', $stock->id)->decrement('quantity', $stock->quantity);
+                            } else {
+                                StockList::where('id', $stock->id)->decrement('quantity', $medicine->quantity);
+                                $medicine->quantity = 0;
+                            }
+                            $medicine->save();
+                        }
+                    }
+                }
+
+                DB::commit();
+                flash()->success('Invoice Return Successfully!');
+                $this->return_medicine = '';
+                $this->return_quantity = '';
+            }catch(\Exception $e){
+                flash()->error($e->getMessage());
+            }
+        }else {
+            flash()->error('Return for invoice ID ' . $invoiceId . ' is not found.');
+        }
+    }
+
     public function returnSubmit(){
         $this->validate([
             'return_medicine' => 'required|numeric|exists:sales_medicines,id',

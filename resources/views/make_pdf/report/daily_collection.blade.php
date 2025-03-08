@@ -66,9 +66,9 @@
                             $c_spl_dis_amount = (clone $c_invoice_data)->sum('spl_dis_amount');
                             $c_sales_return = App\Models\ReturnMedicine::whereIn('invoice_id', $invoice_data->pluck('id'))->whereBetween('return_date', [$start_date->format('Y-m-d'), $end_date->format('Y-m-d')])->sum('total');
                             $c_tp = (clone $c_invoice_data)->sum('sub_total');
-                            $c_actual = $c_tp + $c_vat - ($c_dis_amount + $c_spl_dis_amount);
+                            $c_actual = $c_tp + $c_vat - ($c_dis_amount + $c_spl_dis_amount) - $c_sales_return;
                             $c_collection = (clone $c_invoice_data)->sum('paid');
-                            $c_due = (clone $c_invoice_data)->sum('due');
+                            $c_due = (clone $c_invoice_data)->sum('due') - $c_sales_return;
 
                             $c_dise_total += round($c_dise);
                             $c_vat_total += round($c_vat);

@@ -31,7 +31,7 @@ class MakeInvoiceController extends Controller
             'pdf_title' => 'Impex Pharma',
             'pdf_logo' => url('img/logo.png'),
             'invoice_data' => $invoice_data,
-            'grand_total_words' =>  Number::spell($invoice_data->grand_total, locale: 'en'), // Corrected
+            'grand_total_words' =>  Number::spell(round($invoice_data->grand_total), locale: 'en'), // Corrected
             'site_data' => $site_data
         ];
 
@@ -52,7 +52,7 @@ class MakeInvoiceController extends Controller
             'pdf_title' => 'Impex Pharma',
             'pdf_logo' => url('img/logo.png'),
             'invoice_data' => $invoice_data,
-            'grand_total_words' =>  Number::spell($invoice_data->grand_total, locale: 'en'), // Corrected
+            'grand_total_words' =>  Number::spell(round($invoice_data->grand_total), locale: 'en'), // Corrected
             'site_data' => $site_data,
             'dateTime' => date("d/m/Y,  h:i A", time())
         ];
@@ -71,7 +71,7 @@ class MakeInvoiceController extends Controller
             'pdf_title' => 'Impex Pharma',
             'pdf_logo' => url('img/logo.png'),
             'invoice_data' => $invoice_data,
-            'grand_total_words' =>  Number::spell($invoice_data->grand_total, locale: 'en'), // Corrected
+            'grand_total_words' =>  Number::spell(round($invoice_data->grand_total), locale: 'en'), // Corrected
             'site_data' => $site_data,
             'dateTime' => date("d/m/Y,  h:i A", time())
         ];

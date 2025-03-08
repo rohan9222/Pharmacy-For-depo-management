@@ -7,14 +7,15 @@ use App\Models\Invoice;
 
 use Livewire\WithoutUrlPagination;
 use Livewire\WithPagination;
+use Carbon\Carbon;
 
 use Livewire\Component;
 
 class DeliveryHistory extends Component
 {
     use WithPagination, WithoutUrlPagination;
-    public $pending_search, $delivered_search, $invoices, $managers, $zses, $tses, $customers, $manager_id, $zse_id, $tse_id, $customer_id,$delivered_by;
-    public $perPage = 15;
+    public $pending_search, $delivered_search, $invoices, $managers, $zses, $tses, $customers, $manager_id, $zse_id, $tse_id, $customer_id, $delivered_by, $filter_delivered_by, $filter_delivered_date;
+    public $perPage = 50;
     public $selected_invoices = [];
 
     public function mount() {
@@ -25,23 +26,44 @@ class DeliveryHistory extends Component
 
     public function render()
     {
-        $allInvoices = Invoice::search($this->delivered_search)
-            ->where('delivery_status', 'delivered')
-            ->with('deliveredBy:id,name')
-            ->get()
-            ->groupBy(fn($invoice) => $invoice->summary_id ?? 'Unknown');
-
-        $pagedData = $allInvoices->slice((request('page', 1) - 1) * $this->perPage, $this->perPage);
-
         $this->updateInvoiceList();
 
         return view('livewire.delivery-history', [
-            'delivered_invoices' => new \Illuminate\Pagination\LengthAwarePaginator(
-                $pagedData->values(), $allInvoices->count(), $this->perPage
-            ),
             'delivery_man_lists' => User::where('role', 'Delivery Man')->get(),
+            'delivered_invoices' => $this->getDeliveredInvoices(),
         ])->layout('layouts.app');
     }
+    
+    public function getDeliveredInvoices()
+    {
+        // Step 1: Get unique summary_id values with pagination
+        $paginatedSummaryIds = Invoice::search($this->delivered_search)
+            ->where('delivery_status', 'delivered')
+            ->when($this->filter_delivered_by, fn($q) => $q->where('delivery_by', $this->filter_delivered_by))
+            ->when($this->filter_delivered_date, fn($q) => $q->whereDate('delivery_date', Carbon::parse($this->filter_delivered_date)))
+            ->select('summary_id') // Select only summary_id for pagination
+            ->groupBy('summary_id') // Grouping at the database level
+            ->orderBy('summary_id', 'desc') // Maintain order
+            ->paginate(10); // Paginate by summary_id
+    
+        // Step 2: Fetch full invoice data for the paginated summary IDs
+        $invoices = Invoice::whereIn('summary_id', $paginatedSummaryIds->pluck('summary_id'))
+            ->with('deliveredBy:id,name')
+            ->orderBy('summary_id', 'desc')
+            ->get()
+            ->groupBy('summary_id'); // Group invoices by summary_id in PHP
+    
+        // Step 3: Return paginated response with grouped invoices
+        return new \Illuminate\Pagination\LengthAwarePaginator(
+            $invoices, // Grouped data
+            $paginatedSummaryIds->total(), // Total items
+            $paginatedSummaryIds->perPage(), // Items per page
+            $paginatedSummaryIds->currentPage(), // Current page
+            ['path' => request()->url(), 'query' => request()->query()] // Maintain query parameters
+        );
+    }
+    
+    
 
     public function toggleSelectAll()
     {
@@ -52,14 +74,31 @@ class DeliveryHistory extends Component
         }
     }
 
+    public function tseIdUpdate()
+    {
+        $this->updateInvoiceList('tse');
+        $customers = User::where('role', 'Customer')->where('tse_id', $this->tse_id)->get();
+        if($this->tse_id) {
+            $this->customers = $customers;
+        }else{
+            $this->customers = [];
+        }
+        $this->customer_id = null;
+    }
+
+    public function customerIdUpdate()
+    {
+        $this->updateInvoiceList('customer');
+    }
+
     public function updateInvoiceList($type = null) {
         // Use relationships properly
         // $this->managers = User::where('role', 'Manager')->get();
         // $zses = User::where('role', 'Zonal Sales Executive');
         $this->tses = User::where('role', 'Territory Sales Executive')->get();
-        $customers = User::where('role', 'Customer');
+        
 
-        $invoices = Invoice::where('delivery_status', 'pending')->limit($this->perPage);
+        $invoices = Invoice::where('delivery_status', 'pending');
         // if($this->manager_id != null){
         //     $invoices = $invoices->where('manager_id', $this->manager_id);
         //     $zses = $zses->where('manager_id', $this->manager_id);
@@ -88,28 +127,19 @@ class DeliveryHistory extends Component
         // }
 
         if($this->tse_id != null){
-            $this->invoices = $invoices->where('tse_id', $this->tse_id)->get() ?? null;
-            $customers = $customers->where('tse_id', $this->tse_id);
-            $this->customers = $customers->get() ?? null;
-        }else{
-            $this->invoices = $invoices->get() ?? null;
-            $this->customer_id = null;
-            $this->customers = [];
+            $invoices = $invoices->where('tse_id', $this->tse_id) ?? null;
         }
 
         if($this->customer_id != null){
-            $this->invoices = $invoices->where('customer_id', $this->customer_id)->get() ?? null;
+            $invoices = $invoices->where('customer_id', $this->customer_id) ?? null;
         }
-
         // if($type == 'manager'){
         //     $this->zses = $zses->get() ?? null;
         // }else
         // if($type == 'zse'){
         //     $this->tses = $tses->get() ?? null;
         // }else
-        if($type == 'tse'){
-            $this->customers = $customers->get() ?? null;
-        }
+        $this->invoices = $invoices->limit($this->perPage)->get() ?? null;
     }
 
     public function deliverInvoiceList() {

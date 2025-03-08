@@ -76,13 +76,13 @@
                 <td class="border-dotted border-start">{{$medicine_list->initial_quantity}}</td>
                 <td class="border-dotted border-start">{{$totalPrice}}</td>
                 <td class="border-dotted border-start">{{$vatAmount}}</td>
-                <td class="border-dotted border-start border-end">{{$medicine_list->total}}</td>
+                <td class="border-dotted border-start border-end">{{round($medicine_list->total)}}</td>
             </tr>
 
             @php
                 $sumTotalPrice += $totalPrice;
                 $sumVatAmount += $vatAmount;
-                $sumTotal += $medicine_list->total;
+                $sumTotal += round($medicine_list->total);
             @endphp
         @endforeach
 
@@ -98,12 +98,12 @@
             <tr>
                 <td colspan="5"></td>
                 <td class="border" colspan="2">Discount on TP ({{$invoice_data->discount+$invoice_data->spl_discount}}%):</td>
-                <td class="border">{{$invoice_data->dis_amount+$invoice_data->spl_dis_amount}}</td>
+                <td class="border">{{round($invoice_data->dis_amount+$invoice_data->spl_dis_amount)}}</td>
             </tr>
             <tr>
                 <td colspan="5" class="subtitle text-uppercase">IN WORD: taka. {{$grand_total_words}} only</td>
                 <td class="border" colspan="2"><b>Net Payable Amount:</b></td>
-                <td class="border"><b>{{$invoice_data->grand_total}}</b></td>
+                <td class="border"><b>{{round($invoice_data->grand_total)}}</b></td>
             </tr>
         </table>
     </div>
