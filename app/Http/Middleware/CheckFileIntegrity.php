@@ -5,6 +5,7 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Symfony\Component\HttpFoundation\Response;
@@ -17,7 +18,55 @@ class CheckFileIntegrity
      */
     public function handle(Request $request, Closure $next): Response
     {
+        // Define required PHP extensions
+        $requiredExtensions = [
+            'mbstring', 
+            'openssl', 
+            'pdo', 
+            'bcmath', 
+            'ctype', 
+            'json', 
+            'xml', 
+            'tokenizer',
+            'zip',
+            'gd',
+            'fileinfo',
+            'mysqli',
+            'intl'
+        ];
 
+        $missingExtensions = array_filter($requiredExtensions, function ($ext) {
+            return !extension_loaded($ext);
+        });
+
+        // If any required extensions are missing, show an error page
+        if (!empty($missingExtensions)) {
+            return response()->view('errors.missing_extensions', [
+                'missingExtensions' => $missingExtensions
+            ], 500);
+        }
+
+        if (env('APP_ENV') == 'maintenance') {
+            abort(403, 'Maintenance mode! Access denied.');
+        }
+
+        if($request->ip() == '127.0.0.1' || $request->ip() == '::1' || $request->ip() == 'localhost' || $request->ip() == '127.0.0.1:*' || $request->ip() == '::1:*' || $request->ip() == 'localhost:*'){
+            return $next($request);
+        }
+
+        $allowedDomain = \decrypt('eyJpdiI6Im9MR0RPR3JaeHdHOE5pS29EcEhkNUE9PSIsInZhbHVlIjoiTHowc2dpaTB5N1hHU1dESlRKWHZNRDdLOWRFVXNTVVVtRW1WRzMvcE42OD0iLCJtYWMiOiJmYjA5YmZjNGMwM2VkNWIyODVhYWJmNGIzYjU2NGJiNjIxYzc0OTYwMjAyN2Q1NjliOGM5ZWQ0Y2I2NDZlZDQ2IiwidGFnIjoiIn0');
+        $host = $request->getHost();
+
+        // Allow main domain and any subdomain
+        if ($host === $allowedDomain || str_ends_with($host, '.' . $allowedDomain)) {
+            return $next($request);
+        }else{
+            if (View::exists('errors.license')) {
+                return response()->view('errors.license', [], 403);
+            }
+            abort(403, 'Access denied. A new license is required.');
+        }
+    
         // Load stored file hashes
         $storedHashesPath = storage_path('file_hashes.json');
 

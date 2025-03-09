@@ -19,7 +19,7 @@ class DueInvoiceList extends Component
     public function invoiceDueList(Request $request)
     {
         if ($request->ajax()) {
-            $data = Invoice::with(['customer:id,name,user_id,mobile', 'deliveredBy:id,name'])->where('due', '>', 0);
+            $data = Invoice::with(['customer:id,name,user_id,mobile', 'deliveredBy:id,name', 'salesReturnMedicines'])->where('due', '>', 0);
 
             // Apply filtering conditions
             if ($request->manager_id != null) {
@@ -50,6 +50,12 @@ class DueInvoiceList extends Component
                 })
                 ->editColumn('deliveredBy.name', function ($row) {
                     return $row->deliveredBy ? $row->deliveredBy->name : 'N/A'; // Avoids null errors
+                })
+                ->addColumn('returnAmount', function ($row) {
+                    return round($row->salesReturnMedicines->sum('total'),2);
+                })
+                ->editColumn('due', function ($row) {
+                    return $row->salesReturnMedicines->sum('total') > $row->due ? 0 : round($row->due - $row->salesReturnMedicines->sum('total'),2);
                 })
                 ->rawColumns(['action']) // Ensure HTML buttons render correctly
                 ->make(true);

@@ -22,6 +22,7 @@
                                 <th>Customer Name</th>
                                 <th>Customer Mobile</th>
                                 <th>Total</th>
+                                <th>Return</th>
                                 <th>Paid</th>
                                 <th>Due</th>
                             </tr>
@@ -31,6 +32,7 @@
                         <tfoot>
                             <tr>
                                 <th colspan="6" style="text-align:right">Total:</th>
+                                <th></th>
                                 <th></th>
                                 <th></th>
                                 <th></th>
@@ -49,7 +51,7 @@
     document.addEventListener('DOMContentLoaded', function () {
         var table = $('#invoiceTable').DataTable({
             processing: true,
-            serverSide: true,
+            // serverSide: true,
             order: [[ 1, 'desc' ]],
             ajax: {
                 url: "{{ route('due-list-table') }}", // Ensure correct route
@@ -71,6 +73,7 @@
                 { data: 'customer.name', name: 'customer.name' },
                 { data: 'customer.mobile', name: 'customer.mobile' },
                 { data: 'grand_total', name: 'grand_total' },
+                { data: 'returnAmount', name: 'returnAmount' },
                 { data: 'paid', name: 'paid' },
                 { data: 'due', name: 'due' },
             ],
@@ -102,20 +105,37 @@
             },
             footerCallback: function (row, data, start, end, display) {
                 let api = this.api();
+
+                // Function to remove formatting and convert to a number
                 let intVal = function (i) {
-                    return typeof i === 'string' ? parseFloat(i.replace(/[\$,]/g, '')) || 0 : i;
+                    return typeof i === 'string'
+                        ? parseFloat(i.replace(/[\$,]/g, '')) || 0
+                        : typeof i === 'number'
+                        ? i
+                        : 0;
                 };
-                function total(rowValue){
-                    let total = api.column(rowValue).data().reduce((a, b) => intVal(a) + intVal(b), 0);
-                    let pageTotal = api.column(rowValue, { page: 'current' }).data().reduce((a, b) => intVal(a) + intVal(b), 0);
 
-                    $(api.column(rowValue).footer()).html( 'Page Total: ' +pageTotal.toFixed(2) + '<br> (Grand Total: ' + total.toFixed(2) + ')');
+                // Function to calculate and update totals
+                function calculateTotal(columnIndex) {
+                    let total = api
+                        .column(columnIndex, { search: 'applied' }) // Grand total (all pages, filtered)
+                        .data()
+                        .reduce((a, b) => intVal(a) + intVal(b), 0);
+
+                    let pageTotal = api
+                        .column(columnIndex, { page: 'current' }) // Page total (current visible data)
+                        .data()
+                        .reduce((a, b) => intVal(a) + intVal(b), 0);
+
+                    // Update footer for this column
+                    $(api.column(columnIndex).footer()).html(
+                        `Page Total: ${pageTotal.toFixed(2)}<br>(Grand Total: ${total.toFixed(2)})`
+                    );
                 }
-                total(7);
-                total(8);
-                total(9);
-            }
 
+                // Apply total calculation for columns 7, 8, 9, 10
+                [7, 8, 9, 10].forEach(calculateTotal);
+            }
         });
 
         // Reload table on click of the search button

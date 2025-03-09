@@ -105,7 +105,7 @@
                         <td>{{ round($c_actual) }}</td>
                         <td>{{ round($c_collection) }}</td>
                         <td>{{ round($c_due) }}</td>
-                        <td>{{$sales_target == 0 ? 0 : ($c_tp / $sales_target) * 100}}</td>
+                        <td>{{ round($sales_target == 0 ? 0 : ($c_tp / $sales_target) * 100, 2) }}</td>
                     </tr>
                 @endforeach
 
@@ -126,7 +126,7 @@
                     <td>{{ $c_actual_total }}</td>
                     <td>{{ $c_collection_total }}</td>
                     <td>{{ $c_due_total }}</td>
-                    <td>{{$sales_target_total == 0 ? 0 : ($c_tp_total / $sales_target_total) * 100}}</td>
+                    <td>{{ round($sales_target_total == 0 ? 0 : ($c_tp_total / $sales_target_total) * 100, 2) }}</td>
                 </tr>
                 <tr style="border:none;">
                     <td colspan="14" style="height: 10px;"></td>

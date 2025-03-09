@@ -22,6 +22,7 @@
                                 <th>Customer Name</th>
                                 <th>Customer Mobile</th>
                                 <th>Total</th>
+                                <th>Return</th>
                                 <th>Paid List</th>
                                 <th>Total Paid</th>
                                 <th>Due</th>
@@ -63,6 +64,7 @@
                 { data: 'customer.name', name: 'customer.name' },
                 { data: 'customer.mobile', name: 'customer.mobile' },
                 { data: 'grand_total', name: 'grand_total' },
+                { data: 'returnAmount', name: 'returnAmount' },
                 {
                     data: 'payment_history',
                     name: 'payment_history',

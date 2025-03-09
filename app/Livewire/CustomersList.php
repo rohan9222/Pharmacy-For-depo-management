@@ -146,9 +146,10 @@ class CustomersList extends Component
 
     public function view($id = null){
         $customerData = User::find($id);
-        $invoices = Invoice::where('customer_id', $customerData->id)->get();
+        $invoices = Invoice::where('customer_id', $customerData->id)->with(['salesReturnMedicines'])->get();
         $paymentHistory = PaymentHistory::whereIn('invoice_id', $invoices->pluck('id'))->get();
         $customerData->total_buy = $invoices->sum('grand_total');
+        $customerData->total_return = $invoices->flatMap->salesReturnMedicines->sum('total');
         $customerData->total_due = $invoices->sum('due');
         $customerData->total_invoice = $invoices->count();
         $customerData->total_transaction = $paymentHistory->count();
@@ -158,10 +159,18 @@ class CustomersList extends Component
         $this->invoices = $invoices;
     }
 
+    public function setInvoice($invoiceId)
+    {
+        $this->view($this->customerData->id);
+        $this->selectedInvoice = Invoice::where('id', $invoiceId)->with('salesReturnMedicines')->first();
+        $this->partialPayment = '';
+        $this->amount = '';
+    }
+
     public function partialPay($customerId)
     {
         $this->view($customerId);
-        $this->partialPayment = $this->customerData->total_due;
+        $this->partialPayment = $this->customerData->total_due - $this->customerData->total_return;
         $this->selectedInvoice = null;
         $this->amount = '';
     }
@@ -188,13 +197,13 @@ class CustomersList extends Component
 
             flash()->success('Amount paid successfully.');
         }elseif ($this->partialPayment){
-            $inv = Invoice::where('customer_id', $this->customerData->id)->where('due', '>', 0)->orderBy('id', 'desc')->get();
+            $inv = Invoice::where('customer_id', $this->customerData->id)->with('salesReturnMedicines')->where('due', '>', 0)->orderBy('id', 'desc')->get();
             $remainingPayment = $this->amount;
             foreach ($inv as $invoice) {
                 if ($remainingPayment <= 0) {
                     break;
                 }
-                $amountToPay = min($remainingPayment, $invoice->due); // Pay only what's needed to clear the due
+                $amountToPay = min($remainingPayment, $invoice->due - $invoice->salesReturnMedicines->sum('total')); // Pay only what's needed to clear the due
                 // Update invoice payment
                 $invoice->paid += $amountToPay;
                 $invoice->due -= $amountToPay;

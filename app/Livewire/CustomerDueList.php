@@ -49,7 +49,7 @@ class CustomerDueList extends Component
             $customerIds = $customers->pluck('id');
     
             // Fetch invoices for the selected customers
-            $invoices = Invoice::whereIn('customer_id', $customerIds);
+            $invoices = Invoice::whereIn('customer_id', $customerIds)->with(['salesReturnMedicines']);
     
             // Apply date range filtering (if provided)
             if ($request->start_date && $request->end_date) {
@@ -65,8 +65,11 @@ class CustomerDueList extends Component
             $customers = $customers->map(function ($customer) use ($invoiceData) {
                 $customer->invoice_no = $invoiceData->where('customer_id', $customer->id)->pluck('invoice_no')->toArray();;
                 $customer->invoice_total = $invoiceData->where('customer_id', $customer->id)->sum('grand_total');
+                $customer->invoice_return = $invoiceData->where('customer_id', $customer->id)->flatMap(function ($invoice) {
+                    return $invoice->salesReturnMedicines;
+                })->sum('total');
                 $customer->invoice_paid = $invoiceData->where('customer_id', $customer->id)->sum('paid');
-                $customer->invoice_due = $invoiceData->where('customer_id', $customer->id)->sum('due');
+                $customer->invoice_due = $invoiceData->where('customer_id', $customer->id)->sum('due') - $customer->invoice_return;
                 return $customer;
             });
     
@@ -81,6 +84,9 @@ class CustomerDueList extends Component
                 })
                 ->addColumn('invoice_paid', function ($row) {
                     return number_format($row->invoice_paid, 2);
+                })
+                ->addColumn('invoice_return', function ($row) {
+                    return number_format($row->invoice_return, 2);
                 })
                 ->addColumn('invoice_due', function ($row) {
                     return number_format($row->invoice_due, 2);

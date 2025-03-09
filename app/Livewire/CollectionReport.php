@@ -22,7 +22,7 @@ class CollectionReport extends Component
     public function invoiceCollectionList(Request $request)
     {
         if ($request->ajax()) {
-            $query = Invoice::with(['customer:id,name,user_id,mobile', 'deliveredBy:id,name', 'paymentHistory'])->where('paid', '>', 0);
+            $query = Invoice::with(['customer:id,name,user_id,mobile', 'deliveredBy:id,name', 'paymentHistory', 'salesReturnMedicines'])->where('paid', '>', 0);
 
             // Apply filters for manager, Zonal Sales Executive, Territory Sales Executive, customer
             if (!empty($request->manager_id)) {
@@ -69,6 +69,13 @@ class CollectionReport extends Component
                 })
                 ->editColumn('deliveredBy.name', function ($row) {
                     return $row->deliveredBy ? $row->deliveredBy->name : 'N/A';
+                })
+                
+                ->addColumn('returnAmount', function ($row) {
+                    return round($row->salesReturnMedicines->sum('total'),2);
+                })
+                ->editColumn('due', function ($row) {
+                    return $row->salesReturnMedicines->sum('total') > $row->due ? 0 : round($row->due - $row->salesReturnMedicines->sum('total'),2);
                 })
                 ->rawColumns(['payment_history'])
                 ->make(true);

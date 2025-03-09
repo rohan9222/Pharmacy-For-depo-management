@@ -50,7 +50,7 @@ class InvoiceHistory extends Component
     public function invoiceList(Request $request)
     {
         if ($request->ajax()) {
-            $data = Invoice::with(['customer:id,name', 'deliveredBy:id,name']);
+            $data = Invoice::with(['customer:id,name', 'deliveredBy:id,name', 'salesReturnMedicines']);
 
             // Apply filtering conditions
             if ($request->manager_id != null) {
@@ -80,7 +80,7 @@ class InvoiceHistory extends Component
                     $action = '';
 
                     // Check if the invoice has a due amount
-                    if ($row->due > 0 && auth()->user()->can('make-payment')) {
+                    if ($row->due - $row->salesReturnMedicines->sum('total') > 0 && auth()->user()->can('make-payment')) {
                         $action .= '
                             <button wire:click="setInvoice('.$row->id.')"
                                 class="btn btn-primary btn-sm"
@@ -103,7 +103,6 @@ class InvoiceHistory extends Component
                                 <i class="bi bi-eye"></i>
                             </a>
                         ';
-
                     }
 
                     // Check if the user has the 'return-medicine' permission
@@ -117,6 +116,12 @@ class InvoiceHistory extends Component
                 })
                 ->editColumn('deliveredBy.name', function ($row) {
                     return $row->deliveredBy ? $row->deliveredBy->name : 'N/A'; // Avoids null errors
+                })
+                ->addColumn('returnAmount', function ($row) {
+                    return round($row->salesReturnMedicines->sum('total'),2);
+                })
+                ->editColumn('due', function ($row) {
+                    return $row->salesReturnMedicines->sum('total') > $row->due ? 0 : round($row->due - $row->salesReturnMedicines->sum('total'),2);
                 })
                 ->rawColumns(['action']) // Ensure HTML buttons render correctly
                 ->make(true);
@@ -155,7 +160,7 @@ class InvoiceHistory extends Component
 
     public function setInvoice($invoiceId)
     {
-        $this->selectedInvoice = Invoice::find($invoiceId);
+        $this->selectedInvoice = Invoice::where('id', $invoiceId)->with('salesReturnMedicines')->first();
         $this->partialPayment = '';
         $this->amount = '';
     }

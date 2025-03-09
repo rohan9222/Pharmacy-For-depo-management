@@ -250,6 +250,7 @@
                                             <tr>
                                                 <th>Invoice No</th>
                                                 <th>Total Price</th>
+                                                <th>Return</th>
                                                 <th>Paid Amount</th>
                                                 <th>Due amount</th>
                                                 <th>Action</th>
@@ -260,8 +261,9 @@
                                                 <tr>
                                                     <td>{{ $site_settings->site_invoice_prefix }}-{{ $invoice->invoice_no }}</td>
                                                     <td>{{ $site_settings->site_currency }}{{ $invoice->grand_total }}</td>
+                                                    <td>{{ $site_settings->site_currency }}{{ $invoice->salesReturnMedicines->sum('total') }}</td>
                                                     <td>{{ $site_settings->site_currency }}{{ $invoice->paid }}</td>
-                                                    <td>{{ $site_settings->site_currency }}{{ $invoice->due }}</td>
+                                                    <td>{{ $site_settings->site_currency }}{{ $invoice->salesReturnMedicines->sum('total') > $invoice->due ? 0 : $invoice->due - $invoice->salesReturnMedicines->sum('total') }}</td>
                                                     <td>
                                                         <a href="{{ route('invoice.pdf', $invoice->invoice_no) }}" target="_blank"
                                                             title="View Invoice"

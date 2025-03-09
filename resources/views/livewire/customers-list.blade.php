@@ -167,11 +167,20 @@
                                         </div>
                                     </div>
                                     <div class="d-flex align-items-start">
+                                        <span class="d-inline-flex px-2 py-1 text-warning-emphasis bg-warning-subtle border border-warning-subtle rounded-2 mt-1">
+                                            <i class="bi bi-box-arrow-left"></i>
+                                        </span>
+                                        <div class="ms-75">
+                                            <h5 class="mb-0">{{ $site_settings->site_currency }}{{ $customerData->total_return}}</h4>
+                                            <small>Total Return</small>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex align-items-start">
                                         <span class="d-inline-flex px-2 py-1 text-danger-emphasis bg-danger-subtle border border-danger-subtle rounded-2 mt-1">
                                             <i class="bi bi-exclamation-triangle"></i>
                                         </span>
                                         <div class="ms-75">
-                                            <h5 class="mb-0">{{ $site_settings->site_currency }}{{ $customerData->total_due}}</h4>
+                                            <h5 class="mb-0">{{ $site_settings->site_currency }}{{ $customerData->total_due - $customerData->total_return}}</h4>
                                             <small>Total Due</small>
                                         </div>
                                     </div>
@@ -236,6 +245,7 @@
                                             <tr>
                                                 <th>Invoice No</th>
                                                 <th>Total Price</th>
+                                                <th>Return</th>
                                                 <th>Paid Amount</th>
                                                 <th>Due amount</th>
                                                 <th>Action</th>
@@ -246,10 +256,11 @@
                                                 <tr>
                                                     <td>{{ $site_settings->site_invoice_prefix }}-{{ $invoice->invoice_no }}</td>
                                                     <td>{{ $site_settings->site_currency }}{{ $invoice->grand_total }}</td>
+                                                    <td>{{ $site_settings->site_currency }}{{ $invoice->salesReturnMedicines->sum('total') }}</td>
                                                     <td>{{ $site_settings->site_currency }}{{ $invoice->paid }}</td>
-                                                    <td>{{ $site_settings->site_currency }}{{ $invoice->due }}</td>
+                                                    <td>{{ $site_settings->site_currency }}{{ $invoice->due - $invoice->salesReturnMedicines->sum('total') }}</td>
                                                     <td>
-                                                        @if ($invoice->due > 0 && auth()->user()->can('make-payment'))
+                                                        @if ($invoice->due-$invoice->salesReturnMedicines->sum('total')  > 0 && auth()->user()->can('make-payment'))
                                                             <button wire:click="setInvoice({{ $invoice->id }}, {{ $customerData->id }})"
                                                                 class="btn btn-primary btn-sm"
                                                                 data-bs-toggle="modal"
@@ -283,7 +294,7 @@
                                                             <div class="form-group">
                                                                 <label class="form-label fw-bold">Due Amount</label>
                                                                 <input type="text" class="form-control"
-                                                                    value="{{ $site_settings->site_currency }}{{ $selectedInvoice->due }}"
+                                                                    value="{{ $site_settings->site_currency }}{{ $selectedInvoice->due - $selectedInvoice->salesReturnMedicines->sum('total') }}"
                                                                     readonly>
                                                             </div>
                                                             <div class="form-group mt-2">
@@ -296,7 +307,7 @@
                                                             <div class="form-group">
                                                                 <label class="form-label fw-bold">Due Amount</label>
                                                                 <input type="text" class="form-control"
-                                                                    value="{{ $site_settings->site_currency }}{{ $customerData->total_due}}"
+                                                                    value="{{ $site_settings->site_currency }}{{ $partialPayment}}"
                                                                     readonly>
                                                             </div>
                                                             <div class="form-group mt-2">

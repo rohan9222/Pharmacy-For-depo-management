@@ -22,6 +22,7 @@
                                         <th>Invoice NO</th>
                                         <th>Invoice Date</th>
                                         <th>Total</th>
+                                        <th>Return</th>
                                         <th>Paid</th>
                                         <th>Due</th>
                                         <th>Customer Name</th>
@@ -56,7 +57,7 @@
                             <div class="form-group">
                                 <label class="form-label fw-bold">Due Amount</label>
                                 <input type="text" class="form-control"
-                                    value="{{ $site_settings->site_currency }}{{ $selectedInvoice->due }}"
+                                    value="{{ $site_settings->site_currency }}{{ $selectedInvoice->due - $selectedInvoice->salesReturnMedicines->sum('total') }}"
                                     readonly>
                             </div>
                             <div class="form-group mt-2">
@@ -231,6 +232,7 @@
                 { data: 'invoice_no', name: 'invoice_no' },
                 { data: 'invoice_date', name: 'invoice_date' },
                 { data: 'grand_total', name: 'grand_total' },
+                { data: 'returnAmount', name: 'returnAmount' },
                 { data: 'paid', name: 'paid' },
                 { data: 'due', name: 'due' },
                 { data: 'customer.name', name: 'customer.name' },
@@ -241,7 +243,7 @@
             ],
             columnDefs: [
                 {
-                    targets: [3, 10],  // Invoice Date and Delivery Date
+                    targets: [3, 11],  // Invoice Date and Delivery Date
                     render: function(data, type, row) {
                         return moment(data).format('D-MMM-YYYY');  // Format date
                     }
