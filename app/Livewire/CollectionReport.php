@@ -51,14 +51,6 @@ class CollectionReport extends Component
 
             return DataTables::of($query->get())
                 ->addIndexColumn()
-                // ->addColumn('payment_history', function ($row) {
-                //     return $row->paymentHistory->map(function ($payment) {
-                //         return [
-                //             'amount' => $payment->amount,
-                //             'date' => $payment->date,
-                //         ];
-                //     })->toArray();
-                // })
                 ->addColumn('payment_history', function ($row) {
                     if ($row->paymentHistory->isNotEmpty()) {
                         return $row->paymentHistory->map(function ($payment) {
@@ -74,8 +66,22 @@ class CollectionReport extends Component
                 ->addColumn('returnAmount', function ($row) {
                     return round($row->salesReturnMedicines->sum('total'),2);
                 })
+                // ->editColumn('due', function ($row) {
+                //     return $row->salesReturnMedicines->sum('total') > $row->due ? 0 : round($row->due - $row->salesReturnMedicines->sum('total'),2);
+                // })
                 ->editColumn('due', function ($row) {
-                    return $row->salesReturnMedicines->sum('total') > $row->due ? 0 : round($row->due - $row->salesReturnMedicines->sum('total'),2);
+                    $sumReturnTotal = $row->salesReturnMedicines->sum('total');
+                    $afterReturnDue = $row->grand_total - $sumReturnTotal;
+                    $discount_data = json_decode($row->discount_data);
+
+                    if ($discount_data != null && $discount_data->start_amount <= $afterReturnDue && $afterReturnDue <= $discount_data->end_amount) {
+                        $afterReturnDue = $afterReturnDue - $row->paid;
+                    } elseif ($discount_data != null && $discount_data->start_amount > $afterReturnDue) {
+                        $afterReturnDue += $row->dis_amount - $row->paid; 
+                    }else{
+                        $afterReturnDue = $afterReturnDue - $row->paid;
+                    }
+                    return $row->salesReturnMedicines->sum('total') > $row->due ? 0 : round($afterReturnDue,2);
                 })
                 ->rawColumns(['payment_history'])
                 ->make(true);

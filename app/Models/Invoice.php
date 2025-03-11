@@ -17,6 +17,7 @@ class Invoice extends Model
         'manager_id',
         'sub_total',
         'vat',
+        'discount_data',
         'discount',
         'dis_type',
         'dis_amount',

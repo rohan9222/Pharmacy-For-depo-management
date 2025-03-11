@@ -69,7 +69,30 @@ class CustomerDueList extends Component
                     return $invoice->salesReturnMedicines;
                 })->sum('total');
                 $customer->invoice_paid = $invoiceData->where('customer_id', $customer->id)->sum('paid');
-                $customer->invoice_due = $invoiceData->where('customer_id', $customer->id)->sum('due') - $customer->invoice_return;
+                // $customer->invoice_due = $invoiceData->where('customer_id', $customer->id)->sum('due') - $customer->invoice_return;
+                $customer->invoice_due = max(
+                    0,
+                    $invoiceData->where('customer_id', $customer->id)->sum(function ($invoice) {
+                        $sumReturnTotal = $invoice->salesReturnMedicines->sum('total');
+                        $afterReturnDue = $invoice->grand_total - $sumReturnTotal;
+                        
+                        if ($afterReturnDue >= 0) {
+                            $discount_data = json_decode($invoice->discount_data);
+                            if ($discount_data && $discount_data->start_amount <= $afterReturnDue && $afterReturnDue <= $discount_data->end_amount) {
+                                $totalDue = $afterReturnDue - $invoice->paid;
+                            } elseif ($discount_data && $discount_data->start_amount > $afterReturnDue) {
+                                $totalDue = ($afterReturnDue + $invoice->dis_amount) - $invoice->paid;
+                            } else {
+                                $totalDue = $afterReturnDue - $invoice->paid;
+                            }
+                        } else {
+                            $totalDue = $invoice->grand_total - $invoice->paid;
+                        }
+                
+                        return max(0, $totalDue);
+                    })
+                );
+                
                 return $customer;
             });
     

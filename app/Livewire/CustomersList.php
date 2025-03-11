@@ -143,21 +143,49 @@ class CustomersList extends Component
             flash()->error('Something went wrong!');
         }
     }
-
     public function view($id = null){
         $customerData = User::find($id);
         $invoices = Invoice::where('customer_id', $customerData->id)->with(['salesReturnMedicines'])->get();
         $paymentHistory = PaymentHistory::whereIn('invoice_id', $invoices->pluck('id'))->get();
+        
+        // Initialize totals
         $customerData->total_buy = $invoices->sum('grand_total');
-        $customerData->total_return = $invoices->flatMap->salesReturnMedicines->sum('total');
-        $customerData->total_due = $invoices->sum('due');
+        $customerData->total_return = 0;
+        $customerData->total_due = 0;
+    
+        foreach ($invoices as $invoice) {
+            $sumReturnTotal = $invoice->salesReturnMedicines->sum('total');
+            $afterReturnDue = $invoice->grand_total - $sumReturnTotal;
+            
+            if($afterReturnDue >= 0){
+                $discount_data = json_decode($invoice->discount_data);
+                if ($discount_data != null && $discount_data->start_amount <= $afterReturnDue && $afterReturnDue <= $discount_data->end_amount) {
+                    $totalDue = $afterReturnDue - $invoice->paid;
+                } elseif ($discount_data != null && $discount_data->start_amount > $afterReturnDue) {
+                    $totalDue = ($afterReturnDue + $invoice->dis_amount) - $invoice->paid;
+                }else{
+                    $totalDue = $afterReturnDue - $invoice->paid;
+                }
+            }else{
+                $totalDue = $invoice->grand_total - $invoice->paid;
+            }
+    
+            // Ensure totalDue is never negative
+            $totalDue = max(0, $totalDue);
+
+            $customerData->total_return += $sumReturnTotal;
+            $customerData->total_due += $totalDue;
+        }
+    
         $customerData->total_invoice = $invoices->count();
         $customerData->total_transaction = $paymentHistory->count();
         $customerData->total_paid = $paymentHistory->sum('amount');
-
+    
         $this->customerData = $customerData;
         $this->invoices = $invoices;
     }
+    
+    
 
     public function setInvoice($invoiceId)
     {
@@ -170,7 +198,7 @@ class CustomersList extends Component
     public function partialPay($customerId)
     {
         $this->view($customerId);
-        $this->partialPayment = $this->customerData->total_due - $this->customerData->total_return;
+        $this->partialPayment = $this->customerData->total_due;
         $this->selectedInvoice = null;
         $this->amount = '';
     }
@@ -203,7 +231,16 @@ class CustomersList extends Component
                 if ($remainingPayment <= 0) {
                     break;
                 }
-                $amountToPay = min($remainingPayment, $invoice->due - $invoice->salesReturnMedicines->sum('total')); // Pay only what's needed to clear the due
+                $sumReturnTotal = $invoice->salesReturnMedicines->sum('total');
+                $afterReturnDue = $invoice->grand_total - $sumReturnTotal;
+                $discount_data = json_decode($invoice->discount_data);
+
+                if ($discount_data != null && $discount_data->start_amount <= $afterReturnDue && $afterReturnDue <= $discount_data->end_amount) {
+                    $afterReturnDue = $afterReturnDue - $invoice->paid;
+                } elseif ($discount_data != null && $discount_data->start_amount > $afterReturnDue) {
+                    $afterReturnDue += ($invoice->dis_amount - $invoice->paid);
+                }
+                $amountToPay = min($remainingPayment, $afterReturnDue); // Pay only what's needed to clear the due
                 // Update invoice payment
                 $invoice->paid += $amountToPay;
                 $invoice->due -= $amountToPay;

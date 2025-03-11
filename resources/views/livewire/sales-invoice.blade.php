@@ -191,7 +191,7 @@
                                 @error('discount') <span class="text-danger">{{ $message }}</span> @enderror
                             </td>
                         </tr>
-                        @if (auth()->user()->role != 'Territory Sales Executive')
+                        {{-- @if (auth()->user()->role != 'Territory Sales Executive')
                             <tr>
                                 <th>Spacial Discount (%)</th>
                                 <th>:</th>
@@ -203,7 +203,7 @@
                                     @error('spl_discount') <span class="text-danger">{{ $message }}</span> @enderror
                                 </td>
                             </tr>
-                        @endif
+                        @endif --}}
                         <tr>
                             <th>Grand Total</th>
                             <th>:</th>

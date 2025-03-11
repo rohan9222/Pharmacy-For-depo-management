@@ -33,6 +33,7 @@ class SalesInvoice extends Component
     public $vat = 0;
     public $spl_discount = 0;
     public $spl_discount_amount = 0;
+    public $discount_data;
     public $discount = 0;
     public $discount_amount = 0;
     public $grand_total = 0;
@@ -188,7 +189,14 @@ class SalesInvoice extends Component
 
             $this->discount = $disValue ? $disValue->discount : 0;
             $this->discount_amount = round($this->sub_total * $this->discount / 100, 2);
+            $this->discount_data = json_encode(
+                [
+                    'start_amount' => $disValue ? $disValue->start_amount : 0,
+                    'end_amount' => $disValue ? $disValue->end_amount : 0,       
+                ]
+            );
         }else{
+            $this->discount_data = null;
             $this->discount = 0;
             $this->discount_amount = 0;
         }
@@ -382,6 +390,7 @@ class SalesInvoice extends Component
                 'manager_id' => $userRoles->manager_id,
                 'sub_total' => $this->sub_total,
                 'vat' => $this->vat,
+                'discount_data' => $this->discount_data,
                 'discount' => $this->discount,
                 'dis_type' => 'percentage',
                 'dis_amount' => $this->discount_amount,

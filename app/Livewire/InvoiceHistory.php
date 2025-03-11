@@ -93,11 +93,11 @@ class InvoiceHistory extends Component
 
                     // Check if the user has the 'invoice' permission
                     if (auth()->user()->can('invoice')) {
-                        if ($row->delivery_status == 'pending') {
-                            $action .= '
-                                <button class="btn btn-sm btn-info" wire:click="invoiceEdit('.$row->id.')" data-bs-toggle="modal" data-bs-target="#invoiceEditModal"><i class="bi bi-pencil"></i></button>
-                            ';
-                        }
+                        // if ($row->delivery_status == 'pending') {
+                        //     $action .= '
+                        //         <button class="btn btn-sm btn-info" wire:click="invoiceEdit('.$row->id.')" data-bs-toggle="modal" data-bs-target="#invoiceEditModal"><i class="bi bi-pencil"></i></button>
+                        //     ';
+                        // }
                         $action .= '
                             <a href="' . route('invoice.pdf', $row->invoice_no) . '" target="_blank" class="btn btn-sm btn-success me-1">
                                 <i class="bi bi-eye"></i>
@@ -121,7 +121,18 @@ class InvoiceHistory extends Component
                     return round($row->salesReturnMedicines->sum('total'),2);
                 })
                 ->editColumn('due', function ($row) {
-                    return $row->salesReturnMedicines->sum('total') > $row->due ? 0 : round($row->due - $row->salesReturnMedicines->sum('total'),2);
+                    $sumReturnTotal = $row->salesReturnMedicines->sum('total');
+                    $afterReturnDue = $row->grand_total - $sumReturnTotal;
+                    $discount_data = json_decode($row->discount_data);
+
+                    if ($discount_data != null && $discount_data->start_amount <= $afterReturnDue && $afterReturnDue <= $discount_data->end_amount) {
+                        $afterReturnDue = $afterReturnDue - $row->paid;
+                    } elseif ($discount_data != null && $discount_data->start_amount > $afterReturnDue) {
+                        $afterReturnDue += $row->dis_amount - $row->paid; 
+                    }else{
+                        $afterReturnDue = $afterReturnDue - $row->paid;
+                    }
+                    return $row->salesReturnMedicines->sum('total') > $row->due ? 0 : round($afterReturnDue,2);
                 })
                 ->rawColumns(['action']) // Ensure HTML buttons render correctly
                 ->make(true);

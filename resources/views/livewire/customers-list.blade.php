@@ -180,7 +180,7 @@
                                             <i class="bi bi-exclamation-triangle"></i>
                                         </span>
                                         <div class="ms-75">
-                                            <h5 class="mb-0">{{ $site_settings->site_currency }}{{ $customerData->total_due - $customerData->total_return}}</h4>
+                                            <h5 class="mb-0">{{ $site_settings->site_currency }}{{ $customerData->total_due}}</h4>
                                             <small>Total Due</small>
                                         </div>
                                     </div>
@@ -246,6 +246,7 @@
                                                 <th>Invoice No</th>
                                                 <th>Total Price</th>
                                                 <th>Return</th>
+                                                <th>Discount</th>
                                                 <th>Paid Amount</th>
                                                 <th>Due amount</th>
                                                 <th>Action</th>
@@ -253,14 +254,28 @@
                                         </thead>
                                         <tbody>
                                             @foreach ($invoices as $invoice)
+                                                @php
+                                                    $sumReturnTotal = $invoice->salesReturnMedicines->sum('total');
+                                                    $afterReturnDue = $invoice->grand_total - $sumReturnTotal;
+                                                    $discount_data = json_decode($invoice->discount_data);
+
+                                                    if ($discount_data != null && $discount_data->start_amount <= $afterReturnDue && $afterReturnDue <= $discount_data->end_amount) {
+                                                        $afterReturnDue = $afterReturnDue - $invoice->paid;
+                                                    } elseif ($discount_data != null && $discount_data->start_amount > $afterReturnDue) {
+                                                        $afterReturnDue += ($invoice->dis_amount - $invoice->paid);
+                                                    }else{
+                                                        $afterReturnDue = $afterReturnDue - $invoice->paid;
+                                                    }
+                                                @endphp
                                                 <tr>
                                                     <td>{{ $site_settings->site_invoice_prefix }}-{{ $invoice->invoice_no }}</td>
                                                     <td>{{ $site_settings->site_currency }}{{ $invoice->grand_total }}</td>
-                                                    <td>{{ $site_settings->site_currency }}{{ $invoice->salesReturnMedicines->sum('total') }}</td>
+                                                    <td>{{ $site_settings->site_currency }}{{ $sumReturnTotal }}</td>
+                                                    <td>{{ $site_settings->site_currency }}{{ $invoice->dis_amount }}</td>
                                                     <td>{{ $site_settings->site_currency }}{{ $invoice->paid }}</td>
-                                                    <td>{{ $site_settings->site_currency }}{{ $invoice->due - $invoice->salesReturnMedicines->sum('total') }}</td>
+                                                    <td class="border-end"><b>{{$sumReturnTotal > $invoice->grand_total ? 0 : max(0, round($afterReturnDue, 2)) }}</b></td>
                                                     <td>
-                                                        @if ($invoice->due-$invoice->salesReturnMedicines->sum('total')  > 0 && auth()->user()->can('make-payment'))
+                                                        @if ($afterReturnDue > 0 && auth()->user()->can('make-payment'))
                                                             <button wire:click="setInvoice({{ $invoice->id }}, {{ $customerData->id }})"
                                                                 class="btn btn-primary btn-sm"
                                                                 data-bs-toggle="modal"
@@ -290,11 +305,22 @@
                                                     </div>
                                                     <div class="modal-body">
                                                         @if($selectedInvoice)
+                                                            @php
+                                                                $sumReturnTotal = $selectedInvoice->salesReturnMedicines->sum('total');
+                                                                $afterReturnDue = $selectedInvoice->grand_total - $sumReturnTotal;
+                                                                $discount_data = json_decode($selectedInvoice->discount_data);
+            
+                                                                if ($discount_data != null && $discount_data->start_amount <= $afterReturnDue && $afterReturnDue <= $discount_data->end_amount) {
+                                                                    $afterReturnDue = $afterReturnDue - $selectedInvoice->paid;
+                                                                } elseif ($discount_data != null && $discount_data->start_amount > $afterReturnDue) {
+                                                                    $afterReturnDue += ($selectedInvoice->dis_amount - $selectedInvoice->paid);
+                                                                }
+                                                            @endphp
                                                             <input type="hidden" wire:model="selectedInvoice.id">
                                                             <div class="form-group">
                                                                 <label class="form-label fw-bold">Due Amount</label>
                                                                 <input type="text" class="form-control"
-                                                                    value="{{ $site_settings->site_currency }}{{ $selectedInvoice->due - $selectedInvoice->salesReturnMedicines->sum('total') }}"
+                                                                    value="{{ $site_settings->site_currency }} {{ round($afterReturnDue,2) }}"
                                                                     readonly>
                                                             </div>
                                                             <div class="form-group mt-2">
@@ -307,8 +333,7 @@
                                                             <div class="form-group">
                                                                 <label class="form-label fw-bold">Due Amount</label>
                                                                 <input type="text" class="form-control"
-                                                                    value="{{ $site_settings->site_currency }}{{ $partialPayment}}"
-                                                                    readonly>
+                                                                    value="{{ $site_settings->site_currency }}{{ $partialPayment}}" readonly>
                                                             </div>
                                                             <div class="form-group mt-2">
                                                                 <label class="form-label fw-bold">Amount</label>

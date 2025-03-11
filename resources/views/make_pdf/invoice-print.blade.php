@@ -131,7 +131,7 @@
                 @php
                     $sumTotalPrice += $totalPrice;
                     $sumVatAmount += $vatAmount;
-                    $sumTotal += round($medicine_list->total);
+                    $sumTotal += $medicine_list->total;
                 @endphp
             @endforeach
 
@@ -140,7 +140,7 @@
                     <td class="text-start" colspan="5">Note:</td>
                     <td class="border-start">{{$sumTotalPrice}}</td>
                     <td class="border-start">{{$sumVatAmount}}</td>
-                    <td class="border-start border-end">{{$sumTotal}}</td>
+                    <td class="border-start border-end">{{round($sumTotal)}}</td>
                 </tr>
 
                 <tr></tr>

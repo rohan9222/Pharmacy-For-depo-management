@@ -19,7 +19,7 @@ class DueInvoiceList extends Component
     public function invoiceDueList(Request $request)
     {
         if ($request->ajax()) {
-            $data = Invoice::with(['customer:id,name,user_id,mobile', 'deliveredBy:id,name', 'salesReturnMedicines'])->where('due', '>', 0);
+            $data = Invoice::with(['customer:id,name,user_id,mobile', 'deliveredBy:id,name', 'salesReturnMedicines']);
 
             // Apply filtering conditions
             if ($request->manager_id != null) {
@@ -55,7 +55,18 @@ class DueInvoiceList extends Component
                     return round($row->salesReturnMedicines->sum('total'),2);
                 })
                 ->editColumn('due', function ($row) {
-                    return $row->salesReturnMedicines->sum('total') > $row->due ? 0 : round($row->due - $row->salesReturnMedicines->sum('total'),2);
+                    $sumReturnTotal = $row->salesReturnMedicines->sum('total');
+                    $afterReturnDue = $row->grand_total - $sumReturnTotal;
+                    $discount_data = json_decode($row->discount_data);
+
+                    if ($discount_data != null && $discount_data->start_amount <= $afterReturnDue && $afterReturnDue <= $discount_data->end_amount) {
+                        $afterReturnDue = $afterReturnDue - $row->paid;
+                    } elseif ($discount_data != null && $discount_data->start_amount > $afterReturnDue) {
+                        $afterReturnDue += $row->dis_amount - $row->paid; 
+                    }else{
+                        $afterReturnDue = $afterReturnDue - $row->paid;
+                    }
+                    return $row->salesReturnMedicines->sum('total') > $row->due ? 0 : round($afterReturnDue,2);
                 })
                 ->rawColumns(['action']) // Ensure HTML buttons render correctly
                 ->make(true);

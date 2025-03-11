@@ -258,12 +258,26 @@
                                         </thead>
                                         <tbody>
                                             @foreach ($invoices as $invoice)
+                                                @php
+                                                    $sumReturnTotal = $invoice->salesReturnMedicines->sum('total');
+                                                    $afterReturnDue = $invoice->grand_total - $sumReturnTotal;
+                                                    $discount_data = json_decode($invoice->discount_data);
+
+                                                    if ($discount_data != null && $discount_data->start_amount <= $afterReturnDue && $afterReturnDue <= $discount_data->end_amount) {
+                                                        $afterReturnDue = $afterReturnDue - $invoice->paid;
+                                                    } elseif ($discount_data != null && $discount_data->start_amount > $afterReturnDue) {
+                                                        $afterReturnDue += ($invoice->dis_amount - $invoice->paid);
+                                                    }else{
+                                                        $afterReturnDue = $afterReturnDue - $invoice->paid;
+                                                    }
+                                                @endphp
                                                 <tr>
                                                     <td>{{ $site_settings->site_invoice_prefix }}-{{ $invoice->invoice_no }}</td>
                                                     <td>{{ $site_settings->site_currency }}{{ $invoice->grand_total }}</td>
-                                                    <td>{{ $site_settings->site_currency }}{{ $invoice->salesReturnMedicines->sum('total') }}</td>
+                                                    <td>{{ $site_settings->site_currency }}{{ $sumReturnTotal }}</td>
                                                     <td>{{ $site_settings->site_currency }}{{ $invoice->paid }}</td>
-                                                    <td>{{ $site_settings->site_currency }}{{ $invoice->salesReturnMedicines->sum('total') > $invoice->due ? 0 : $invoice->due - $invoice->salesReturnMedicines->sum('total') }}</td>
+                                                    <td class="border-end"><b>{{$sumReturnTotal > ($invoice->grand_total) ? 0 : round($afterReturnDue)}}</b></td>
+                                                    {{-- <td>{{ $site_settings->site_currency }}{{ $invoice->salesReturnMedicines->sum('total') > $invoice->due ? 0 : $invoice->due - $invoice->salesReturnMedicines->sum('total') }}</td> --}}
                                                     <td>
                                                         <a href="{{ route('invoice.pdf', $invoice->invoice_no) }}" target="_blank"
                                                             title="View Invoice"
