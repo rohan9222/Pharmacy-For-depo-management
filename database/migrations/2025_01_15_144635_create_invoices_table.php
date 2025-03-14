@@ -22,6 +22,7 @@ return new class extends Migration
             $table->foreignId('customer_id')->nullable()->constrained('users')->nullOnDelete()->cascadeOnUpdate()->comment('user id who has customer role');
             $table->decimal('sub_total', 11, 2)->default(0.00);
             $table->decimal('discount', 11, 2)->default(0.00)->nullable();
+            $table->string('invoice_data')->nullable();
             $table->enum('dis_type', ['percentage', 'fixed'])->default('percentage')->nullable();
             $table->decimal('dis_amount', 11, 2)->default(0.00)->nullable();
             $table->decimal('spl_discount', 11, 2)->default(0.00)->nullable();

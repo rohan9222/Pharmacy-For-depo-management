@@ -5,6 +5,7 @@ namespace App\Livewire;
 use Livewire\Component;
 
 use App\Models\User;
+use App\Models\DiscountValue;
 use App\Models\Invoice;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -71,26 +72,33 @@ class CustomerDueList extends Component
                 $customer->invoice_paid = $invoiceData->where('customer_id', $customer->id)->sum('paid');
                 // $customer->invoice_due = $invoiceData->where('customer_id', $customer->id)->sum('due') - $customer->invoice_return;
                 $customer->invoice_due = max(
-                    0,
                     $invoiceData->where('customer_id', $customer->id)->sum(function ($invoice) {
+                        $afterReturnPrice = $invoice->sub_total - $invoice->salesReturnMedicines->sum('total_price');
+                        $afterReturnVat = $invoice->vat - $invoice->salesReturnMedicines->sum('vat');
                         $sumReturnTotal = $invoice->salesReturnMedicines->sum('total');
-                        $afterReturnDue = $invoice->grand_total - $sumReturnTotal;
-                        
-                        if ($afterReturnDue >= 0) {
-                            $discount_data = json_decode($invoice->discount_data);
-                            if ($discount_data && $discount_data->start_amount <= $afterReturnDue && $afterReturnDue <= $discount_data->end_amount) {
-                                $totalDue = $afterReturnDue - $invoice->paid;
-                            } elseif ($discount_data && $discount_data->start_amount > $afterReturnDue) {
-                                $totalDue = ($afterReturnDue + $invoice->dis_amount) - $invoice->paid;
-                            } else {
-                                $totalDue = $afterReturnDue - $invoice->paid;
-                            }
+
+                        $discount_data = json_decode($invoice->discount_data);
+                        $newDiscount = DiscountValue::where('discount_type', 'General')
+                            ->where('start_amount', '<=', $afterReturnPrice)
+                            ->where('end_amount', '>=', $afterReturnPrice)
+                            ->pluck('discount')
+                            ->first();
+
+                        if (!empty($discount_data) && $discount_data->start_amount <= $afterReturnPrice && $afterReturnPrice <= $discount_data->end_amount) {
+                            $afterReturnDis = ($afterReturnPrice * $invoice->discount) / 100;
+                            $afterReturnDue = ($afterReturnPrice - $afterReturnDis) + $afterReturnVat; 
+                        } elseif ($newDiscount !== null) {
+                            $afterReturnDue = ($afterReturnPrice + $afterReturnVat) - ($afterReturnPrice * $newDiscount / 100);
                         } else {
-                            $totalDue = $invoice->grand_total - $invoice->paid;
+                            $afterReturnDue = $afterReturnPrice + $afterReturnVat;
                         }
                 
-                        return max(0, $totalDue);
+                        // Ensure afterReturnDue is never negative
+                        $totalDue = round(max($afterReturnDue - $invoice->paid, 0), 2);
+                
+                        return $totalDue;
                     })
+                    , 0
                 );
                 
                 return $customer;

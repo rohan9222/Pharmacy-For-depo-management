@@ -22,6 +22,7 @@ return new class extends Migration
             $table->timestamp('expiry_date')->nullable();
             $table->integer('quantity')->default(1);
             $table->decimal('price', 11, 2)->default(0.00)->nullable();
+            $table->decimal('total_price', 11, 2)->default(0.00)->nullable();
             $table->decimal('discount', 11, 2)->default(0.00)->nullable();
             $table->enum('dis_type', ['percentage', 'fixed'])->default('percentage')->nullable();
             $table->decimal('dis_amount', 11, 2)->default(0.00)->nullable();

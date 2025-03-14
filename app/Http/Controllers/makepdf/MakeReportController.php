@@ -154,10 +154,11 @@ class MakeReportController extends Controller
             'manager_data' => $manager_data ?? ''
         ];
 
-        $pdf = PDF::loadView('make_pdf.report.stock-statement', $data);
-        $pdf->setPaper('a4');
-        $pdf->AutoPrint(true);
-        return $pdf->stream($site_data->site_invoice_prefix . '-' . $request->invoice . '(' . date('m-d-Y') . ').pdf'); // Fixed string interpolation
+return view('make_pdf.report.stock-statement', $data);
+        // $pdf = PDF::loadView('make_pdf.report.stock-statement', $data);
+        // $pdf->setPaper('a4');
+        // $pdf->AutoPrint(true);
+        // return $pdf->stream($site_data->site_invoice_prefix . '-' . $request->invoice . '(' . date('m-d-Y') . ').pdf'); // Fixed string interpolation
     }
 
 }

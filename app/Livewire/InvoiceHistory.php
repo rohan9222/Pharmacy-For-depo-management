@@ -10,6 +10,8 @@ use App\Models\StockList;
 use App\Models\SiteSetting;
 use App\Models\SalesMedicine;
 use App\Models\ReturnMedicine;
+use App\Models\StockReturnList;
+use App\Models\DiscountValue;
 use App\Models\user;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -27,7 +29,7 @@ class InvoiceHistory extends Component
 {
     use WithPagination, WithoutUrlPagination;
 
-    public $search, $invoice_data, $site_settings, $return_date, $return_quantity, $return_medicine, $invoice_discount, $spl_discount,$partialPayment,$amount,$selectedInvoice;
+    public $search, $invoice_data, $site_settings, $return_date, $return_quantity, $return_medicine, $invoice_discount, $spl_discount, $amount,$selectedInvoice;
 
     public function mount(){
         if(auth()->user()->hasRole('Super Admin')) {
@@ -121,18 +123,30 @@ class InvoiceHistory extends Component
                     return round($row->salesReturnMedicines->sum('total'),2);
                 })
                 ->editColumn('due', function ($row) {
+                    $afterReturnPrice = $row->sub_total - $row->salesReturnMedicines->sum('total_price');
+                    $afterReturnVat = $row->vat - $row->salesReturnMedicines->sum('vat');
                     $sumReturnTotal = $row->salesReturnMedicines->sum('total');
-                    $afterReturnDue = $row->grand_total - $sumReturnTotal;
-                    $discount_data = json_decode($row->discount_data);
 
-                    if ($discount_data != null && $discount_data->start_amount <= $afterReturnDue && $afterReturnDue <= $discount_data->end_amount) {
-                        $afterReturnDue = $afterReturnDue - $row->paid;
-                    } elseif ($discount_data != null && $discount_data->start_amount > $afterReturnDue) {
-                        $afterReturnDue += $row->dis_amount - $row->paid; 
-                    }else{
-                        $afterReturnDue = $afterReturnDue - $row->paid;
+                    $discount_data = json_decode($row->discount_data);
+                    $newDiscount = DiscountValue::where('discount_type', 'General')
+                        ->where('start_amount', '<=', $afterReturnPrice)
+                        ->where('end_amount', '>=', $afterReturnPrice)
+                        ->pluck('discount')
+                        ->first();
+
+                    if (!empty($discount_data) && $discount_data->start_amount <= $afterReturnPrice && $afterReturnPrice <= $discount_data->end_amount) {
+                        $afterReturnDis = ($afterReturnPrice * $row->discount) / 100;
+                        $afterReturnDue = ($afterReturnPrice - $afterReturnDis) + $afterReturnVat; 
+                    } elseif ($newDiscount !== null) {
+                        $afterReturnDue = ($afterReturnPrice + $afterReturnVat) - ($afterReturnPrice * $newDiscount / 100);
+                    } else {
+                        $afterReturnDue = $afterReturnPrice + $afterReturnVat;
                     }
-                    return $row->salesReturnMedicines->sum('total') > $row->due ? 0 : round($afterReturnDue,2);
+            
+                    // Ensure afterReturnDue is never negative
+                    $totalDue = round(max($afterReturnDue - $row->paid, 0), 2);
+
+                    return $totalDue;
                 })
                 ->rawColumns(['action']) // Ensure HTML buttons render correctly
                 ->make(true);
@@ -172,7 +186,6 @@ class InvoiceHistory extends Component
     public function setInvoice($invoiceId)
     {
         $this->selectedInvoice = Invoice::where('id', $invoiceId)->with('salesReturnMedicines')->first();
-        $this->partialPayment = '';
         $this->amount = '';
     }
 
@@ -301,7 +314,8 @@ class InvoiceHistory extends Component
                 'sales_medicine_id' => $sales_medicine->id,
                 'quantity' => $this->return_quantity,
                 'price' => $sales_medicine->price,
-                'vat' => $sales_medicine->price * $sales_medicine->vat/100,
+                'total_price' => $sales_medicine->price * $this->return_quantity,
+                'vat' => ($sales_medicine->price * $this->return_quantity) * $sales_medicine->vat/100,
                 'total' => ($this->return_quantity * $sales_medicine->price) + ($this->return_quantity * $sales_medicine->price * $sales_medicine->vat/100),
                 'return_date' => $this->return_date,
             ])->save();

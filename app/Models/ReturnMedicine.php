@@ -12,6 +12,7 @@ class ReturnMedicine extends Model
         'sales_medicine_id',
         'quantity',
         'price',
+        'total_price',
         'vat',
         'total',
         'return_date',

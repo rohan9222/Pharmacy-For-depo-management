@@ -53,24 +53,34 @@
                     </div>
                     <div class="modal-body">
                         @if($selectedInvoice)
+                            @php
+                                $afterReturnPrice = $selectedInvoice->sub_total - $selectedInvoice->salesReturnMedicines->sum('total_price');
+                                $afterReturnVat = $selectedInvoice->vat - $selectedInvoice->salesReturnMedicines->sum('vat');
+                                $sumReturnTotal = $selectedInvoice->salesReturnMedicines->sum('total_price');
+
+                                $discount_data = json_decode($selectedInvoice->discount_data);
+                                $newDiscount = App\Models\DiscountValue::where('discount_type', 'General')
+                                    ->where('start_amount', '<=', $afterReturnPrice)
+                                    ->where('end_amount', '>=', $afterReturnPrice)
+                                    ->pluck('discount')
+                                    ->first();
+
+                                if (!empty($discount_data) && $discount_data->start_amount <= $afterReturnPrice && $afterReturnPrice <= $discount_data->end_amount) {
+                                    $afterReturnDis = ($afterReturnPrice * $selectedInvoice->discount) / 100;
+                                    $afterReturnDue = ($afterReturnPrice - $afterReturnDis) + $afterReturnVat; 
+                                } elseif ($newDiscount !== null) {
+                                    $afterReturnDue = ($afterReturnPrice + $afterReturnVat) - ($afterReturnPrice * $newDiscount / 100);
+                                } else {
+                                    $afterReturnDue = $afterReturnPrice + $afterReturnVat;
+                                }
+
+                                $actualDue = round(max($afterReturnDue - $selectedInvoice->paid, 0), 2);
+                            @endphp
                             <input type="hidden" wire:model="selectedInvoice.id">
                             <div class="form-group">
                                 <label class="form-label fw-bold">Due Amount</label>
                                 <input type="text" class="form-control"
-                                    value="{{ $site_settings->site_currency }}{{ $selectedInvoice->due - $selectedInvoice->salesReturnMedicines->sum('total') }}"
-                                    readonly>
-                            </div>
-                            <div class="form-group mt-2">
-                                <label class="form-label fw-bold">Amount</label>
-                                <input type="text" wire:model="amount" class="form-control" required>
-                                @error('amount') <span class="text-danger">{{ $message }}</span> @enderror
-                            </div>
-                        @endif
-                        @if($partialPayment)
-                            <div class="form-group">
-                                <label class="form-label fw-bold">Due Amount</label>
-                                <input type="text" class="form-control"
-                                    value="{{ $site_settings->site_currency }}{{ $customerData->total_due}}"
+                                    value="{{ $site_settings->site_currency }} {{ $actualDue }}"
                                     readonly>
                             </div>
                             <div class="form-group mt-2">

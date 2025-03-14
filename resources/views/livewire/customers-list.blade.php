@@ -246,7 +246,7 @@
                                                 <th>Invoice No</th>
                                                 <th>Total Price</th>
                                                 <th>Return</th>
-                                                <th>Discount</th>
+                                                {{-- <th>Discount</th> --}}
                                                 <th>Paid Amount</th>
                                                 <th>Due amount</th>
                                                 <th>Action</th>
@@ -255,27 +255,36 @@
                                         <tbody>
                                             @foreach ($invoices as $invoice)
                                                 @php
+                                                    $afterReturnPrice = $invoice->sub_total - $invoice->salesReturnMedicines->sum('total_price');
+                                                    $afterReturnVat = $invoice->vat - $invoice->salesReturnMedicines->sum('vat');
                                                     $sumReturnTotal = $invoice->salesReturnMedicines->sum('total');
-                                                    $afterReturnDue = $invoice->grand_total - $sumReturnTotal;
-                                                    $discount_data = json_decode($invoice->discount_data);
 
-                                                    if ($discount_data != null && $discount_data->start_amount <= $afterReturnDue && $afterReturnDue <= $discount_data->end_amount) {
-                                                        $afterReturnDue = $afterReturnDue - $invoice->paid;
-                                                    } elseif ($discount_data != null && $discount_data->start_amount > $afterReturnDue) {
-                                                        $afterReturnDue += ($invoice->dis_amount - $invoice->paid);
-                                                    }else{
-                                                        $afterReturnDue = $afterReturnDue - $invoice->paid;
+                                                    $discount_data = json_decode($invoice->discount_data);
+                                                    $newDiscount = App\Models\DiscountValue::where('discount_type', 'General')
+                                                        ->where('start_amount', '<=', $afterReturnPrice)
+                                                        ->where('end_amount', '>=', $afterReturnPrice)
+                                                        ->pluck('discount')
+                                                        ->first();
+                        
+                                                    if (!empty($discount_data) && $discount_data->start_amount <= $afterReturnPrice && $afterReturnPrice <= $discount_data->end_amount) {
+                                                        $afterReturnDis = ($afterReturnPrice * $invoice->discount) / 100;
+                                                        $afterReturnDue = ($afterReturnPrice - $afterReturnDis) + $afterReturnVat; 
+                                                    } elseif ($newDiscount !== null) {
+                                                        $afterReturnDue = ($afterReturnPrice + $afterReturnVat) - ($afterReturnPrice * $newDiscount / 100);
+                                                    } else {
+                                                        $afterReturnDue = $afterReturnPrice + $afterReturnVat;
                                                     }
+                                                    $actualDue = round(max($afterReturnDue - $invoice->paid, 0), 2);
                                                 @endphp
                                                 <tr>
                                                     <td>{{ $site_settings->site_invoice_prefix }}-{{ $invoice->invoice_no }}</td>
                                                     <td>{{ $site_settings->site_currency }}{{ $invoice->grand_total }}</td>
                                                     <td>{{ $site_settings->site_currency }}{{ $sumReturnTotal }}</td>
-                                                    <td>{{ $site_settings->site_currency }}{{ $invoice->dis_amount }}</td>
+                                                    {{-- <td>{{ $site_settings->site_currency }}{{ $invoice->dis_amount }}</td> --}}
                                                     <td>{{ $site_settings->site_currency }}{{ $invoice->paid }}</td>
-                                                    <td class="border-end"><b>{{$sumReturnTotal > $invoice->grand_total ? 0 : max(0, round($afterReturnDue, 2)) }}</b></td>
+                                                    <td class="border-end"><b>{{ $actualDue }}</b></td>
                                                     <td>
-                                                        @if ($afterReturnDue > 0 && auth()->user()->can('make-payment'))
+                                                        @if ($actualDue > 0 && auth()->user()->can('make-payment'))
                                                             <button wire:click="setInvoice({{ $invoice->id }}, {{ $customerData->id }})"
                                                                 class="btn btn-primary btn-sm"
                                                                 data-bs-toggle="modal"
@@ -306,21 +315,33 @@
                                                     <div class="modal-body">
                                                         @if($selectedInvoice)
                                                             @php
-                                                                $sumReturnTotal = $selectedInvoice->salesReturnMedicines->sum('total');
-                                                                $afterReturnDue = $selectedInvoice->grand_total - $sumReturnTotal;
-                                                                $discount_data = json_decode($selectedInvoice->discount_data);
+                                                                $afterReturnPrice = $selectedInvoice->sub_total - $selectedInvoice->salesReturnMedicines->sum('total_price');
+                                                                $afterReturnVat = $selectedInvoice->vat - $selectedInvoice->salesReturnMedicines->sum('vat');
+                                                                $sumReturnTotal = $selectedInvoice->salesReturnMedicines->sum('total_price');
             
-                                                                if ($discount_data != null && $discount_data->start_amount <= $afterReturnDue && $afterReturnDue <= $discount_data->end_amount) {
-                                                                    $afterReturnDue = $afterReturnDue - $selectedInvoice->paid;
-                                                                } elseif ($discount_data != null && $discount_data->start_amount > $afterReturnDue) {
-                                                                    $afterReturnDue += ($selectedInvoice->dis_amount - $selectedInvoice->paid);
+                                                                $discount_data = json_decode($selectedInvoice->discount_data);
+                                                                $newDiscount = App\Models\DiscountValue::where('discount_type', 'General')
+                                                                    ->where('start_amount', '<=', $afterReturnPrice)
+                                                                    ->where('end_amount', '>=', $afterReturnPrice)
+                                                                    ->pluck('discount')
+                                                                    ->first();
+                                    
+                                                                if (!empty($discount_data) && $discount_data->start_amount <= $afterReturnPrice && $afterReturnPrice <= $discount_data->end_amount) {
+                                                                    $afterReturnDis = ($afterReturnPrice * $selectedInvoice->discount) / 100;
+                                                                    $afterReturnDue = ($afterReturnPrice - $afterReturnDis) + $afterReturnVat; 
+                                                                } elseif ($newDiscount !== null) {
+                                                                    $afterReturnDue = ($afterReturnPrice + $afterReturnVat) - ($afterReturnPrice * $newDiscount / 100);
+                                                                } else {
+                                                                    $afterReturnDue = $afterReturnPrice + $afterReturnVat;
                                                                 }
+
+                                                                $actualDue = round(max($afterReturnDue - $selectedInvoice->paid, 0), 2);
                                                             @endphp
                                                             <input type="hidden" wire:model="selectedInvoice.id">
                                                             <div class="form-group">
                                                                 <label class="form-label fw-bold">Due Amount</label>
                                                                 <input type="text" class="form-control"
-                                                                    value="{{ $site_settings->site_currency }} {{ round($afterReturnDue,2) }}"
+                                                                    value="{{ $site_settings->site_currency }} {{ $actualDue }}"
                                                                     readonly>
                                                             </div>
                                                             <div class="form-group mt-2">

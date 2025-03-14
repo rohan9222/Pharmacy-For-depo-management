@@ -58,7 +58,9 @@
 
                         if ($roleShort) {
                             $invoice_data = App\Models\Invoice::where($roleShort . '_id', $under_user->id);
+
                             $c_invoice_data = (clone $invoice_data)->whereBetween('invoice_date', [$start_date->format('Y-m-d'), $end_date->format('Y-m-d')]);
+                            
                             $c_mon = (clone $c_invoice_data)->count();
                             $c_dise = (clone $c_invoice_data)->sum('dis_amount') + (clone $c_invoice_data)->sum('spl_dis_amount');
                             $c_vat = (clone $c_invoice_data)->sum('vat');
@@ -68,7 +70,31 @@
                             $c_tp = (clone $c_invoice_data)->sum('sub_total');
                             $c_actual = $c_tp + $c_vat - ($c_dis_amount + $c_spl_dis_amount) - $c_sales_return;
                             $c_collection = (clone $c_invoice_data)->sum('paid');
-                            $c_due = (clone $c_invoice_data)->sum('due') - $c_sales_return;
+
+                            foreach ((clone $c_invoice_data)->get() as $invoice) {
+                                $afterReturnPrice = $invoice->sub_total - $invoice->salesReturnMedicines->sum('total_price');
+                                $afterReturnVat = $invoice->vat - $invoice->salesReturnMedicines->sum('vat');
+                                $sumReturnTotal = $invoice->salesReturnMedicines->sum('total');
+
+                                $discount_data = json_decode($invoice->discount_data);
+                                $newDiscount = App\Models\DiscountValue::where('discount_type', 'General')
+                                    ->where('start_amount', '<=', $afterReturnPrice)
+                                    ->where('end_amount', '>=', $afterReturnPrice)
+                                    ->pluck('discount')
+                                    ->first();
+
+                                if (!empty($discount_data) && $discount_data->start_amount <= $afterReturnPrice && $afterReturnPrice <= $discount_data->end_amount) {
+                                    $afterReturnDis = ($afterReturnPrice * $invoice->discount) / 100;
+                                    $afterReturnDue = ($afterReturnPrice - $afterReturnDis) + $afterReturnVat; 
+                                } elseif ($newDiscount !== null) {
+                                    $afterReturnDue = ($afterReturnPrice + $afterReturnVat) - ($afterReturnPrice * $newDiscount / 100);
+                                } else {
+                                    $afterReturnDue = $afterReturnPrice + $afterReturnVat;
+                                }
+                                $actualDue = round(max($afterReturnDue - $invoice->paid, 0), 2);
+
+                                $c_due += $actualDue;
+                            }
 
                             $c_dise_total += round($c_dise);
                             $c_vat_total += round($c_vat);
@@ -83,9 +109,9 @@
 
                             $l_mon_total += $l_mon;
                             $sales_target = App\Models\TargetReport::where('user_id', $under_user->id)
-                            ->where('target_month', $end_date->format('F'))
-                            ->where('target_year', $end_date->format('Y'))
-                            ->value('sales_target') ?? 0 ;
+                                        ->where('target_month', $end_date->format('F'))
+                                        ->where('target_year', $end_date->format('Y'))
+                                        ->value('sales_target') ?? 0 ;
                         }
                     @endphp
                     <tr>

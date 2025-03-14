@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use Livewire\Component;
 
+use App\Models\DiscountValue;
 use App\Models\Invoice;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -55,18 +56,30 @@ class DueInvoiceList extends Component
                     return round($row->salesReturnMedicines->sum('total'),2);
                 })
                 ->editColumn('due', function ($row) {
+                    $afterReturnPrice = $row->sub_total - $row->salesReturnMedicines->sum('total_price');
+                    $afterReturnVat = $row->vat - $row->salesReturnMedicines->sum('vat');
                     $sumReturnTotal = $row->salesReturnMedicines->sum('total');
-                    $afterReturnDue = $row->grand_total - $sumReturnTotal;
-                    $discount_data = json_decode($row->discount_data);
 
-                    if ($discount_data != null && $discount_data->start_amount <= $afterReturnDue && $afterReturnDue <= $discount_data->end_amount) {
-                        $afterReturnDue = $afterReturnDue - $row->paid;
-                    } elseif ($discount_data != null && $discount_data->start_amount > $afterReturnDue) {
-                        $afterReturnDue += $row->dis_amount - $row->paid; 
-                    }else{
-                        $afterReturnDue = $afterReturnDue - $row->paid;
+                    $discount_data = json_decode($row->discount_data);
+                    $newDiscount = DiscountValue::where('discount_type', 'General')
+                        ->where('start_amount', '<=', $afterReturnPrice)
+                        ->where('end_amount', '>=', $afterReturnPrice)
+                        ->pluck('discount')
+                        ->first();
+
+                    if (!empty($discount_data) && $discount_data->start_amount <= $afterReturnPrice && $afterReturnPrice <= $discount_data->end_amount) {
+                        $afterReturnDis = ($afterReturnPrice * $row->discount) / 100;
+                        $afterReturnDue = ($afterReturnPrice - $afterReturnDis) + $afterReturnVat; 
+                    } elseif ($newDiscount !== null) {
+                        $afterReturnDue = ($afterReturnPrice + $afterReturnVat) - ($afterReturnPrice * $newDiscount / 100);
+                    } else {
+                        $afterReturnDue = $afterReturnPrice + $afterReturnVat;
                     }
-                    return $row->salesReturnMedicines->sum('total') > $row->due ? 0 : round($afterReturnDue,2);
+            
+                    // Ensure afterReturnDue is never negative
+                    $totalDue = round(max($afterReturnDue - $row->paid, 0), 2);
+
+                    return $totalDue;
                 })
                 ->rawColumns(['action']) // Ensure HTML buttons render correctly
                 ->make(true);

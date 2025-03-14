@@ -1,7 +1,7 @@
-@php
+{{-- @php
     ini_set("pcre.backtrack_limit", "500000000");
     error_reporting(0);
-@endphp
+@endphp --}}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -102,11 +102,11 @@
         </table>
     </div>
 </body>
+</html>
 <script>
     window.print();
 </script>
-</html>
-
+{{-- 
 @php
     $content = ob_get_clean();
 
@@ -149,4 +149,4 @@
     // $mpdf->SetWatermarkImage(public_path('img/logo.png')); // Path to watermark image
     $mpdf->showWatermarkImage = true;
     $mpdf->Output();
-@endphp
+@endphp --}}
