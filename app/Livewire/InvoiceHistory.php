@@ -248,7 +248,8 @@ class InvoiceHistory extends Component
                             'sales_medicine_id' => $medicine->id,
                             'quantity' => $medicine->quantity,
                             'price' => $medicine->price,
-                            'vat' => $medicine->price * $medicine->vat/100,
+                            'total_price' => $medicine->price * $medicine->quantity,
+                            'vat' => ($medicine->price * $medicine->quantity) * $medicine->vat/100,
                             'total' => ($medicine->quantity * $medicine->price) + ($medicine->quantity * $medicine->price * $medicine->vat/100),
                             'return_date' => $this->return_date,
                         ])->save();
@@ -348,5 +349,4 @@ class InvoiceHistory extends Component
             flash()->error($e->getMessage());
         }
     }
-
 }

@@ -58,10 +58,7 @@
 
                         if ($roleShort) {
                             $invoice_data = App\Models\Invoice::where($roleShort . '_id', $under_user->id);
-                            $c_invoice_data = (clone $invoice_data)->whereBetween('invoice_date', [
-                                $start_date->format('Y-m-d 00:00:00'),
-                                $end_date->format('Y-m-d 23:59:59')
-                            ]);
+                            $c_invoice_data = (clone $invoice_data)->whereBetween('invoice_date', [$start_date->format('Y-m-d'), $end_date->format('Y-m-d')]);
                             
                             $c_mon = (clone $c_invoice_data)->count();
                             $l_mon = (clone $invoice_data)->whereBetween('invoice_date', [$start_date->copy()->subDays(30),$start_date])->count();
@@ -70,13 +67,14 @@
                                         ->where('target_month', $end_date->format('F'))
                                         ->where('target_year', $end_date->format('Y'))
                                         ->value('sales_target') ?? 0 ;
-                   
+
+                            // $c_dise = (clone $c_invoice_data)->sum('dis_amount') + (clone $c_invoice_data)->sum('spl_dis_amount');
+
                             foreach ((clone $c_invoice_data)->get() as $invoice) {
-                                $invoiceProductsTotal = number_format($invoice->sub_total, 2, '.', '');
-                                $invoiceReturnProductsTotal = number_format($invoice->salesReturnMedicines->sum('total_price'), 2, '.', '');
-                                $afterReturnPrice = $invoiceProductsTotal - $invoiceReturnProductsTotal;
-                                $afterReturnVat = number_format($invoice->vat, 2, '.', '') - number_format($invoice->salesReturnMedicines->sum('vat'), 2, '.', '');
-                                
+                                $afterReturnPrice = $invoice->sub_total - $invoice->salesReturnMedicines->sum('total_price');
+                                $afterReturnVat = $invoice->vat - $invoice->salesReturnMedicines->sum('vat');
+                                // $sumReturnTotal = $invoice->salesReturnMedicines->sum('total');
+
                                 $discount_data = json_decode($invoice->discount_data);
                                 $newDiscount = App\Models\DiscountValue::where('discount_type', 'General')
                                             ->where('start_amount', '<=', $afterReturnPrice)
@@ -85,36 +83,38 @@
                                             ->first();
 
                                 if (!empty($discount_data) && $discount_data->start_amount <= $afterReturnPrice && $afterReturnPrice <= $discount_data->end_amount) {
-                                    $afterReturnDis = number_format($afterReturnPrice * $invoice->discount / 100, 2, '.', '') ; 
+                                    $afterReturnDis = ($afterReturnPrice * $invoice->discount) / 100;
                                     $afterReturnDue = ($afterReturnPrice - $afterReturnDis) + $afterReturnVat; 
                                 } elseif ($newDiscount !== null) {
-                                    $afterReturnDis = number_format($afterReturnPrice * $newDiscount / 100, 2, '.', '');
-                                    $afterReturnDue = ($afterReturnPrice  - $afterReturnDis) + $afterReturnVat;
-                                }else {
-                                    $afterReturnDis = number_format($afterReturnPrice * $newDiscount / 100, 2, '.', '');
-                                    $afterReturnDue = ($afterReturnPrice  - $afterReturnDis) + $afterReturnVat;
-                                }
-                                
+                                    $afterReturnDis = ($afterReturnPrice * $newDiscount) / 100;
+                                    $afterReturnDue = ($afterReturnPrice + $afterReturnVat) - ($afterReturnPrice * $newDiscount / 100);
+                                } 
+                                // else {
+                                //     $afterReturnDue = $afterReturnPrice + $afterReturnVat;
+                                // }
                                 $actualDue = round(max($afterReturnDue - $invoice->paid, 0), 2);
 
                                 $c_dise += $afterReturnDis;
                                 $c_vat += $afterReturnVat;
-                                $c_sales_return += $invoiceReturnProductsTotal;
-                                $c_tp += $afterReturnPrice;
-                                $c_actual += $afterReturnDue;
                                 $c_due += $actualDue;
                             }
-                                
+
+                            // $c_vat = (clone $c_invoice_data)->sum('vat');
+                            // $c_dis_amount = (clone $c_invoice_data)->sum('dis_amount');
+                            // $c_spl_dis_amount = (clone $c_invoice_data)->sum('spl_dis_amount');
+                            $c_sales_return = App\Models\ReturnMedicine::whereIn('invoice_id', $invoice_data->pluck('id'))->whereBetween('return_date', [$start_date->format('Y-m-d'), $end_date->format('Y-m-d')])->sum('total');
+                            $c_tp = (clone $c_invoice_data)->sum('sub_total');
+                            $c_actual = $c_tp + $c_vat - ($c_dis_amount + $c_spl_dis_amount) - $c_sales_return;
                             $c_collection = (clone $c_invoice_data)->sum('paid');
 
-                            $c_dise_total += $c_dise;
-                            $c_vat_total += $c_vat;
-                            $c_sales_return_total += $c_sales_return;
-                            $c_tp_total += $c_tp;
-                            $c_actual_total += $c_actual;
-                            $c_collection_total += $c_collection;
-                            $c_due_total += $c_due;
-                            $c_mon_total += $c_mon;
+                            $c_dise_total += round($c_dise);
+                            $c_vat_total += round($c_vat);
+                            $c_sales_return_total += round($c_sales_return);
+                            $c_tp_total += round($c_tp);
+                            $c_actual_total += round($c_actual);
+                            $c_collection_total += round($c_collection);
+                            $c_due_total += round($c_due);
+                            $c_mon_total += round($c_mon);
 
                             $l_mon_total += $l_mon;
                         }
@@ -150,13 +150,13 @@
                     <td>{{ $c_mon_total }}</td>
                     <td>{{ $l_mon_total }}</td>
                     <td>{{ round($sales_target_total) }}</td>
-                    <td>{{ round($c_dise_total) }}</td>
-                    <td>{{ round($c_vat_total) }}</td>
-                    <td>{{ round($c_sales_return_total) }}</td>
-                    <td>{{ round($c_tp_total) }}</td>
-                    <td>{{ round($c_actual_total) }}</td>
-                    <td>{{ round($c_collection_total) }}</td>
-                    <td>{{ round($c_due_total) }}</td>
+                    <td>{{ $c_dise_total }}</td>
+                    <td>{{ $c_vat_total }}</td>
+                    <td>{{ $c_sales_return_total }}</td>
+                    <td>{{ $c_tp_total }}</td>
+                    <td>{{ $c_actual_total }}</td>
+                    <td>{{ $c_collection_total }}</td>
+                    <td>{{ $c_due_total }}</td>
                     <td>{{ round($sales_target_total == 0 ? 0 : ($c_tp_total / $sales_target_total) * 100, 2) }}</td>
                 </tr>
                 <tr style="border:none;">
@@ -164,13 +164,13 @@
                 </tr>
                 
                 @php
-                    $c_dise_grand_total +=  round($c_dise_total);
-                    $c_vat_grand_total +=  round($c_vat_total);
-                    $c_sales_return_grand_total +=  round($c_sales_return_total);
-                    $c_tp_grand_total +=  round($c_tp_total);
-                    $c_actual_grand_total +=  round($c_actual_total);
-                    $c_collection_grand_total +=  round($c_collection_total);
-                    $c_due_grand_total +=  round($c_due_total);
+                    $c_dise_grand_total += $c_dise_total;
+                    $c_vat_grand_total += $c_vat_total;
+                    $c_sales_return_grand_total += $c_sales_return_total;
+                    $c_tp_grand_total += $c_tp_total;
+                    $c_actual_grand_total += $c_actual_total;
+                    $c_collection_grand_total += $c_collection_total;
+                    $c_due_grand_total += $c_due_total;
                     $c_mon_grand_total += $c_mon_total;
                     $l_mon_grand_total += $$l_mon_total;
                 @endphp

@@ -110,7 +110,7 @@
                         startDate: start,
                         endDate: end,
                         alwaysShowCalendars: true,
-                        drops: "auto",
+                        //drops: "auto",
                         showWeekNumbers: true,
                         showISOWeekNumbers: true,
                         autoApply: true,
@@ -142,7 +142,7 @@
                         startDate: start,
                         endDate: end,
                         alwaysShowCalendars: true,
-                        drops: "auto",
+                        //drops: "auto",
                         showWeekNumbers: true,
                         showISOWeekNumbers: true,
                         autoApply: true,
@@ -171,7 +171,7 @@
 
                     var reportPicker = $('#reportdate').daterangepicker({
                         singleDatePicker: true,
-                        drops: "auto",
+                        //drops: "auto",
                         showWeekNumbers: true,
                         showISOWeekNumbers: true,
                         autoApply: true,
