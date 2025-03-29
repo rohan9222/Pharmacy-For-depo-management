@@ -46,7 +46,7 @@
                 @php
                     $roleShort = rolesConvertShort($user_data_all->role);
                     $invoice_data = App\Models\Invoice::where($roleShort . '_id', $user_data_all->id)
-                                ->whereBetween('invoice_date', [$start_date->format('Y-m-d'), $end_date->format('Y-m-d')])
+                                ->whereBetween('invoice_date', [$start_date->format('Y-m-d 00:00:00'), $end_date->format('Y-m-d 23:59:59')])
                                 ->pluck('id')
                                 ->toArray();
 

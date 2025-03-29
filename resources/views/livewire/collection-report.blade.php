@@ -30,6 +30,14 @@
                         </thead>
                         <tbody class="text-center">
                         </tbody>
+                        <tfoot>
+                            <tr>
+                                <th colspan="6" style="text-align:right">Total:</th>
+                                <th colspan="4"></th>
+                                <th></th>
+                                <th></th>
+                            </tr>
+                        </tfoot>
                     </table>
                 </div>
             </div>
@@ -42,7 +50,7 @@
     document.addEventListener('DOMContentLoaded', function () {
         var table = $('#invoiceTable').DataTable({
             processing: true,
-            serverSide: true,
+            // serverSide: true,
             order: [[ 1, 'desc' ]],
             ajax: {
                 url: "{{ route('collection-list-table') }}", // Ensure correct route
@@ -53,8 +61,9 @@
                     d.customer_id = $('#customer_id').val();
                     d.start_date = $('#start_date').val();
                     d.end_date = $('#end_date').val();
-                }
+                },
             },
+
             columns: [
                 { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false },
                 { data: 'DT_RowIndex', name: 'DT_RowIndex' },
@@ -113,6 +122,39 @@
             select: {
                 style: 'os',
                 selector: 'td:first-child'
+            },
+            footerCallback: function (row, data, start, end, display) {
+                let api = this.api();
+
+                // Function to remove formatting and convert to a number
+                let intVal = function (i) {
+                    return typeof i === 'string'
+                        ? parseFloat(i.replace(/[\$,]/g, '')) || 0
+                        : typeof i === 'number'
+                        ? i
+                        : 0;
+                };
+
+                // Function to calculate and update totals
+                function calculateTotal(columnIndex) {
+                    let total = api
+                        .column(columnIndex, { search: 'applied' }) // Grand total (all pages, filtered)
+                        .data()
+                        .reduce((a, b) => intVal(a) + intVal(b), 0);
+
+                    let pageTotal = api
+                        .column(columnIndex, { page: 'current' }) // Page total (current visible data)
+                        .data()
+                        .reduce((a, b) => intVal(a) + intVal(b), 0);
+
+                    // Update footer for this column
+                    $(api.column(columnIndex).footer()).html(
+                        `Page Total: ${pageTotal.toFixed(2)}<br>(Grand Total: ${total.toFixed(2)})`
+                    );
+                }
+
+                // Apply total calculation for columns 7, 8, 9, 10
+                [10,11].forEach(calculateTotal);
             }
         });
 

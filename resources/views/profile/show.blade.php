@@ -1,45 +1,143 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            {{ __('Profile') }}
+        <h2 class="h2">
+            {{ __('Profile Dashboard') }}
         </h2>
     </x-slot>
 
-    <div>
-        <div class="max-w-7xl mx-auto py-10 sm:px-6 lg:px-8">
-            @if (Laravel\Fortify\Features::canUpdateProfileInformation())
-                @livewire('profile.update-profile-information-form')
+    <div class="row justify-content-center">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <section class="section profile">
+                        <div class="row">
+                            <div class="col-xl-5">
+                                <div class="card">
+                                    <div class="card-body profile-card pt-4 d-flex flex-column align-items-center">
+                                    <img src="{{ Auth::user()->profile_photo_url }}" alt="{{ Auth::user()->name }}" style="max-width: 10rem; min-width: 10rem;" alt="Profile Image" class="profileImagePreview rounded-circle">
+                                    <h3>{{ Auth::user()->name }}</h3> 
+                                    @if(Auth::user()->roles->isNotEmpty())
+                                        <h4>Act as : 
+                                            @foreach (Auth::user()->roles as $role)
+                                                {{ $role->name }}
+                                                @if (!$loop->last)
+                                                    ,
+                                                @endif
+                                            @endforeach
+                                        </h4>
+                                    @else
+                                        <p class="p-0 m-0 pt-2">Hi, Your Registration is Completed.</p>
+                                        <p class="p-1 m-0 fw-semibold">But No Role Assigned.</p>
+                                        <p class="p-0 m-0">Wait for Admin Approval.</p>
+                                        <p class="p-0 m-0">OR Contact Super Admin for More Information</p>
+                                    @endif
+    
+                                    <div class="social-links mt-2">
+                                        <a href="#" class="twitter"><i class="bi bi-twitter"></i></a>
+                                        <a href="#" class="facebook"><i class="bi bi-facebook"></i></a>
+                                        <a href="#" class="instagram"><i class="bi bi-instagram"></i></a>
+                                        <a href="#" class="linkedin"><i class="bi bi-linkedin"></i></a>
+                                        </div>
+                                    </div>
+                                </div>
+    
+                                <div class="row pt-3">
+                                    @canany(['create-role', 'edit-role', 'delete-role'])
+                                        <a class="btn btn-primary col-md mx-1" href="{{ route('roles.index') }}">
+                                            <i class="fa-solid fa-users-gear"></i> Manage Roles</a>
+                                    @endcanany
+                                    @canany(['create-user', 'edit-user', 'delete-user'])
+                                        <a class="btn btn-success col-md mx-1" href="{{ route('users.index') }}">
+                                            <i class="fa-solid fa-user-gear"></i> Manage Users</a>
+                                    @endcanany
+                                    @canany(['create', 'edit', 'delete','view'])
+                                        <a class="btn btn-info col-md mx-1" href="{{ route('dashboard.index') }}"><i class="fa-brands fa-squarespace"></i> {{ __('Dashboard') }}</a>
+                                    @endcanany
+                                    <p>&nbsp;</p>
+                                </div>
+                            </div>
 
-                <x-section-border />
-            @endif
+                            <div class="col-xl-7">
+                                <div class="card">
+                                    <div class="card-body pt-3">
+                                        <!-- Bordered Tabs -->
+                                        <ul class="nav nav-tabs nav-tabs-bordered" role="tablist">
+                                            <li class="nav-item" role="presentation">
+                                            <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#profile-overview" aria-selected="true" role="tab">Overview</button>
+                                            </li>
+                                            <li class="nav-item" role="presentation">
+                                                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#profile-edit" aria-selected="false" tabindex="-1" role="tab">Edit Profile</button>
+                                            </li>
+                                            <li class="nav-item" role="presentation">
+                                                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#profile-change-password" aria-selected="false" tabindex="-1" role="tab">Change Password</button>
+                                            </li>
+                                            <li class="nav-item" role="presentation">
+                                                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#profile-two-factor" aria-selected="false" tabindex="-1" role="tab">Two Factor</button>
+                                            </li>
+                                            <li class="nav-item" role="presentation">
+                                                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#profile-browser-sessions" aria-selected="false" tabindex="-1" role="tab">Browser Sessions</button>
+                                            </li>
+                                        </ul>
 
-            @if (Laravel\Fortify\Features::enabled(Laravel\Fortify\Features::updatePasswords()))
-                <div class="mt-10 sm:mt-0">
-                    @livewire('profile.update-password-form')
+                                        <div class="tab-content pt-2">
+                                            <div class="tab-pane fade show active profile-overview" id="profile-overview" role="tabpanel">
+                                                <h5 class="card-title">Profile Details</h5>
+                                                <div class="row">
+                                                    @foreach(Auth::user()->roles as $role)
+                                                        <li class="label fw-bold">{{ $role->name }} Role: Yes</li>
+                                                    @endforeach 
+
+                                                    @if(Auth::user()->hasRole('Super Admin'))
+                                                        @foreach (\Spatie\Permission\Models\Permission::pluck('name') as $permission)
+                                                            <li>{{ $permission }} permission: Yes</li>
+                                                        @endforeach
+                                                    @else
+                                                        @foreach(Auth::user()->getPermissionsViaRoles()->pluck('name') as $permission)
+                                                            <li>{{ $permission }} permission: Yes</li>
+                                                        @endforeach
+                                                    @endif
+                                                </div>
+                                            </div>
+                                            <div class="tab-pane fade profile-edit pt-3" id="profile-edit" role="tabpanel">
+                                                @if (Laravel\Fortify\Features::canUpdateProfileInformation())
+                                                    @livewire('profile.update-profile-information-form')
+                                                    <x-section-border />
+                                                @endif
+                                                @if (Laravel\Jetstream\Jetstream::hasAccountDeletionFeatures())
+                                                    @livewire('profile.delete-user-form')
+                                                @endif
+                                            </div>
+                                            <div class="tab-pane fade profile-edit pt-3" id="profile-change-password" role="tabpanel">
+                                                @if (Laravel\Fortify\Features::enabled(Laravel\Fortify\Features::updatePasswords()))
+                                                    @livewire('profile.update-password-form')
+                                                    <x-section-border />
+                                                @endif
+                                            </div>
+                                            <div class="tab-pane fade profile-edit pt-3" id="profile-two-factor" role="tabpanel">
+                                                @if (Laravel\Fortify\Features::canManageTwoFactorAuthentication())
+                                                    @livewire('profile.two-factor-authentication-form')                                    
+                                                    <x-section-border />
+                                                @endif
+                                            </div>
+                                            <div class="tab-pane fade profile-edit pt-3" id="profile-browser-sessions" role="tabpanel">
+                                                {{-- @if (Laravel\Jetstream\Jetstream::hasSessionFeatures()) --}}
+                                                    @livewire('profile.logout-other-browser-sessions-form')
+                                                {{-- @endif --}}
+                                                <x-section-border />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
                 </div>
-
-                <x-section-border />
-            @endif
-
-            @if (Laravel\Fortify\Features::canManageTwoFactorAuthentication())
-                <div class="mt-10 sm:mt-0">
-                    @livewire('profile.two-factor-authentication-form')
-                </div>
-
-                <x-section-border />
-            @endif
-
-            <div class="mt-10 sm:mt-0">
-                @livewire('profile.logout-other-browser-sessions-form')
             </div>
+        </div>
+    </div>
 
-            @if (Laravel\Jetstream\Jetstream::hasAccountDeletionFeatures())
-                <x-section-border />
-
-                <div class="mt-10 sm:mt-0">
-                    @livewire('profile.delete-user-form')
-                </div>
-            @endif
+    <div>
+        <div class="mx-auto">
         </div>
     </div>
 </x-app-layout>

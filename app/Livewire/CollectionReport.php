@@ -40,8 +40,8 @@ class CollectionReport extends Component
 
             // Date filtering for PaymentHistory
             if (!empty($request->start_date) && !empty($request->end_date)) {
-                $startDate = Carbon::parse($request->start_date)->format('Y-m-d');
-                $endDate = Carbon::parse($request->end_date)->format('Y-m-d');
+                $startDate = Carbon::parse($request->start_date)->format('Y-m-d 00:00:00');
+                $endDate = Carbon::parse($request->end_date)->format('Y-m-d 23:59:59');
 
                 // Filter invoices that have payments in the given range
                 $query->whereHas('paymentHistory', function ($q) use ($startDate, $endDate) {

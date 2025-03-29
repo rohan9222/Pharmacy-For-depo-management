@@ -336,9 +336,10 @@
                             {{ Auth::user()->name }}
                         @endif
                     </a>
+                    
                     <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
                         <li class="dropdown-header">{{ __('Manage Account') }}</li>
-                        <li><a class="dropdown-item" href="{{ route('user.profile') }}">{{ __('Profile') }}</a></li>
+                        <li><a class="dropdown-item" href="{{ route('profile.show') }}">{{ __('Profile') }}</a></li>
                         @canany(['create-role', 'edit-role', 'delete-role'])
                             <li><a class="dropdown-item" href="{{ route('roles.index') }}">{{ __('Manage Role') }}</a></li>
                         @endcanany

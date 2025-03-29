@@ -70,7 +70,7 @@ class InvoiceReturnHistory extends Component
             }
 
             if ($request->start_date && $request->end_date) {
-                $data = $data->whereBetween('return_date', [Carbon::parse($request->start_date)->format('Y-m-d'), Carbon::parse($request->end_date)->format('Y-m-d')]);
+                $data = $data->whereBetween('return_date', [Carbon::parse($request->start_date)->format('Y-m-d 00:00:00'), Carbon::parse($request->end_date)->format('Y-m-d 23:59:59')]);
             }
             return DataTables::of($data->get())
                 ->addIndexColumn() // Auto Increment Column

@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\{DashboardController,UserProfileController};
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Admin\{RoleController,UserController};
 use App\Http\Controllers\makepdf\{MakeInvoiceController,MakeSummaryController,MakeReportController};
 use App\Livewire\{SupportersList,CustomersList,DeliveryManList,SupplierList,MedicinesList,CategoryList, PackSizeList, StockMedicines,StockInvoiceList,StockMedicinesList,SalesInvoice,InvoiceHistory,DeliveryHistory,InvoiceReturnHistory,SiteSettings,TargetHistory,DueInvoiceList,CollectionReport,ReportGenerate,ProductTarget,CustomerDueList};
@@ -76,12 +76,6 @@ Route::middleware([
 
 // site settings
     Route::get('/site-settings', SiteSettings::class)->name('site-settings');
-
-// profile
-    Route::get('/user/profile', [UserProfileController::class, 'index'])->name('user.profile');
-    Route::post('/user/profile/upload', [UserProfileController::class, 'uploadFile'])->name('user.profile.upload');
-    Route::get('/user/profile/update', [UserProfileController::class, 'update'])->name('user.profile.update');
-    Route::get('/user/password/update', [UserProfileController::class, 'updatePassword'])->name('user.password.update');
 
 // summary
     Route::get('/target-history', TargetHistory::class)->name('target-history');

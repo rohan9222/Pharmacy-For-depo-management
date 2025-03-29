@@ -134,8 +134,8 @@ class MakeReportController extends Controller
     }
 
     public function stockStatement(Request $request){
-        $start_date = Carbon::parse($request->reportdate)->startOfMonth()->format('Y-m-d');
-        $end_date = Carbon::parse($request->reportdate)->format('Y-m-d');
+        $start_date = Carbon::parse($request->reportdate)->startOfMonth()->format('Y-m-d 00:00:00');
+        $end_date = Carbon::parse($request->reportdate)->format('Y-m-d 23:59:59');
         $report_date = Carbon::parse($request->reportdate);
         $medicines = Medicine::all();
         $invoices = Invoice::with('salesMedicines')->whereBetween('invoice_date', [$start_date, $end_date])->get();
