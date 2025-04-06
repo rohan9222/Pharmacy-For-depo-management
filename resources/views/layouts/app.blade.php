@@ -6,7 +6,8 @@
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
         <title>{{ config('app.name', 'ImpexPharma') }}</title>
-        <link rel="shortcut icon" href="{{ asset('img/favicon.ico') }}" type="image/x-icon">
+
+        <link rel="shortcut icon" href="{{ asset(siteUrlSettings('site_favicon')) }}" type="image/x-icon">
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
@@ -20,20 +21,20 @@
         <style>
             #toggleSidebar {
                 position: absolute;
-                left: 15rem;
+                /* left: 15rem; */
                 font-size: larger;
                 font-weight: bolder;
             }
 
-            .collapsed #toggleSidebar {
+            /* .collapsed #toggleSidebar {
                 left: 3.7rem !important;
-            }
+            } */
 
             .sidebar {
                 height: 100vh;
                 width: 250px;
                 position: fixed;
-                top: 0;
+                top: 3.5rem !important;
                 left: 0;
                 padding-top: 1rem;
                 transition: width 0.3s;

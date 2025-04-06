@@ -36,8 +36,8 @@ Schedule::call(function () {
         OpeningStock::create([
             'medicine_id' => $medicine->id,
             'opening_stock' => $medicine->quantity,
-            'stock_month' => Carbon::now()->format('F'),
-            'stock_year' => Carbon::now()->format('Y')
+            'opening_month' => Carbon::now()->format('F'),
+            'opening_year' => Carbon::now()->format('Y')
         ]);
     });
 })->monthly()->timezone('Asia/Dhaka');

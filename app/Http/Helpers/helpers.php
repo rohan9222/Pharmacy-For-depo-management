@@ -6,6 +6,7 @@
  * Date: 25-Jun-2024
  * Time: 03.01 PM
  */
+use App\Models\SiteSetting;
 
 if (!function_exists('rolesConvert')) {
     function rolesConvert($data = null) {
@@ -49,5 +50,18 @@ if (!function_exists('underRole')) {
             default:
                 return null; // or handle as needed
         }
+    }
+}
+
+// if (!function_exists('siteUrlSettings')) {
+//     function siteUrlSettings($key) {
+//         return SiteSetting::first()->$key ?? null;
+//     }
+// }
+if (!function_exists('siteUrlSettings')) {
+    function siteUrlSettings($key)
+    {
+        $settings = SiteSetting::first(); // Always fetch latest from DB
+        return $settings->{$key} ?? null;
     }
 }

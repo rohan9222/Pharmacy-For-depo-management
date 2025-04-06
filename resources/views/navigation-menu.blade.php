@@ -1,9 +1,9 @@
-<nav id="navbar" class="navbar navbar-expand-lg fixed-top bg-body-tertiary shadow-sm z-1">
+<nav id="navbar" class="navbar navbar-expand-lg fixed-top bg-body-tertiary z-3">
     <div class="container-fluid">
-        <a href="/" class="navbar-brand d-lg-none">
+        <a href="/" class="navbar-brand d-flex align-items-center mb-md-0 me-md-auto link-body-emphasis text-decoration-none">
             <!-- Logo -->
-            <x-application-mark class="sidebar-logo" style="width: 25px;" />
-            <span class="sidebar-text fs-4 fst-italic"><span class="text-info">Impex</span> Pharma</span>
+            <x-application-mark class="sidebar-logo" style="height: 2rem !important; width: 3rem !important;" />
+            {!! siteUrlSettings('site_name') !!}
         </a>
         
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">

@@ -1,4 +1,4 @@
-<div id="sidebar" class="d-none d-lg-block z-3 sidebar shadow-sm d-flex flex-column p-3 bg-body-tertiary">
+<div id="sidebar" class="d-none d-lg-block z-1 sidebar d-flex flex-column p-3 bg-body-tertiary">
     {{-- <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
     </button>
@@ -6,11 +6,11 @@
         <!-- Navigation Links -->
     {{-- <div class="collapse navbar-collapse" id="navbarNav"> --}}
      
-        <a href="/" class="navbar-brand d-flex align-items-center mb-md-0 me-md-auto link-body-emphasis text-decoration-none">
+        {{-- <a href="/" class="navbar-brand d-flex align-items-center mb-md-0 me-md-auto link-body-emphasis text-decoration-none">
             <!-- Logo -->
             <x-application-mark class="sidebar-logo w-25" />
-            <span class="sidebar-text fs-4 fst-italic"><span class="text-info">Impex</span> Pharma</span>
-        </a>
+            {!! siteUrlSettings('site_name') !!}
+        </a> --}}
 
         <ul class="nav nav-pills flex-column mb-auto">
             <li class="nav-item">

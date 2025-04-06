@@ -11,46 +11,43 @@
         <!-- Profile Photo -->
         @if (Laravel\Jetstream\Jetstream::managesProfilePhotos())
             <div class="row mb-3" x-data="{photoName: null, photoPreview: null}">
-                <label for="" class="col-md-4 col-lg-3 col-form-label">Profile Image</label>
+                <x-label class="col-md-4 col-lg-3 col-form-label" for="photo" value="{{ __('Profile image') }}" />
+                <!-- Profile Photo File Input -->
                 <div class="col-md-8 col-lg-9">
+                    <input type="file" id="photo" class="d-none"
+                                wire:model.live="photo"
+                                x-ref="photo"
+                                x-on:change="
+                                        photoName = $refs.photo.files[0].name;
+                                        const reader = new FileReader();
+                                        reader.onload = (e) => {
+                                            photoPreview = e.target.result;
+                                        };
+                                        reader.readAsDataURL($refs.photo.files[0]);
+                                " />
+
+
+                    <!-- Current Profile Photo -->
                     <div class="mt-2" x-show="! photoPreview">
-                        <img  class="profileImagePreview img-thumbnail rounded-circle w-25 h-25" src="{{ $this->user->profile_photo_url }}" alt="{{ $this->user->name }}" alt="Profile">
+                        <img src="{{ $this->user->profile_photo_url }}" alt="{{ $this->user->name }}" class="img-fluid img-thumbnail rounded w-25 h-25">
                     </div>
-                    
+
                     <!-- New Profile Photo Preview -->
                     <div class="mt-2" x-show="photoPreview" style="display: none;">
-                        <img :src="photoPreview" alt="Profile Photo Preview" class="profileImagePreview img-thumbnail rounded-circle w-25 h-25" />
+                        <img :src="photoPreview" alt="Profile Photo Preview" class="profileImagePreview img-thumbnail rounded w-25 h-25" />
                     </div>
-                    
-                    
-                    <div class="pt-2">
-                        <!-- Profile Photo File Input -->
-                        <input 
-                            type="file" 
-                            id="image" 
-                            class="btn btn-info form-control d-none" 
-                            wire:model.live="photo"
-                            x-ref="photo"
-                            x-on:change="photoName = $refs.photo.files[0].name;
-                                const reader = new FileReader();
-                                reader.onload = (e) => {
-                                    photoPreview = e.target.result;
-                                };
-                                reader.readAsDataURL($refs.photo.files[0]);" 
-                            name="image" 
-                            accept="image/*">
-                            
-                            <x-success-button class="btn-sm p-2 px-3" type="button" x-on:click.prevent="$refs.photo.click()">
-                                <i class="bi bi-upload"></i>
-                            </x-success-button>
-                            
-                            @if ($this->user->profile_photo_path)
-                                <x-danger-button type="button" class="btn-sm p-2 px-3" wire:click="deleteProfilePhoto">
-                                    <i class="bi bi-trash"></i>
-                                </x-danger-button>
-                            @endif
-                        <x-input-error for="photo" class="mt-2" />
-                    </div>
+
+                    <x-success-button class="mt-2 me-2" type="button" x-on:click.prevent="$refs.photo.click()">
+                        <i class="bi bi-upload"></i>
+                    </x-success-button>
+
+                    @if ($this->user->profile_photo_path)
+                        <x-danger-button type="button" class="mt-2" wire:click="deleteProfilePhoto">
+                            <i class="bi bi-trash"></i>
+                        </x-danger-button>
+                    @endif
+
+                    <x-input-error for="photo" class="mt-2" />
                 </div>
             </div>
         @endif
@@ -83,9 +80,9 @@
                 </small>
 
                 @if ($this->verificationLinkSent)
-                    <small class="mt-2 font-weight-medium text-success text-sm">
+                    <p class="mt-2 font-weight-medium text-success text-sm">
                         {{ __('A new verification link has been sent to your email address.') }}
-                    </small>                
+                    </p>
                 @endif
             @endif
         </div>

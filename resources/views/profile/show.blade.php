@@ -63,26 +63,32 @@
                                         <!-- Bordered Tabs -->
                                         <ul class="nav nav-tabs nav-tabs-bordered" role="tablist">
                                             <li class="nav-item" role="presentation">
-                                            <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#profile-overview" aria-selected="true" role="tab">Overview</button>
+                                                <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#profile-overview" aria-selected="true" role="tab">Overview</button>
                                             </li>
-                                            <li class="nav-item" role="presentation">
-                                                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#profile-edit" aria-selected="false" tabindex="-1" role="tab">Edit Profile</button>
-                                            </li>
-                                            <li class="nav-item" role="presentation">
-                                                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#profile-change-password" aria-selected="false" tabindex="-1" role="tab">Change Password</button>
-                                            </li>
-                                            <li class="nav-item" role="presentation">
-                                                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#profile-two-factor" aria-selected="false" tabindex="-1" role="tab">Two Factor</button>
-                                            </li>
+                                            @if (Laravel\Fortify\Features::canUpdateProfileInformation() || Laravel\Jetstream\Jetstream::hasAccountDeletionFeatures())
+                                                <li class="nav-item" role="presentation">
+                                                    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#profile-edit" aria-selected="false" tabindex="-1" role="tab">Edit Profile</button>
+                                                </li>
+                                            @endif
+                                            @if (Laravel\Fortify\Features::enabled(Laravel\Fortify\Features::updatePasswords()))
+                                                <li class="nav-item" role="presentation">
+                                                    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#profile-change-password" aria-selected="false" tabindex="-1" role="tab">Change Password</button>
+                                                </li>
+                                            @endif
+                                            @if (Laravel\Fortify\Features::canManageTwoFactorAuthentication())
+                                                <li class="nav-item" role="presentation">
+                                                    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#profile-two-factor" aria-selected="false" tabindex="-1" role="tab">Two Factor</button>
+                                                </li>
+                                            @endif
                                             <li class="nav-item" role="presentation">
                                                 <button class="nav-link" data-bs-toggle="tab" data-bs-target="#profile-browser-sessions" aria-selected="false" tabindex="-1" role="tab">Browser Sessions</button>
                                             </li>
                                         </ul>
 
                                         <div class="tab-content pt-2">
-                                            <div class="tab-pane fade show active profile-overview" id="profile-overview" role="tabpanel">
-                                                <h5 class="card-title">Profile Details</h5>
-                                                <div class="row">
+                                            <div class="card shadow p-3 tab-pane fade show active" id="profile-overview" role="tabpanel">
+                                                <h3 class="card-title">Profile Details</h3>
+                                                <div class="row card-body">
                                                     @foreach(Auth::user()->roles as $role)
                                                         <li class="label fw-bold">{{ $role->name }} Role: Yes</li>
                                                     @endforeach 
@@ -98,32 +104,31 @@
                                                     @endif
                                                 </div>
                                             </div>
-                                            <div class="tab-pane fade profile-edit pt-3" id="profile-edit" role="tabpanel">
-                                                @if (Laravel\Fortify\Features::canUpdateProfileInformation())
-                                                    @livewire('profile.update-profile-information-form')
-                                                    <x-section-border />
-                                                @endif
-                                                @if (Laravel\Jetstream\Jetstream::hasAccountDeletionFeatures())
-                                                    @livewire('profile.delete-user-form')
-                                                @endif
-                                            </div>
-                                            <div class="tab-pane fade profile-edit pt-3" id="profile-change-password" role="tabpanel">
-                                                @if (Laravel\Fortify\Features::enabled(Laravel\Fortify\Features::updatePasswords()))
-                                                    @livewire('profile.update-password-form')
-                                                    <x-section-border />
-                                                @endif
-                                            </div>
-                                            <div class="tab-pane fade profile-edit pt-3" id="profile-two-factor" role="tabpanel">
-                                                @if (Laravel\Fortify\Features::canManageTwoFactorAuthentication())
-                                                    @livewire('profile.two-factor-authentication-form')                                    
-                                                    <x-section-border />
-                                                @endif
-                                            </div>
-                                            <div class="tab-pane fade profile-edit pt-3" id="profile-browser-sessions" role="tabpanel">
+                                            @if (Laravel\Fortify\Features::canUpdateProfileInformation() || Laravel\Jetstream\Jetstream::hasAccountDeletionFeatures())
+                                                <div class="card shadow p-3 tab-pane fade" id="profile-edit" role="tabpanel">
+                                                    @if (Laravel\Fortify\Features::canUpdateProfileInformation())
+                                                        @livewire('profile.update-profile-information-form')
+                                                        <x-section-border />
+                                                    @endif
+                                                    @if (Laravel\Jetstream\Jetstream::hasAccountDeletionFeatures())
+                                                        @livewire('profile.delete-user-form')
+                                                    @endif
+                                                </div>
+                                            @endif
+                                            @if (Laravel\Fortify\Features::enabled(Laravel\Fortify\Features::updatePasswords()))
+                                                <div class="card shadow p-3 tab-pane fade" id="profile-change-password" role="tabpanel">
+                                                        @livewire('profile.update-password-form')
+                                                </div>
+                                            @endif
+                                            @if (Laravel\Fortify\Features::canManageTwoFactorAuthentication())
+                                                <div class="card shadow p-3 tab-pane fade" id="profile-two-factor" role="tabpanel">
+                                                        @livewire('profile.two-factor-authentication-form')
+                                                </div>
+                                            @endif
+                                            <div class="card shadow p-3 tab-pane fade" id="profile-browser-sessions" role="tabpanel">
                                                 {{-- @if (Laravel\Jetstream\Jetstream::hasSessionFeatures()) --}}
                                                     @livewire('profile.logout-other-browser-sessions-form')
                                                 {{-- @endif --}}
-                                                <x-section-border />
                                             </div>
                                         </div>
                                     </div>
