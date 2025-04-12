@@ -1,23 +1,79 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Laravel project on CodePagol
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+## About This Project
 
-## About Laravel
+Hello, Team Members!
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+This is our New Laravel Project. Below, I have explained in detail the Laravel libraries we are using in this project.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+If you have any questions or need clarification, feel free to discuss them in the group chat.
+
+Looking forward to our collaboration!
+
+# Install composer dependency
+
+composer install
+
+# Install node modules
+
+npm install / yarn
+
+# Copy environment file
+
+cp .env.example .env
+
+# Set the Application key
+
+php artisan key:generate
+
+# setup the database credentials and migrate database
+
+php artisan migrate
+
+# Damy data Insert with Seeder && Factory
+
+php artisan migrate:fresh --seed
+
+Best regards,
+[Md Jahangir Alam Rohan](https://github.com/rohan9222)
+
+## Laravel Libraries We Are Using
+
+-   [Laravel Framework. The Laravel Framework is a PHP web application framework with a focus on simplicity, ease of use, and developer experience.](https://laravel.com/)
+-   [Laravel Jetstream for Authorization. Provides a starter kit with features like authentication, registration, and team management.](https://jetstream.laravel.com/introduction.html)
+-   [Laravel Spatie Permission for Role-Based Access Control.Manages roles and permissions efficiently in a Laravel application.](https://spatie.be/docs/laravel-permission/v6/introduction)
+-   [Maatwebsite/Laravel-Excel for Excel. Simplifies importing and exporting Excel files in Laravel.](https://docs.laravel-excel.com/3.1/introduction/introduction.html)
+-   [PhpSpreadsheet. A library for reading and writing spreadsheet files in various formats.](https://phpspreadsheet.readthedocs.io/en/latest/)
+-   [Intervention/Image for Image Processing. Handles image resizing, cropping, and manipulation easily.](https://image.intervention.io/)
+-   [Dompdf for PDF Generation. Converts HTML content into PDF documents with ease.](https://github.com/dompdf/dompdf)
+-   [Livewire. Builds dynamic interfaces using Laravel Blade without writing JavaScript.](https://livewire.laravel.com/)
+-   [Guzzle PHP for HTTP Requests. A PHP HTTP client for sending HTTP requests and handling API interactions.](https://docs.guzzlephp.org/en/stable/)
+
+## Node Modules We Are Using
+
+-   [Node.js package](https://www.npmjs.com/)
+-   [livewire/livewire](https://github.com/livewire/livewire)
+-   [@popperjs/core js](https://popper.js.org/)
+-   [Tailwind CSS](https://tailwindcss.com/)
+-   [Jquery](https://jquery.com/)
+-   [Jquery UI](https://jqueryui.com/)
+-   [Slick Carousel for showcasing content or images](https://kenwheeler.github.io/slick/)
+-   [Toastr for non-blocking notifications.](https://github.com/CodeSeven/toastr)
+-   [Swal](https://sweetalert2.github.io/)
+-   [Moment.js](https://momentjs.com/)
+-   [ApexCharts for modern charting library that is highly customizable and easy to use for data visualization.](https://apexcharts.com/)
+
+Now let's get started with our project!
+
+## What is Laravel?
+
+-   [Simple, fast routing engine](https://laravel.com/docs/routing).
+-   [Powerful dependency injection container](https://laravel.com/docs/container).
+-   Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
+-   Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
+-   Database agnostic [schema migrations](https://laravel.com/docs/migrations).
+-   [Robust background job processing](https://laravel.com/docs/queues).
+-   [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
 
 Laravel is accessible, powerful, and provides tools required for large, robust applications.
 
@@ -35,19 +91,19 @@ We would like to extend our thanks to the following sponsors for funding Laravel
 
 ### Premium Partners
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+-   **[Vehikl](https://vehikl.com/)**
+-   **[Tighten Co.](https://tighten.co)**
+-   **[WebReinvent](https://webreinvent.com/)**
+-   **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
+-   **[64 Robots](https://64robots.com)**
+-   **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
+-   **[Cyber-Duck](https://cyber-duck.co.uk)**
+-   **[DevSquad](https://devsquad.com/hire-laravel-developers)**
+-   **[Jump24](https://jump24.co.uk)**
+-   **[Redberry](https://redberry.international/laravel/)**
+-   **[Active Logic](https://activelogic.com)**
+-   **[byte5](https://byte5.de)**
+-   **[OP.GG](https://op.gg)**
 
 ## Contributing
 
