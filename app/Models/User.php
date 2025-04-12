@@ -46,9 +46,10 @@ class User extends Authenticatable
         'category',
         'password',
         'product_target',
+        'product_target_data',
         'sales_target',
-        'field_officer_id',
-        'sales_manager_id',
+        'tse_id',
+        'zse_id',
         'manager_id',
     ];
 
@@ -90,6 +91,7 @@ class User extends Authenticatable
     public function scopeSearch($query, $search)
     {
         return $query->where('name', 'like', '%' . $search . '%')
+            ->orWhere('user_id', 'like', '%' . $search . '%')
             ->orWhere('email', 'like', '%' . $search . '%')
             ->orWhere('mobile', 'like', '%' . $search . '%')
             ->orWhere('balance', 'like', '%' . $search . '%')
@@ -104,24 +106,28 @@ class User extends Authenticatable
 
     public function salesManager()
     {
-        return $this->belongsTo(User::class, 'sales_manager_id');
+        return $this->belongsTo(User::class, 'zse_id');
     }
 
     public function fieldOfficer()
     {
-        return $this->belongsTo(User::class, 'field_officer_id');
+        return $this->belongsTo(User::class, 'tse_id');
     }
 
     public function customers()
     {
         return $this->hasMany(User::class, 'manager_id')
-            ->orWhere('sales_manager_id', $this->id)
-            ->orWhere('field_officer_id', $this->id);
+            ->orWhere('zse_id', $this->id)
+            ->orWhere('tse_id', $this->id);
     }
 
     public function targetReports()
     {
         return $this->hasMany(TargetReport::class);
+    }
+
+    public function invoiceData(){
+        return $this->hasMany(Invoice::class , 'customer_id');
     }
 
 }

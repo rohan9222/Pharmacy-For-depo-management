@@ -6,43 +6,55 @@
 
     <div class="d-flex justify-content-center">
         <div class="col-10" x-show="!isUserProfile" x-transition>
+            <div class="row">
+                <div class="col-12">
+                    @canany(['create-user', 'edit-user', 'delete-user'])
+                        <a class="btn btn-success col-md mx-1" href="{{ route('users.create') }}">
+                            <i class="fa-solid fa-user-gear"></i>Add User</a>
+                    @endcanany
+                </div>
+            </div>
             <div class="row mt-3">
                 <div class="row justify-content-end">
-                    <div class="col-3">
-                        <input id="search" class="form-control" type="search" wire:model.live="search" placeholder="Search By Name" aria-label="Search By Name">
+                    <div class="col-sm-6 col-lg-3">
+                        <input id="search" class="form-control" type="search" wire:model.live="search" placeholder="Search" aria-label="Search By Name">
                     </div>
                 </div>
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th>SN</th>
-                            <th>Person Name</th>
-                            <th>Email Address</th>
-                            <th>mobile</th>
-                            <th>Address</th>
-                            <th>Target</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach ($admin_users as $admin_user)
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
                             <tr>
-                                <td>{{ $loop->iteration }}</td>
-                                <td>{{ $admin_user->name }}</td>
-                                <td>{{ $admin_user->email }}</td>
-                                <td>{{ $admin_user->mobile }}</td>
-                                <td>{{ $admin_user->address }}</td>
-                                <td>{{ $admin_user->sales_target }}</td>
-                                <td>
-                                    @if(Auth::user()->hasRole('Super Admin') || Auth::user()->hasRole('Depo Incharge'))
-                                        <button class="btn btn-sm btn-info" wire:click="edit({{ $admin_user->id }})" @click="isOpen = true"><i class="bi bi-pencil-square"></i></button>
-                                    @endif
-                                    <button class="btn btn-sm btn-primary" wire:click="view({{ $admin_user->id }})" @click="isUserProfile = true, isUserList = false" ><i class="bi bi-eye"></i></button>
-                                </td>
+                                <th>SN</th>
+                                <th>User ID</th>
+                                <th>Person Name</th>
+                                <th>Email Address</th>
+                                <th>mobile</th>
+                                <th>Address</th>
+                                <th>Target</th>
+                                <th>Action</th>
                             </tr>
-                        @endforeach
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            @foreach ($admin_users as $admin_user)
+                                <tr>
+                                    <td>{{ $loop->iteration }}</td>
+                                    <td>{{ $admin_user->user_id }}</td>
+                                    <td>{{ $admin_user->name }}</td>
+                                    <td>{{ $admin_user->email }}</td>
+                                    <td>{{ $admin_user->mobile }}</td>
+                                    <td>{{ $admin_user->address }}</td>
+                                    <td>{{ $admin_user->sales_target }}</td>
+                                    <td>
+                                        @if(Auth::user()->hasRole('Super Admin') || Auth::user()->hasRole('Depo Incharge'))
+                                            <button class="btn btn-sm btn-info" wire:click="edit({{ $admin_user->id }})" @click="isOpen = true"><i class="bi bi-pencil-square"></i></button>
+                                        @endif
+                                        <button class="btn btn-sm btn-primary" wire:click="view({{ $admin_user->id }})" @click="isUserProfile = true, isUserList = false" ><i class="bi bi-eye"></i></button>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
                 @if ($target_edit && $sales_target !== '')
                     <div class="modal fade show d-block" tabindex="-1" role="dialog">
                         <div class="modal-dialog">
@@ -86,15 +98,15 @@
         </div>
 
         <div class="col-10" x-show="isUserProfile" x-transition x-cloak>
-            <button class="btn btn-sm btn-info" @click="isUserProfile = false; $wire.set('sales_manager_id', ''); $wire.set('field_officer_id', ''); $wire.set('customer_id', '');">back</button>
+            <button class="btn btn-sm btn-info" @click="isUserProfile = false; $wire.set('zse_id', ''); $wire.set('tse_id', ''); $wire.set('customer_id', '');">back</button>
             @if ($adminUserData)
                 <div class="row pt-2">
-                    <div class="col-xl-4 col-lg-5 col-md-5 order-1 order-md-0">
+                    <div class="col-xl-4 col-lg-5 col-md-5">
                         <div class="card border-0 shadow">
                             <div class="card-body">
                                 <div class="user-avatar-section">
                                     <div class="d-flex align-items-center flex-column">
-                                        <img class="img-fluid rounded-circle mb-2" src="{{ asset('img/noimage.png') }}" onerror="this.src='{{ asset('img/noimage.png') }}'" height="100" width="100" alt="User avatar">
+                                        <img class="img-fluid rounded-circle mb-2" src="{{ $adminUserData->profile_photo_url ?? asset('img/noimage.png') }}" onerror="this.src='{{ asset('img/noimage.png') }}'" height="100" width="100" alt="User avatar">
                                         <div class="user-info text-center">
                                             <h4>{{ $adminUserData->name }}</h4>
                                             <span class="d-inline-flex px-2 text-success-emphasis bg-success-subtle border border-success-subtle rounded-2">{{ $adminUserData->role }}</span>
@@ -130,6 +142,10 @@
                                             <span>{{ $adminUserData->name }}</span>
                                         </li>
                                         <li class="mb-75">
+                                            <span class="fw-bolder me-25">User ID:</span>
+                                            <span>{{ $adminUserData->user_id }}</span>
+                                        </li>
+                                        <li class="mb-75">
                                             <span class="fw-bolder me-25">Phone:</span>
                                             <span>{{ $adminUserData->mobile }}</span>
                                         </li>
@@ -160,26 +176,26 @@
                         </div>
                     </div>
 
-                    <div class="col-xl-8 col-lg-7 col-md-7 order-0 order-md-1">
-                        <div class="row p-1 mb-1">
+                    <div class="col-xl-8 col-lg-7 col-md-7">
+                        <div class="row p-1 mb-1 g-1">
                         @if ($type == 'manager')
-                            <div class="col-3">
-                                <select class="form-select form-select-sm" wire:change="view({{$adminUserData->id}})" wire:model="sales_manager_id">
-                                    <option value=''>Select Sales Manager</option>
-                                    @foreach ($sales_managers as $sales_manager)
-                                        <option value="{{ $sales_manager->id }}">{{ $sales_manager->name }}</option>
+                            <div class="col-lg-3 col-md-6">
+                                <select class="form-select form-select-sm" wire:change="view({{$adminUserData->id}})" wire:model="zse_id">
+                                    <option value=''>Select Zonal Sales Executive</option>
+                                    @foreach ($zses as $zse)
+                                        <option value="{{ $zse->id }}">{{ $zse->name }}</option>
                                     @endforeach
                                 </select>
                             </div>
-                            <div class="col-3">
-                                <select class="form-select form-select-sm" wire:change="view({{$adminUserData->id}})" wire:model="field_officer_id" >
-                                    <option value=''>Select Field Officer</option>
-                                    @foreach ($field_officers ?? [] as $field_officer)
-                                        <option value="{{ $field_officer->id }}">{{ $field_officer->name }}</option>
+                            <div class="col-lg-3 col-md-6">
+                                <select class="form-select form-select-sm" wire:change="view({{$adminUserData->id}})" wire:model="tse_id" >
+                                    <option value=''>Select Territory Sales Executive</option>
+                                    @foreach ($tses ?? [] as $tse)
+                                        <option value="{{ $tse->id }}">{{ $tse->name }}</option>
                                     @endforeach
                                 </select>
                             </div>
-                            <div class="col-3">
+                            <div class="col-lg-3 col-md-6">
                                 <select class="form-select form-select-sm" wire:change="view({{$adminUserData->id}})" wire:model="customer_id">
                                     <option value=''>Select Customer</option>
                                     @foreach ($customers ?? [] as $customer)
@@ -187,12 +203,12 @@
                                     @endforeach
                                 </select>
                             </div>
-                        @elseif ($type == 'sales_manager')
+                        @elseif ($type == 'zse')
                             <div class="col-4">
-                                <select class="form-select form-select-sm" wire:change="view({{$adminUserData->id}})" wire:model="field_officer_id">
-                                    <option value=''>Select Field Officer</option>
-                                    @foreach ($field_officers as $field_officer)
-                                        <option value="{{ $field_officer->id }}">{{ $field_officer->name }}</option>
+                                <select class="form-select form-select-sm" wire:change="view({{$adminUserData->id}})" wire:model="tse_id">
+                                    <option value=''>Select Territory Sales Executive</option>
+                                    @foreach ($tses as $tse)
+                                        <option value="{{ $tse->id }}">{{ $tse->name }}</option>
                                     @endforeach
                                 </select>
                             </div>
@@ -204,7 +220,7 @@
                                     @endforeach
                                 </select>
                             </div>
-                        @elseif ($type == 'field_officer')
+                        @elseif ($type == 'tse')
                             <div class="col-4">
                                 <select class="form-select form-select-sm" wire:change="view({{$adminUserData->id}})" wire:model="customer_id">
                                     <option value=''>Select Customer</option>
@@ -214,13 +230,13 @@
                                 </select>
                             </div>
                         @endif
-                            <div class="col-4">
+                            {{-- <div class="col-lg-3 col-md-6">
                                 <div class="input-group mb-3">
-                                    <input type="date" class="form-control" placeholder="Start Date" wire:model="start_date">
+                                    <input type="date" class="form-control form-control-sm" placeholder="Start Date" wire:model="start_date">
                                     <span class="input-group-text">To</span>
                                     <input type="date" class="form-control" placeholder="End Date" wire:model="end_date">
                                 </div>
-                            </div>
+                            </div> --}}
                         </div>
 
                         <div class="card">
@@ -234,6 +250,7 @@
                                             <tr>
                                                 <th>Invoice No</th>
                                                 <th>Total Price</th>
+                                                <th>Return</th>
                                                 <th>Paid Amount</th>
                                                 <th>Due amount</th>
                                                 <th>Action</th>
@@ -241,11 +258,35 @@
                                         </thead>
                                         <tbody>
                                             @foreach ($invoices as $invoice)
+                                                @php
+                                                    $afterReturnPrice = $invoice->sub_total - $invoice->salesReturnMedicines->sum('total_price');
+                                                    $afterReturnVat = $invoice->vat - $invoice->salesReturnMedicines->sum('vat');
+                                                    $sumReturnTotal = $invoice->salesReturnMedicines->sum('total');
+
+                                                    $discount_data = json_decode($invoice->discount_data);
+                                                    $newDiscount = App\Models\DiscountValue::where('discount_type', 'General')
+                                                        ->where('start_amount', '<=', $afterReturnPrice)
+                                                        ->where('end_amount', '>=', $afterReturnPrice)
+                                                        ->pluck('discount')
+                                                        ->first();
+                        
+                                                    if (!empty($discount_data) && $discount_data->start_amount <= $afterReturnPrice && $afterReturnPrice <= $discount_data->end_amount) {
+                                                        $afterReturnDis = ($afterReturnPrice * $invoice->discount) / 100;
+                                                        $afterReturnDue = ($afterReturnPrice - $afterReturnDis) + $afterReturnVat; 
+                                                    } elseif ($newDiscount !== null) {
+                                                        $afterReturnDue = ($afterReturnPrice + $afterReturnVat) - ($afterReturnPrice * $newDiscount / 100);
+                                                    } else {
+                                                        $afterReturnDue = $afterReturnPrice + $afterReturnVat;
+                                                    }
+                                                    $actualDue = round(max($afterReturnDue - $invoice->paid, 0), 2);
+                                                @endphp
                                                 <tr>
                                                     <td>{{ $site_settings->site_invoice_prefix }}-{{ $invoice->invoice_no }}</td>
                                                     <td>{{ $site_settings->site_currency }}{{ $invoice->grand_total }}</td>
+                                                    <td>{{ $site_settings->site_currency }}{{ $sumReturnTotal }}</td>
                                                     <td>{{ $site_settings->site_currency }}{{ $invoice->paid }}</td>
-                                                    <td>{{ $site_settings->site_currency }}{{ $invoice->due }}</td>
+                                                    <td class="border-end"><b>{{ $actualDue }}</b></td>
+                                                    {{-- <td>{{ $site_settings->site_currency }}{{ $invoice->salesReturnMedicines->sum('total') > $invoice->due ? 0 : $invoice->due - $invoice->salesReturnMedicines->sum('total') }}</td> --}}
                                                     <td>
                                                         <a href="{{ route('invoice.pdf', $invoice->invoice_no) }}" target="_blank"
                                                             title="View Invoice"
@@ -266,3 +307,4 @@
         </div>
     </div>
 </div>
+

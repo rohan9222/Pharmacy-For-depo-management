@@ -3,7 +3,7 @@ body {
     padding: 0;
     height: 100vh;
     width: 100%;
-    font-family: Arial,sans-serif;
+    font-family: 'Times New Roman', Arial, Helvetica, sans-serif;
 }
 
 .a4 {
@@ -43,3 +43,5 @@ body {
 .ps-2 { padding-left: 2em; }
 .ms-2 { margin-left: 2em; }
 .h-100 { height: 100%; }
+
+.table-border tr, .table-border td, .table-border th{ border: 1px solid #000; }

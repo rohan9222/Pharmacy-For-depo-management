@@ -40,23 +40,23 @@
                                             <input class="form-control" type="address" id="address" wire:model="address" placeholder="address" aria-label="address">
                                             @error('address') <span class="text-danger">{{ $message }}</span> @enderror
                                         </div>
-                                        <div class="col-3">
+                                        {{-- <div class="col-3">
                                             <input class="form-control" type="number" id="balance" wire:model="balance" placeholder="Balance" aria-label="Balance">
                                             @error('balance') <span class="text-danger">{{ $message }}</span> @enderror
-                                        </div>
+                                        </div> --}}
                                         <div class="col-3">
-                                            <select name="field_officer_team" id="field_officer_team" class="form-control" wire:model="field_officer_team">
-                                                <option value="">Select Field Officer</option>
-                                                @foreach ($field_officers as $field_officer)
-                                                    <option value="{{ $field_officer->id }}"
-                                                        {{ isset($field_officer->fieldOfficer) && $field_officer->fieldOfficer->id == $field_officer->id
+                                            <select name="tse_team" id="tse_team" class="form-control" wire:model="tse_team">
+                                                <option value="">Select Territory Sales Executive</option>
+                                                @foreach ($tses as $tse)
+                                                    <option value="{{ $tse->id }}"
+                                                        {{ isset($tse->fieldOfficer) && $tse->fieldOfficer->id == $tse->id
                                                             ? 'selected'
-                                                            : ($field_officer->id == auth()->user()->id ? 'selected' : '') }}>
-                                                        {{ $field_officer->name }}
+                                                            : ($tse->id == auth()->user()->id ? 'selected' : '') }}>
+                                                        {{ $tse->name }}
                                                     </option>
                                                 @endforeach
                                             </select>
-                                            @error('field_officer_team') <span class="text-danger">{{ $message }}</span> @enderror
+                                            @error('tse_team') <span class="text-danger">{{ $message }}</span> @enderror
                                         </div>
                                         <div class="col-3">
                                             <input type="text" class="form-control" id="route" wire:model="route" placeholder="Route" aria-label="Route">
@@ -81,53 +81,58 @@
 
             <div class="row mt-3">
                 <div class="row justify-content-end">
-                    <div class="col-3">
-                        <input id="search" class="form-control" type="search" wire:model.live="search" placeholder="Search By Name" aria-label="Search By Name">
+                    <div class="col-lg-6 col-md-6 col-sm-6">
+                        <input id="search" class="form-control" type="search" wire:model.live="search" placeholder="Search" aria-label="Search By Name">
                     </div>
                 </div>
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th>SN</th>
-                            <th>customer Name</th>
-                            <th>Email Address</th>
-                            <th>mobile</th>
-                            {{-- <th>Balance</th> --}}
-                            <th>Address</th>
-                            <th>Field Officer</th>
-                            <th>Route</th>
-                            <th>Category</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach ($customers as $customer)
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
                             <tr>
-                                <td>{{ $loop->iteration }}</td>
-                                <td>{{ $customer->name }}</td>
-                                <td>{{ $customer->email }}</td>
-                                <td>{{ $customer->mobile }}</td>
-                                {{-- <td>{{ $customer->balance }}</td> --}}
-                                <td>{{ $customer->address }}</td>
-                                <td>{{ $customer->fieldOfficer->name ?? 'N/A' }}</td>
-                                <td>{{ $customer->route ?? 'N/A' }}</td>
-                                <td>{{ $customer->category ?? 'N/A' }}</td>
-                                <td>
-                                    @can('view-customer')
-                                        <button class="btn btn-sm btn-primary" wire:click="view({{ $customer->id }})" @click="isCustomerProfile = true, isCustomerList = false" ><i class="bi bi-eye"></i></button>
-                                    @endcan
-                                    @can('edit-customer')
-                                        <button class="btn btn-sm btn-info" wire:click="edit({{ $customer->id }})" @click="isOpen = true"><i class="bi bi-pencil-square"></i></button>
-                                    @endcan
-
-                                    @can('delete-customer')
-                                        <button class="btn btn-sm btn-danger" wire:click="delete({{ $customer->id }})"><i class="bi bi-trash"></i></button>
-                                    @endcan
-                                </td>
+                                <th>SN</th>
+                                <th>Customer ID</th>
+                                <th>customer Name</th>
+                                <th>Email Address</th>
+                                <th>mobile</th>
+                                {{-- <th>Balance</th> --}}
+                                <th>Address</th>
+                                <th>Territory Sales Executive</th>
+                                <th>Route</th>
+                                <th>Category</th>
+                                <th>Action</th>
                             </tr>
-                        @endforeach
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            @foreach ($customers as $customer)
+                                <tr>
+                                    <td>{{ $loop->iteration }}</td>
+                                    <td>{{ $customer->user_id }}</td>
+                                    <td>{{ $customer->name }}</td>
+                                    <td>{{ $customer->email }}</td>
+                                    <td>{{ $customer->mobile }}</td>
+                                    {{-- <td>{{ $customer->balance }}</td> --}}
+                                    <td>{{ $customer->address }}</td>
+                                    <td>{{ $customer->fieldOfficer->name ?? 'N/A' }}</td>
+                                    <td>{{ $customer->route ?? 'N/A' }}</td>
+                                    <td>{{ $customer->category ?? 'N/A' }}</td>
+                                    <td>
+                                        @can('view-customer')
+                                            <button class="btn btn-sm btn-primary" wire:click="view({{ $customer->id }})" @click="isCustomerProfile = true, isCustomerList = false" ><i class="bi bi-eye"></i></button>
+                                        @endcan
+
+                                        @can('edit-customer')
+                                            <button class="btn btn-sm btn-info" wire:click="edit({{ $customer->id }})" @click="isOpen = true"><i class="bi bi-pencil-square"></i></button>
+                                        @endcan
+    
+                                        @can('delete-customer')
+                                            <button class="btn btn-sm btn-danger" wire:click="delete({{ $customer->id }})"><i class="bi bi-trash"></i></button>
+                                        @endcan
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
             </div>
 
             <div class="pagination">
@@ -139,7 +144,7 @@
             <button class="btn btn-sm btn-info" @click="isCustomerProfile = false">back</button>
             @if ($customerData)
                 <div class="row pt-2">
-                    <div class="col-xl-4 col-lg-5 col-md-5 order-1 order-md-0">
+                    <div class="col-xl-4 col-lg-5 col-md-5">
                         <div class="card border-0 shadow">
                             <div class="card-body">
                                 <div class="user-avatar-section">
@@ -162,6 +167,15 @@
                                         </div>
                                     </div>
                                     <div class="d-flex align-items-start">
+                                        <span class="d-inline-flex px-2 py-1 text-warning-emphasis bg-warning-subtle border border-warning-subtle rounded-2 mt-1">
+                                            <i class="bi bi-box-arrow-left"></i>
+                                        </span>
+                                        <div class="ms-75">
+                                            <h5 class="mb-0">{{ $site_settings->site_currency }}{{ $customerData->total_return}}</h4>
+                                            <small>Total Return</small>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex align-items-start">
                                         <span class="d-inline-flex px-2 py-1 text-danger-emphasis bg-danger-subtle border border-danger-subtle rounded-2 mt-1">
                                             <i class="bi bi-exclamation-triangle"></i>
                                         </span>
@@ -178,6 +192,10 @@
                                         <li class="mb-75">
                                             <span class="fw-bolder me-25">Name:</span>
                                             <span>{{ $customerData->name }}</span>
+                                        </li>
+                                        <li class="mb-75">
+                                            <span class="fw-bolder me-25">Customer ID:</span>
+                                            <span>{{ $customerData->user_id }}</span>
                                         </li>
                                         <li class="mb-75">
                                             <span class="fw-bolder me-25">Phone:</span>
@@ -205,7 +223,7 @@
                                             <span>{{ $customerData->address }}</span>
                                         </li>
                                         <li class="mb-75 d-flex justify-content-end">
-                                            @if ($customerData->total_due > 0)
+                                            @if ($customerData->total_due > 0 && auth()->user()->can('make-payment'))
                                                 <button class="btn btn-info btn-sm" wire:click="partialPay({{ $customerData->id }})" data-bs-toggle="modal" data-bs-target="#duePaymentModal">Pay Now</button>
                                             @endif
                                         </li>
@@ -215,7 +233,7 @@
                         </div>
                     </div>
 
-                    <div class="col-xl-8 col-lg-7 col-md-7 order-0 order-md-1">
+                    <div class="col-xl-8 col-lg-7 col-md-7">
                         <div class="card">
                             <div class="card-header">
                                 <h4>Customer Invoice</h4>
@@ -227,6 +245,8 @@
                                             <tr>
                                                 <th>Invoice No</th>
                                                 <th>Total Price</th>
+                                                <th>Return</th>
+                                                {{-- <th>Discount</th> --}}
                                                 <th>Paid Amount</th>
                                                 <th>Due amount</th>
                                                 <th>Action</th>
@@ -234,13 +254,37 @@
                                         </thead>
                                         <tbody>
                                             @foreach ($invoices as $invoice)
+                                                @php
+                                                    $afterReturnPrice = $invoice->sub_total - $invoice->salesReturnMedicines->sum('total_price');
+                                                    $afterReturnVat = $invoice->vat - $invoice->salesReturnMedicines->sum('vat');
+                                                    $sumReturnTotal = $invoice->salesReturnMedicines->sum('total');
+
+                                                    $discount_data = json_decode($invoice->discount_data);
+                                                    $newDiscount = App\Models\DiscountValue::where('discount_type', 'General')
+                                                        ->where('start_amount', '<=', $afterReturnPrice)
+                                                        ->where('end_amount', '>=', $afterReturnPrice)
+                                                        ->pluck('discount')
+                                                        ->first();
+                        
+                                                    if (!empty($discount_data) && $discount_data->start_amount <= $afterReturnPrice && $afterReturnPrice <= $discount_data->end_amount) {
+                                                        $afterReturnDis = ($afterReturnPrice * $invoice->discount) / 100;
+                                                        $afterReturnDue = ($afterReturnPrice - $afterReturnDis) + $afterReturnVat; 
+                                                    } elseif ($newDiscount !== null) {
+                                                        $afterReturnDue = ($afterReturnPrice + $afterReturnVat) - ($afterReturnPrice * $newDiscount / 100);
+                                                    } else {
+                                                        $afterReturnDue = $afterReturnPrice + $afterReturnVat;
+                                                    }
+                                                    $actualDue = round(max($afterReturnDue - $invoice->paid, 0), 2);
+                                                @endphp
                                                 <tr>
                                                     <td>{{ $site_settings->site_invoice_prefix }}-{{ $invoice->invoice_no }}</td>
                                                     <td>{{ $site_settings->site_currency }}{{ $invoice->grand_total }}</td>
+                                                    <td>{{ $site_settings->site_currency }}{{ $sumReturnTotal }}</td>
+                                                    {{-- <td>{{ $site_settings->site_currency }}{{ $invoice->dis_amount }}</td> --}}
                                                     <td>{{ $site_settings->site_currency }}{{ $invoice->paid }}</td>
-                                                    <td>{{ $site_settings->site_currency }}{{ $invoice->due }}</td>
+                                                    <td class="border-end"><b>{{ $actualDue }}</b></td>
                                                     <td>
-                                                        @if ($invoice->due > 0)
+                                                        @if ($actualDue > 0 && auth()->user()->can('make-payment'))
                                                             <button wire:click="setInvoice({{ $invoice->id }}, {{ $customerData->id }})"
                                                                 class="btn btn-primary btn-sm"
                                                                 data-bs-toggle="modal"
@@ -270,16 +314,39 @@
                                                     </div>
                                                     <div class="modal-body">
                                                         @if($selectedInvoice)
+                                                            @php
+                                                                $afterReturnPrice = $selectedInvoice->sub_total - $selectedInvoice->salesReturnMedicines->sum('total_price');
+                                                                $afterReturnVat = $selectedInvoice->vat - $selectedInvoice->salesReturnMedicines->sum('vat');
+                                                                $sumReturnTotal = $selectedInvoice->salesReturnMedicines->sum('total_price');
+            
+                                                                $discount_data = json_decode($selectedInvoice->discount_data);
+                                                                $newDiscount = App\Models\DiscountValue::where('discount_type', 'General')
+                                                                    ->where('start_amount', '<=', $afterReturnPrice)
+                                                                    ->where('end_amount', '>=', $afterReturnPrice)
+                                                                    ->pluck('discount')
+                                                                    ->first();
+                                    
+                                                                if (!empty($discount_data) && $discount_data->start_amount <= $afterReturnPrice && $afterReturnPrice <= $discount_data->end_amount) {
+                                                                    $afterReturnDis = ($afterReturnPrice * $selectedInvoice->discount) / 100;
+                                                                    $afterReturnDue = ($afterReturnPrice - $afterReturnDis) + $afterReturnVat; 
+                                                                } elseif ($newDiscount !== null) {
+                                                                    $afterReturnDue = ($afterReturnPrice + $afterReturnVat) - ($afterReturnPrice * $newDiscount / 100);
+                                                                } else {
+                                                                    $afterReturnDue = $afterReturnPrice + $afterReturnVat;
+                                                                }
+
+                                                                $actualDue = round(max($afterReturnDue - $selectedInvoice->paid, 0), 2);
+                                                            @endphp
                                                             <input type="hidden" wire:model="selectedInvoice.id">
                                                             <div class="form-group">
                                                                 <label class="form-label fw-bold">Due Amount</label>
                                                                 <input type="text" class="form-control"
-                                                                    value="{{ $site_settings->site_currency }}{{ $selectedInvoice->due }}"
+                                                                    value="{{ $site_settings->site_currency }} {{ $actualDue }}"
                                                                     readonly>
                                                             </div>
                                                             <div class="form-group mt-2">
                                                                 <label class="form-label fw-bold">Amount</label>
-                                                                <input type="number" wire:model="amount" class="form-control" required>
+                                                                <input type="text" wire:model="amount" class="form-control" required>
                                                                 @error('amount') <span class="text-danger">{{ $message }}</span> @enderror
                                                             </div>
                                                         @endif
@@ -287,12 +354,11 @@
                                                             <div class="form-group">
                                                                 <label class="form-label fw-bold">Due Amount</label>
                                                                 <input type="text" class="form-control"
-                                                                    value="{{ $site_settings->site_currency }}{{ $customerData->total_due}}"
-                                                                    readonly>
+                                                                    value="{{ $site_settings->site_currency }}{{ $partialPayment}}" readonly>
                                                             </div>
                                                             <div class="form-group mt-2">
                                                                 <label class="form-label fw-bold">Amount</label>
-                                                                <input type="number" wire:model="amount" class="form-control" required>
+                                                                <input type="text" wire:model="amount" class="form-control" required>
                                                                 @error('amount') <span class="text-danger">{{ $message }}</span> @enderror
                                                             </div>
                                                         @endif

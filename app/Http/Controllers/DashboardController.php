@@ -7,7 +7,7 @@ use App\Models\{User, Medicine, SalesMedicine, StockInvoice, StockList, SiteSett
 use Illuminate\Http\Request;
 // use App\Models\{CustomersInfo,CollectionSummary,BillingInfo};
 use Carbon\Carbon;
-
+use Illuminate\Support\Facades\DB;
 class DashboardController extends Controller
 {
     /**
@@ -22,8 +22,6 @@ class DashboardController extends Controller
 
         $users = User::with(['manager', 'salesManager', 'fieldOfficer'])->get();
 
-        // Recursive method to build the hierarchy
-        $hierarchy = $this->buildHierarchy($users);
         $site_setting = SiteSetting::first();
 
         // Medicines that are out of stock (quantity < 0)
@@ -35,78 +33,120 @@ class DashboardController extends Controller
         // Medicines that will expire soon (within the set number of days)
         $expire_alert_medicine = $site_setting->medicine_expiry_days ? StockList::where('expiry_date', '<', Carbon::now()->addDays(floatval($site_setting->medicine_expiry_days))->format('Y-m-d'))->get() ?? null :  null;
 
-        return view('dashboard', compact('total_medicine', 'total_sales', 'total_purchases', 'total_customers', 'hierarchy', 'stock_out_medicine', 'low_stock_medicine', 'expired_medicine', 'expire_alert_medicine'));
-    }
 
-    /**
-     * Build the hierarchy of users
-     */
-    private function buildHierarchy($users, $parentId = null)
-    {
-        $tree = [];
 
-        foreach ($users as $user) {
-            if ($user->manager_id == $parentId) {
-                $children = $this->buildHierarchy($users, $user->id);
-
-                $tree[] = [
-                    'id' => $user->id,
-                    'name' => $user->name,
-                    'role' => $user->role,
-                    'imageURL' => $user->profile_photo_url,
-                    'children' => $children,
-                ];
-            }
+        $dates = collect();
+        for ($i = 0; $i < 7; $i++) {
+            $dates->push(Carbon::today()->subDays(6 - $i)->toDateString());
         }
 
-        return $tree;
-    }
+        // Get invoice + sales_medicines data
+        $invoiceData = DB::table('invoices')
+            ->join('sales_medicines', 'invoices.id', '=', 'sales_medicines.invoice_id')
+            ->join('medicines', 'sales_medicines.medicine_id', '=', 'medicines.id')
+            ->select(
+                DB::raw('DATE(invoices.created_at) as date'),
+                'sales_medicines.medicine_id',
+                'medicines.name as medicine_name',
+                DB::raw('SUM(sales_medicines.initial_quantity) as total_quantity')
+            )
+            ->whereBetween('invoices.created_at', [Carbon::today()->subDays(6), Carbon::today()->endOfDay()])
+            ->groupBy('date', 'sales_medicines.medicine_id', 'medicines.name')
+            ->orderBy('date')
+            ->get();
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
+        $grouped = $invoiceData->groupBy('medicine_id');
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
+        $series = [];
+        foreach ($grouped as $medicine_id => $entries) {
+            $name = $entries->first()->medicine_name;
+            $dailyQuantities = [];
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
+            foreach ($dates as $date) {
+                $entry = $entries->firstWhere('date', $date);
+                $dailyQuantities[] = $entry ? (int)$entry->total_quantity : 0;
+            }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
+            $series[] = [
+                'name' => $name,
+                'data' => $dailyQuantities
+            ];
+        }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        // Hierarchy tree data
+        $users = User::select('id', 'name', 'role', 'manager_id', 'zse_id', 'tse_id', 'profile_photo_path')->get();
+        $managers = $users->where('role', 'Manager');
+        $treeData = [];
+
+        foreach ($managers as $manager) {
+            $zseList = $users->where('manager_id', $manager->id)->where('role', 'Zonal Sales Executive')->values();
+
+            $zseChildren = $zseList->map(function ($zse) use ($users) {
+                $tseList = $users->where('zse_id', $zse->id)->where('role', 'Territory Sales Executive')->values();
+
+                $tseChildren = $tseList->map(function ($tse) {
+                    return [
+                        'id' => 'tse_' . $tse->id,
+                        'data' => [
+                            'imageURL' => $tse->profile_photo_url,
+                            'role' => $tse->role,
+                            'name' => $tse->name,
+                        ],
+                        'options' => [
+                            'nodeBGColor' => '#c9cba3',
+                            'nodeBGColorHover' => '#c9cba3',
+                        ]
+                    ];
+                });
+
+                return [
+                    'id' => 'zse_' . $zse->id,
+                    'data' => [
+                        'imageURL' => $zse->profile_photo_url,
+                        'role' => $zse->role,
+                        'name' => $zse->name,
+                    ],
+                    'options' => [
+                        'nodeBGColor' => '#f8ad9d',
+                        'nodeBGColorHover' => '#f8ad9d',
+                    ],
+                    'children' => $tseChildren->toArray()
+                ];
+            });
+
+            $treeData[] = [
+                'id' => 'manager_' . $manager->id,
+                'data' => [
+                    'imageURL' => $manager->profile_photo_url,
+                    'role' => $manager->role,
+                    'name' => $manager->name,
+                ],
+                'options' => [
+                    'nodeBGColor' => '#00afb9',
+                    'nodeBGColorHover' => '#00afb9',
+                ],
+                'children' => $zseChildren->toArray()
+            ];
+        }
+
+        // সর্বোচ্চ parent নোড তৈরি করুন
+        $hierarchy = [
+            'id' => 'depo',
+            'data' => [
+                'imageURL' => asset(siteUrlSettings('site_icon')),
+                'name' => siteUrlSettings('site_name'),
+            ],
+            'options' => [
+                'nodeBGColor' => '#cdb4db',
+                'nodeBGColorHover' => '#cdb4db',
+            ],
+            'children' => $treeData // একাধিক manager থাকলে সবাই এখানে যুক্ত হবে
+        ];
+        $hierarchy = !empty($treeData) ? json_encode($treeData[0]) : json_encode([]);
+    // send the first tree (or adapt for multiple)
+
+
+        return view('dashboard', compact('total_medicine', 'total_sales', 'total_purchases', 'total_customers', 'hierarchy', 'stock_out_medicine', 'low_stock_medicine', 'expired_medicine', 'expire_alert_medicine', 'series', 'dates'));
     }
 }

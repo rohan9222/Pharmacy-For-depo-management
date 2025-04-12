@@ -29,6 +29,11 @@ class StockList extends Model
         return $this->belongsTo(Medicine::class);
     }
 
+    public function stockReturnList()
+    {
+        return $this->hasMany(StockReturnList::class, 'stock_list_id');
+    }
+
     public function scopeSearch($query, $search)
     {
         return $query->where(function ($query) use ($search) {

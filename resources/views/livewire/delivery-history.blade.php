@@ -11,6 +11,22 @@
                     <h4>Delivery History</h4>
                 </div>
                 <div class="card-body">
+                    <div class="row p-2">
+                        <div class="col-4">
+                            <select class="form-control form-control-sm" wire:model="filter_delivered_by">
+                                <option value="">Delivery Man</option>
+                                @foreach ($delivery_man_lists ?? [] as $delivery_man)
+                                    <option value="{{ $delivery_man->id }}">{{ $delivery_man->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-4">
+                            <input type="date" class="form-control form-control-sm" wire:model="filter_delivered_date">
+                        </div>
+                        <div class="col-4">
+                            <button type="button" class="btn btn-sm btn-primary" wire:click="getDeliveredInvoices">Search</button>
+                        </div>
+                    </div>
                     <div class="row justify-content-end">
                         <div class="col-3">
                             <input id="search" class="form-control" type="search" wire:model.live="delivered_search" placeholder="Search" aria-label="Search">
@@ -86,23 +102,23 @@
                             </select>
                         </div>
                         <div class="col">
-                            <select class="form-control form-control-sm" wire:change="updateInvoiceList('sales_manager')" wire:model="sales_manager_id">
-                                <option value="">Select Sales Manager</option>
-                                @foreach ($sales_managers ?? [] as $sales_manager)
-                                    <option value="{{ $sales_manager->id }}">{{ $sales_manager->name }}</option>
+                            <select class="form-control form-control-sm" wire:change="updateInvoiceList('zse')" wire:model="zse_id">
+                                <option value="">Select Zonal Sales Executive</option>
+                                @foreach ($zses ?? [] as $zse)
+                                    <option value="{{ $zse->id }}">{{ $zse->name }}</option>
                                 @endforeach
                             </select>
                         </div> --}}
                         <div class="col">
-                            <select class="form-control form-control-sm tom-select p-0" x-init="initTomSelect()" wire:change="updateInvoiceList('field_officer')" wire:model="field_officer_id">
-                                <option value="">Select Field Officer</option>
-                                @foreach ($field_officers ?? [] as $field_officer)
-                                    <option value="{{ $field_officer->id }}">{{ $field_officer->name }}</option>
+                            <select class="form-control form-control-sm tom-select p-0" x-init="$nextTick(() => initTomSelect())"  wire:change="tseIdUpdate()" wire:model="tse_id">
+                                <option value="">Select Territory Sales Executive</option>
+                                @foreach ($tses ?? [] as $tse)
+                                    <option value="{{ $tse->id }}">{{ $tse->name }}</option>
                                 @endforeach
                             </select>
                         </div>
                         <div class="col">
-                            <select class="form-control form-control-sm tom-select p-0" x-init="initTomSelect()" wire:change="updateInvoiceList()"  wire:model="customer_id">
+                            <select class="form-control form-control-sm tom-select p-0"  x-init="$nextTick(() => initTomSelect())"  wire:change="customerIdUpdate()" wire:model="customer_id">
                                 <option value="">Select Customer</option>
                                 @foreach ($customers ?? [] as $customer)
                                     <option value="{{ $customer->id }}">{{ $customer->name }}</option>
@@ -115,7 +131,7 @@
                             <div class="col-7">
                                 <div class="border border-rounded p-2">
                                     @if ($invoices === null)
-                                        <div class="text-danger text-center">!!! Select Field Officer First !!!</div>
+                                        <div class="text-danger text-center">!!! Select Territory Sales Executive First !!!</div>
                                     @elseif ($invoices->isEmpty())
                                         <div class="text-danger text-center">!!! No Invoice Found !!!</div>
                                     @else

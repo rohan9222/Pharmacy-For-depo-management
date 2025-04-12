@@ -18,7 +18,7 @@
                                 </div>
                             </div>
 
-                            <div class="row mt-3" wire:ignore>
+                            <div class="row mt-3 table-responsive" wire:ignore>
                                 <table class="table" id="returnInvoiceTable">
                                     <thead>
                                         <tr>
@@ -221,8 +221,8 @@
                     url: "{{ route('return-medicines-table') }}", // Ensure correct route
                     data: function(d) {
                         d.manager_id = $('#manager_id').val();
-                        d.sales_manager_id = $('#sales_manager_id').val();
-                        d.field_officer_id = $('#field_officer_id').val();
+                        d.zse_id = $('#zse_id').val();
+                        d.tse_id = $('#tse_id').val();
                         d.customer_id = $('#customer_id').val();
                         d.start_date = $('#start_date').val();
                         d.end_date = $('#end_date').val();

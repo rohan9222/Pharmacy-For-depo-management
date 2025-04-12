@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Models;
+use Illuminate\Support\Facades\Cache;
 
 use Illuminate\Database\Eloquent\Model;
 
@@ -25,4 +26,11 @@ class SiteSetting extends Model
         'medicine_low_stock_alert',
         'medicine_low_stock_quantity',
     ];
+
+    public static function getSettings()
+    {
+        return Cache::rememberForever('site_settings', function () {
+            return self::first();
+        });
+    }
 }

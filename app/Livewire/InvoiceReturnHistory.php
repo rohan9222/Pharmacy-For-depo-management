@@ -54,13 +54,13 @@ class InvoiceReturnHistory extends Component
                 $data = $data->whereIn('invoice_id', $Minvoice);
             }
 
-            if ($request->sales_manager_id != null) {
-                $SMinvoice = Invoice::where('sales_manager_id', $request->sales_manager_id)->pluck('id');
+            if ($request->zse_id != null) {
+                $SMinvoice = Invoice::where('zse_id', $request->zse_id)->pluck('id');
                 $data = $data->whereIn('invoice_id', $SMinvoice);
             }
 
-            if ($request->field_officer_id != null) {
-                $Finvoice = Invoice::where('field_officer_id', $request->field_officer_id)->pluck('id');
+            if ($request->tse_id != null) {
+                $Finvoice = Invoice::where('tse_id', $request->tse_id)->pluck('id');
                 $data = $data->whereIn('invoice_id', $Finvoice);
             }
 
@@ -70,7 +70,7 @@ class InvoiceReturnHistory extends Component
             }
 
             if ($request->start_date && $request->end_date) {
-                $data = $data->whereBetween('return_date', [Carbon::parse($request->start_date)->format('Y-m-d'), Carbon::parse($request->end_date)->format('Y-m-d')]);
+                $data = $data->whereBetween('return_date', [Carbon::parse($request->start_date)->format('Y-m-d 00:00:00'), Carbon::parse($request->end_date)->format('Y-m-d 23:59:59')]);
             }
             return DataTables::of($data->get())
                 ->addIndexColumn() // Auto Increment Column
@@ -86,7 +86,6 @@ class InvoiceReturnHistory extends Component
                 ->make(true);
         }
     }
-
 
     public function invoiceView($invoiceID = null)
     {

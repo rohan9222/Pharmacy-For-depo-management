@@ -6,4 +6,62 @@
  * Date: 25-Jun-2024
  * Time: 03.01 PM
  */
+use App\Models\SiteSetting;
 
+if (!function_exists('rolesConvert')) {
+    function rolesConvert($data = null) {
+        switch ($data) {
+            case 'Manager':
+                return 'Manager';
+            case 'Zonal Sales Executive':
+                return 'ZSE';
+            case 'Territory Sales Executive':
+                return 'TSE';
+            default:
+                return null; // or handle as needed
+        }
+    }
+}
+
+if (!function_exists('rolesConvertShort')) {
+    function rolesConvertShort($data = null) {
+        switch ($data) {
+            case 'Manager':
+                return 'manager';
+            case 'Zonal Sales Executive':
+                return 'zse';
+            case 'Territory Sales Executive':
+                return 'tse';
+            default:
+                return null; // or handle as needed
+        }
+    }
+}
+
+if (!function_exists('underRole')) {
+    function underRole($data = null) {
+        switch ($data) {
+            case 'Manager':
+                return 'Zonal Sales Executive';
+            case 'Zonal Sales Executive':
+                return 'Territory Sales Executive';
+            case 'Territory Sales Executive':
+                return 'Customer';
+            default:
+                return null; // or handle as needed
+        }
+    }
+}
+
+// if (!function_exists('siteUrlSettings')) {
+//     function siteUrlSettings($key) {
+//         return SiteSetting::first()->$key ?? null;
+//     }
+// }
+if (!function_exists('siteUrlSettings')) {
+    function siteUrlSettings($key)
+    {
+        $settings = SiteSetting::first(); // Always fetch latest from DB
+        return $settings->{$key} ?? null;
+    }
+}

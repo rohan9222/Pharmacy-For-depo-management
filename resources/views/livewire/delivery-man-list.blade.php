@@ -5,7 +5,7 @@
     </x-slot>
 
     <div class="d-flex justify-content-center">
-        <div class="col-8">
+        <div class="col-10">
             @if(auth()->user()->can('create-delivery-man') || $customerId)
                 <div class="row">
                     <div class="col">
@@ -24,23 +24,23 @@
                             <div class="card card-body">
                                 <form wire:submit.prevent="submit">
                                     <div class="row g-2">
-                                        <div class="col-3">
+                                        <div class="col-lg-3 col-md-6 col-sm-6">
                                             <input class="form-control" type="text" id="name" wire:model="name" placeholder="Delivery Man Name" aria-label="Delivery Man Name">
                                             @error('name') <span class="text-danger">{{ $message }}</span> @enderror
                                         </div>
-                                        <div class="col-3">
+                                        <div class="col-lg-3 col-md-6 col-sm-6">
                                             <input class="form-control" type="text" id="email" wire:model="email" placeholder="Email Address" aria-label="Email Address">
                                             @error('email') <span class="text-danger">{{ $message }}</span> @enderror
                                         </div>
-                                        <div class="col-3">
+                                        <div class="col-lg-3 col-md-6 col-sm-6">
                                             <input class="form-control" type="text" id="mobile" wire:model="mobile" placeholder="mobile" aria-label="mobile">
                                             @error('mobile') <span class="text-danger">{{ $message }}</span> @enderror
                                         </div>
-                                        <div class="col-3">
+                                        <div class="col-lg-3 col-md-6 col-sm-6">
                                             <input class="form-control" type="address" id="address" wire:model="address" placeholder="address" aria-label="address">
                                             @error('address') <span class="text-danger">{{ $message }}</span> @enderror
                                         </div>
-                                        <div class="col-3">
+                                        <div class="col-lg-3 col-md-6 col-sm-6">
                                             <input class="form-control" type="number" id="balance" wire:model="balance" placeholder="Balance" aria-label="Balance">
                                             @error('balance') <span class="text-danger">{{ $message }}</span> @enderror
                                         </div>
@@ -67,44 +67,48 @@
 
             <div class="row mt-3">
                 <div class="row justify-content-end">
-                    <div class="col-3">
-                        <input id="search" class="form-control" type="search" wire:model.live="search" placeholder="Search By Name" aria-label="Search By Name">
+                    <div class="col-lg-3 col-md-6 col-sm-6">
+                        <input id="search" class="form-control" type="search" wire:model.live="search" placeholder="Search" aria-label="Search By Name">
                     </div>
                 </div>
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th>SN</th>
-                            <th>Delivery Man Name</th>
-                            <th>Email Address</th>
-                            <th>mobile</th>
-                            {{-- <th>Balance</th> --}}
-                            <th>Address</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach ($customers as $customer)
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
                             <tr>
-                                <td>{{ $loop->iteration }}</td>
-                                <td>{{ $customer->name }}</td>
-                                <td>{{ $customer->email }}</td>
-                                <td>{{ $customer->mobile }}</td>
-                                {{-- <td>{{ $customer->balance }}</td> --}}
-                                <td>{{ $customer->address }}</td>
-                                <td>
-                                    @can('edit-delivery-man')
-                                        <button class="btn btn-sm btn-info" wire:click="edit({{ $customer->id }})" @click="isOpen = true"><i class="bi bi-pencil-square"></i></button>
-                                    @endcan
-                                    @can('delete-delivery-man')
-                                        <button class="btn btn-sm btn-danger" wire:click="delete({{ $customer->id }})"><i class="bi bi-trash"></i></button>
-                                    @endcan
-
-                                </td>
+                                <th>SN</th>
+                                <th>User ID</th>
+                                <th>Delivery Man Name</th>
+                                <th>Email Address</th>
+                                <th>mobile</th>
+                                {{-- <th>Balance</th> --}}
+                                <th>Address</th>
+                                <th>Action</th>
                             </tr>
-                        @endforeach
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            @foreach ($customers as $customer)
+                                <tr>
+                                    <td>{{ $loop->iteration }}</td>
+                                    <td>{{ $customer->user_id }}</td>
+                                    <td>{{ $customer->name }}</td>
+                                    <td>{{ $customer->email }}</td>
+                                    <td>{{ $customer->mobile }}</td>
+                                    {{-- <td>{{ $customer->balance }}</td> --}}
+                                    <td>{{ $customer->address }}</td>
+                                    <td>
+                                        @can('edit-delivery-man')
+                                            <button class="btn btn-sm btn-info" wire:click="edit({{ $customer->id }})" @click="isOpen = true"><i class="bi bi-pencil-square"></i></button>
+                                        @endcan
+                                        @can('delete-delivery-man')
+                                            <button class="btn btn-sm btn-danger" wire:click="delete({{ $customer->id }})"><i class="bi bi-trash"></i></button>
+                                        @endcan
+    
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
             </div>
 
             <div class="pagination">

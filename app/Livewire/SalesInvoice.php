@@ -11,7 +11,7 @@ use App\Models\Category;
 use App\Models\SiteSetting;
 use App\Models\PaymentHistory;
 use App\Models\DiscountValue;
-use App\Models\user;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
@@ -25,7 +25,7 @@ class SalesInvoice extends Component
 {
     use WithPagination, WithoutUrlPagination;
 
-    public $search, $medicines, $customers, $invoice_date, $customer,$category,$category_lists, $field_officers, $invoice_number, $field_officer,$name,$email,$mobile,$address,$balance,$field_officer_team,$route,$customer_category;
+    public $search, $medicines, $customers, $invoice_date, $customer,$category,$category_lists, $tses, $invoice_number, $tse,$name,$email,$mobile,$address,$balance,$tse_team,$route,$customer_category;
     public $highlightedIndex = 0;
     public $stockMedicines = []; // Medicine stock data
     public $sub_total = 0;
@@ -33,6 +33,7 @@ class SalesInvoice extends Component
     public $vat = 0;
     public $spl_discount = 0;
     public $spl_discount_amount = 0;
+    public $discount_data;
     public $discount = 0;
     public $discount_amount = 0;
     public $grand_total = 0;
@@ -48,21 +49,21 @@ class SalesInvoice extends Component
 
     public function render()
     {
-        $field_officers = User::select('id', 'name')->role('Field Officer');
+        $tses = User::select('id', 'name')->role('Territory Sales Executive');
         if (auth()->user()->hasRole('Manager')) {
-            $field_officers = $field_officers->where('manager_id', auth()->user()->id);
-        } elseif (auth()->user()->hasRole('Sales Manager')) {
-            $field_officers = $field_officers->where('sales_manager_id', auth()->user()->id);
-        } elseif (auth()->user()->hasRole('Field Officer')) {
-            $field_officers = $field_officers->where('id', auth()->user()->id);
+            $tses = $tses->where('manager_id', auth()->user()->id);
+        } elseif (auth()->user()->hasRole('Zonal Sales Executive')) {
+            $tses = $tses->where('zse_id', auth()->user()->id);
+        } elseif (auth()->user()->hasRole('Territory Sales Executive')) {
+            $tses = $tses->where('id', auth()->user()->id);
         }
-        $this->field_officers = $field_officers->get();
+        $this->tses = $tses->get();
         $this->category_lists = Category::select('name')->get();
         $this->invoice_date = Carbon::now()->toDateString();
         $customers = User::where('role', 'customer');
 
-        if (auth()->user()->role == 'Field Officer') {
-            $customers = $customers->where('field_officer_id', auth()->user()->id);
+        if (auth()->user()->role == 'Territory Sales Executive') {
+            $customers = $customers->where('tse_id', auth()->user()->id);
         }
 
         $this->customers = $customers->get();
@@ -97,11 +98,11 @@ class SalesInvoice extends Component
             'balance' => 'nullable|numeric',
             'route' => 'required|string|max:255',
             'customer_category' => 'required|string|max:255',
-            'field_officer_team' => ['required','exists:users,id',
+            'tse_team' => ['required','exists:users,id',
                 function ($attribute, $value, $fail) {
                     $user = User::find($value); // Retrieve the user once to avoid multiple queries
-                    if (!$user || (!$user->sales_manager_id && !$user->manager_id)) {
-                        $fail('This field officer team does not exist or not assigned to any manager and sales manager.');
+                    if (!$user || (!$user->zse_id && !$user->manager_id)) {
+                        $fail('This Territory Sales Executive team does not exist or not assigned to any manager and Zonal Sales Executive.');
                     }
                 }
             ],
@@ -122,9 +123,9 @@ class SalesInvoice extends Component
                     'role' => 'Customer',
                     'route' => $this->route,
                     'category' => $this->customer_category,
-                    'field_officer_id' => $this->field_officer_team,
-                    'sales_manager_id' => User::where('id', $this->field_officer_team)->first()->sales_manager_id,
-                    'manager_id' => User::where('id', $this->field_officer_team)->first()->manager_id,
+                    'tse_id' => $this->tse_team,
+                    'zse_id' => User::where('id', $this->tse_team)->first()->zse_id,
+                    'manager_id' => User::where('id', $this->tse_team)->first()->manager_id,
                 ]
             );
 
@@ -145,6 +146,7 @@ class SalesInvoice extends Component
         // This method is triggered when the customer is updated
         $this->calculateTotals();
     }
+
     public function calculateTotals()
     {
         // Initialize totals
@@ -187,7 +189,14 @@ class SalesInvoice extends Component
 
             $this->discount = $disValue ? $disValue->discount : 0;
             $this->discount_amount = round($this->sub_total * $this->discount / 100, 2);
+            $this->discount_data = json_encode(
+                [
+                    'start_amount' => $disValue ? $disValue->start_amount : 0,
+                    'end_amount' => $disValue ? $disValue->end_amount : 0,       
+                ]
+            );
         }else{
+            $this->discount_data = null;
             $this->discount = 0;
             $this->discount_amount = 0;
         }
@@ -199,6 +208,16 @@ class SalesInvoice extends Component
         $this->grand_total = round(max($this->total - ($this->spl_discount_amount + $this->discount_amount), 0), 2);
         $this->due_amount = round(max($this->grand_total - $this->paid_amount, 0), 2);
     }
+
+    public function updatedSearch()
+    {
+        $med = Medicine::where('barcode', $this->search)->first();
+        if ($med) {
+            $this->addMedicine($med->id);
+            $this->search = '';
+        }
+    }
+    
 
     public function addMedicine($index)
     {
@@ -234,6 +253,8 @@ class SalesInvoice extends Component
 
             // Recalculate totals
             $this->calculateTotals();
+            
+            $this->dispatch('focusInput');
         } else {
             session()->flash('error', 'Medicine not found!'); // Flash message if no medicine is found
         }
@@ -245,6 +266,7 @@ class SalesInvoice extends Component
         $this->stockMedicines = array_values($this->stockMedicines);
         $this->calculateTotals();
     }
+
     public function increaseQuantity($index, $quantity = 1)
     {
         // Get the medicine details from the database
@@ -289,7 +311,6 @@ class SalesInvoice extends Component
         // Recalculate totals
         $this->calculateTotals();
     }
-
 
     public function updatedStockMedicines($value, $key)
     {
@@ -364,11 +385,12 @@ class SalesInvoice extends Component
                 'invoice_no' => $invoice_no,
                 'invoice_date' => $this->invoice_date,
                 'customer_id' => $this->customer,
-                'field_officer_id' => $userRoles->field_officer_id,
-                'sales_manager_id' => $userRoles->sales_manager_id,
+                'tse_id' => $userRoles->tse_id,
+                'zse_id' => $userRoles->zse_id,
                 'manager_id' => $userRoles->manager_id,
                 'sub_total' => $this->sub_total,
                 'vat' => $this->vat,
+                'discount_data' => $this->discount_data,
                 'discount' => $this->discount,
                 'dis_type' => 'percentage',
                 'dis_amount' => $this->discount_amount,
@@ -380,8 +402,8 @@ class SalesInvoice extends Component
                 'due' => $this->due_amount,
             ]);
 
-            TargetReport::where('user_id', $userRoles->field_officer_id)->where('target_month', date('F'))->where('target_year', date('Y'))->increment('sales_target_achieve', $this->sub_total);
-            TargetReport::where('user_id', $userRoles->sales_manager_id)->where('target_month', date('F'))->where('target_year', date('Y'))->increment('sales_target_achieve', $this->sub_total);
+            TargetReport::where('user_id', $userRoles->tse_id)->where('target_month', date('F'))->where('target_year', date('Y'))->increment('sales_target_achieve', $this->sub_total);
+            TargetReport::where('user_id', $userRoles->zse_id)->where('target_month', date('F'))->where('target_year', date('Y'))->increment('sales_target_achieve', $this->sub_total);
             TargetReport::where('user_id', $userRoles->manager_id)->where('target_month', date('F'))->where('target_year', date('Y'))->increment('sales_target_achieve', $this->sub_total);
 
             if($this->paid_amount > 0){
@@ -414,7 +436,7 @@ class SalesInvoice extends Component
                 // }
                 $stockList = StockList::where('medicine_id', $medicine['medicine_id'])
                     ->where('quantity', '>', 0) // Only consider stocks with positive quantity
-                    ->orderBy('expiry_date', 'desc')
+                    ->orderBy('expiry_date', 'asc')
                     ->get();
                 $remainingQuantity = $medicine['quantity'];
                 foreach ($stockList as $stock) {

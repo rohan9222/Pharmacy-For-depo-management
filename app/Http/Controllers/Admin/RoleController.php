@@ -75,7 +75,7 @@ class RoleController extends Controller
      */
     public function edit(Role $role): View
     {
-        if (in_array($role->name, ['Super Admin', 'Depo Incharge', 'Manager', 'Sales Manager', 'Field Officer', 'Delivery Man'])) {
+        if (in_array($role->name, ['Super Admin', 'Depo Incharge', 'Manager', 'Zonal Sales Executive', 'Territory Sales Executive', 'Delivery Man'])) {
             abort(403, 'This role cannot be edited');
         }
 
@@ -112,7 +112,7 @@ class RoleController extends Controller
      */
     public function destroy(Role $role): RedirectResponse
     {
-        if (in_array($role->name, ['Super Admin', 'Depo Incharge', 'Manager', 'Sales Manager', 'Field Officer'])) {
+        if (in_array($role->name, ['Super Admin', 'Depo Incharge', 'Manager', 'Zonal Sales Executive', 'Territory Sales Executive'])) {
             abort(403, 'This role cannot be edited');
         }
 

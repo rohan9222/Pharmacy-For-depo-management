@@ -35,7 +35,13 @@ class UpdateUserRequest extends FormRequest
                 }
             ],
             'password' => 'nullable|string|min:8|confirmed',
-            'roles' => 'required'
+            'address' => 'nullable|string|max:255',
+            'territory' => 'required|string|max:255',
+            'mobile' => 'required|numeric|digits:11',
+            'balance' => 'nullable|numeric',
+            'product_target' => 'nullable|numeric',
+            'sales_target' => 'nullable|numeric',
+            'roles' => 'required|array',
         ];
     }
 }

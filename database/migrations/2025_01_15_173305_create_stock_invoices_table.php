@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('stock_invoices', function (Blueprint $table) {
             $table->id();
             $table->string('invoice_no', 50)->unique();
-            $table->timestamp('invoice_date')->default(now());
+            $table->timestamp('invoice_date')->default(DB::raw('CURRENT_TIMESTAMP'))->nullable();
             $table->foreignId('supplier_id')->nullable()->constrained()->nullOnDelete()->cascadeOnUpdate()->comment('supplier list id');
             $table->decimal('sub_total', 11, 2)->default(0.00)->nullable();
             $table->decimal('discount', 11, 2)->default(0.00)->nullable();

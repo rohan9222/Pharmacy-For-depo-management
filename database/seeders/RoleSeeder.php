@@ -16,8 +16,8 @@ class RoleSeeder extends Seeder
         Role::create(['name' => 'Super Admin']);
         $depo = Role::create(['name' => 'Depo Incharge']);
         $manager = Role::create(['name' => 'Manager']);
-        $sales_manager = Role::create(['name' => 'Sales Manager']);
-        $field_officer = Role::create(['name' => 'Field Officer']);
+        $zse = Role::create(['name' => 'Zonal Sales Executive']);
+        $tse = Role::create(['name' => 'Territory Sales Executive']);
         $delivery_man = Role::create(['name' => 'Delivery Man']);
 
         $delivery_man->givePermissionTo([
@@ -34,16 +34,18 @@ class RoleSeeder extends Seeder
             'view-medicine-stock',
             'create-delivery-man',
             'edit-delivery-man',
+            'delivery-report',
             'admin-role',
             'create-user',
             'edit-user',
             'create-manager',
             'edit-manager',
-            'create-sales-manager',
-            'edit-sales-manager',
-            'create-field-officer',
-            'edit-field-officer',
+            'create-zonal-sales-executive',
+            'edit-zonal-sales-executive',
+            'create-territory-sales-executive',
+            'edit-territory-sales-executive',
             'create-customer',
+            'view-customer',
             'edit-customer',
             'create-supplier',
             'edit-supplier',
@@ -51,6 +53,7 @@ class RoleSeeder extends Seeder
             'create-category',
             'edit-category',
             'invoice',
+            'make-payment',
             'view-invoice',
             'return-medicine',
             'create',
@@ -64,11 +67,12 @@ class RoleSeeder extends Seeder
             'edit-user',
             'view-medicine',
             'view-medicine-stock',
-            'create-sales-manager',
-            'edit-sales-manager',
-            'create-field-officer',
-            'edit-field-officer',
+            'create-zonal-sales-executive',
+            'edit-zonal-sales-executive',
+            'create-territory-sales-executive',
+            'edit-territory-sales-executive',
             'create-customer',
+            'view-customer',
             'edit-customer',
             'create-supplier',
             'edit-supplier',
@@ -81,14 +85,15 @@ class RoleSeeder extends Seeder
             'view'
         ]);
 
-        $sales_manager->givePermissionTo([
+        $zse->givePermissionTo([
             'admin-role',
             'create-user',
             'edit-user',
             'view-medicine',
-            'create-field-officer',
-            'edit-field-officer',
+            'create-territory-sales-executive',
+            'edit-territory-sales-executive',
             'create-customer',
+            'view-customer',
             'edit-customer',
             'view-report',
             'invoice',
@@ -99,10 +104,11 @@ class RoleSeeder extends Seeder
             'view'
         ]);
 
-        $field_officer->givePermissionTo([
+        $tse->givePermissionTo([
             'admin-role',
             'view-medicine',
             'create-customer',
+            'view-customer',
             'edit-customer',
             'view-report',
             'invoice',

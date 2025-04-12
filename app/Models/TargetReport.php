@@ -9,8 +9,11 @@ class TargetReport extends Model
     protected $fillable = [
         'user_id',
         'manager',
-        'sales_manager',
-        'field_officer',
+        'zse',
+        'tse',
+        'product_target',
+        'product_target_data',
+        'product_target_achieve',
         'sales_target',
         'sales_target_achieve',
         'target_month',

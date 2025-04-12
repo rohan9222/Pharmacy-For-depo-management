@@ -70,7 +70,8 @@ class PackSizeList extends Component
         $packSize = PackSize::find($id);
         if ($packSize) {
             $this->packSizeId = $id;
-            $this->name = $packSize->name;
+            $this->pack_name = $packSize->pack_name;
+            $this->pack_size = $packSize->pack_size;
             $this->description = $packSize->description;
             $this->status = $packSize->status;
         }else {

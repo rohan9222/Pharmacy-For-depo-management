@@ -15,13 +15,14 @@ return new class extends Migration
             $table->id();
             $table->string('invoice_no', 50)->unique()->comment('invoice must be unique');
             // $table->foreignId('user_id')->constrained()->cascadeOnDelete()->cascadeOnUpdate()->comment('customer list id');
-            $table->timestamp('invoice_date')->default(now());
+            $table->timestamp('invoice_date')->default(DB::raw('CURRENT_TIMESTAMP'))->nullable();
             $table->foreignId('manager_id')->nullable()->constrained('users')->nullOnDelete()->cascadeOnUpdate()->comment('user id who has manager role');
-            $table->foreignId('sales_manager_id')->nullable()->constrained('users')->nullOnDelete()->cascadeOnUpdate()->comment('user id who has sales manager role');
-            $table->foreignId('field_officer_id')->nullable()->constrained('users')->nullOnDelete()->cascadeOnUpdate()->comment('user id who has field officer role');
+            $table->foreignId('zse_id')->nullable()->constrained('users')->nullOnDelete()->cascadeOnUpdate()->comment('user id who has Zonal Sales Executive role');
+            $table->foreignId('tse_id')->nullable()->constrained('users')->nullOnDelete()->cascadeOnUpdate()->comment('user id who has Territory Sales Executive role');
             $table->foreignId('customer_id')->nullable()->constrained('users')->nullOnDelete()->cascadeOnUpdate()->comment('user id who has customer role');
             $table->decimal('sub_total', 11, 2)->default(0.00);
             $table->decimal('discount', 11, 2)->default(0.00)->nullable();
+            $table->string('invoice_data')->nullable();
             $table->enum('dis_type', ['percentage', 'fixed'])->default('percentage')->nullable();
             $table->decimal('dis_amount', 11, 2)->default(0.00)->nullable();
             $table->decimal('spl_discount', 11, 2)->default(0.00)->nullable();
@@ -34,7 +35,7 @@ return new class extends Migration
             $table->decimal('due', 11, 2)->default(0.00);
             $table->enum('delivery_status',['pending','cancel','delivered','return','shipped'])->default('pending')->nullable();
             $table->foreignId('delivery_by')->nullable()->constrained('users')->nullOnDelete()->cascadeOnUpdate()->comment('user id who has delivery role');
-            $table->timestamp('delivery_date')->nullable();
+            $table->timestamp('delivery_date')->default(DB::raw('CURRENT_TIMESTAMP'))->nullable();
             $table->integer('summary_id')->nullable();
             $table->timestamps();
         });

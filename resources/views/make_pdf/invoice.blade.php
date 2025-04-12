@@ -15,18 +15,18 @@
 <body class="a4">
     <div class="p-1">
         <div>
-            <div style="display: inline-block; width: 45%; float: left;">
-                <p class="m-0 subtitle ">Sales Office :</p>
-                <p class="m-0">Address : {{$site_data->site_address}}</p>
-                <p class="m-0">Mobile : {{$site_data->site_phone}}</p>
-            </div>
-            <div class="title">Invoice</div>
+            <!--<div style="display: inline-block; width: 45%; float: left;">-->
+            <!--    <p class="m-0 subtitle ">Sales Office :</p>-->
+            <!--    <p class="m-0">Address : {{$site_data->site_address}}</p>-->
+            <!--    <p class="m-0">Mobile : {{$site_data->site_phone}}</p>-->
+            <!--</div>-->
+            <div class="title" style="text-align: center;">Invoice</div>
         </div>
         {{-- {{ dd($invoice_data) }} --}}
         <table class="table border">
             <tr>
                 <td >Cust ID: {{$invoice_data->customer->user_id}}</td>
-                <td >MPO ID: {{$invoice_data->fieldOfficer->user_id}}</td>
+                <td >TSE ID: {{$invoice_data->fieldOfficer->user_id}}</td>
                 <td>Category: {{$invoice_data->customer->category}}</td>
             </tr>
             <tr>
@@ -76,13 +76,13 @@
                 <td class="border-dotted border-start">{{$medicine_list->initial_quantity}}</td>
                 <td class="border-dotted border-start">{{$totalPrice}}</td>
                 <td class="border-dotted border-start">{{$vatAmount}}</td>
-                <td class="border-dotted border-start border-end">{{$medicine_list->total}}</td>
+                <td class="border-dotted border-start border-end">{{round($medicine_list->total)}}</td>
             </tr>
 
             @php
                 $sumTotalPrice += $totalPrice;
                 $sumVatAmount += $vatAmount;
-                $sumTotal += $medicine_list->total;
+                $sumTotal += round($medicine_list->total);
             @endphp
         @endforeach
 
@@ -98,19 +98,16 @@
             <tr>
                 <td colspan="5"></td>
                 <td class="border" colspan="2">Discount on TP ({{$invoice_data->discount+$invoice_data->spl_discount}}%):</td>
-                <td class="border">{{$invoice_data->dis_amount+$invoice_data->spl_dis_amount}}</td>
+                <td class="border">{{round($invoice_data->dis_amount+$invoice_data->spl_dis_amount)}}</td>
             </tr>
             <tr>
                 <td colspan="5" class="subtitle text-uppercase">IN WORD: taka. {{$grand_total_words}} only</td>
                 <td class="border" colspan="2"><b>Net Payable Amount:</b></td>
-                <td class="border"><b>{{$invoice_data->grand_total}}</b></td>
+                <td class="border"><b>{{round($invoice_data->grand_total)}}</b></td>
             </tr>
         </table>
     </div>
 </body>
-<script>
-    window.print();
-</script>
 </html>
 
 
@@ -120,7 +117,7 @@
 
     $conf       =   [
         'mode'          =>  'utf-8',
-        'format'        =>  [224, 286],
+        // 'format'        =>  [224, 286],
         'tempDir'       =>  storage_path('temp'),
         'orientation'   => 'portrait',
         'margin_left' => 6,
@@ -130,32 +127,43 @@
 
     $mpdf = new \Mpdf\Mpdf($conf);
     $dateTime = date("d/m/Y,  h:i A", time());
-    $html = "<div style='width:100%; text-align:center;'>
-                <div style='font-size:18px;text-align:center'><h2 style='margin:0; background-color:#cff4fc'>$pdf_title</h2></div>
-            </div>";
+    $html = "
+        <!--<div style='width:100%; text-align:center; margin-bottom: 20px;'>-->
+        <!--    <table style='margin: 0 auto;'>-->
+        <!--        <tr>-->
+        <!--            <td style='vertical-align: middle;'>-->
+        <!--                <img src='$pdf_logo' alt='' style='width: 50px;'>-->
+        <!--            </td>-->
+        <!--            <td style='vertical-align: middle; padding-left: 10px;'>-->
+                        <!--<h1 style='margin: 0; text-transform: uppercase; font-style: italic;'>$pdf_title</h1>-->
+        <!--            </td>-->
+        <!--        </tr>-->
+        <!--    </table>-->
+        <!--</div>-->
+    ";
 
         $mpdf->SetHTMLHeader($html);
         $mpdf->SetTopMargin(20);
 
     $mpdf->SetHTMLFooter("
         <div class='footer text-center' style='width:100%;'>
-            <div style='width:20%; float: left;'>
+            <div style='width:19%; float: left;'>
                 <p>-------------------</p>
                 <p>Powered By</p>
             </div>
-            <div style='width:20%; float: left;'>
+            <div style='width:19%; float: left;'>
                 <p>-------------------</p>
                 <p>Authorized By</p>
             </div>
-            <div style='width:20%; float: left;'>
+            <div style='width:19%; float: left;'>
                 <p>-------------------</p>
                 <p>Delivered By</p>
             </div>
-            <div style='width:20%; float: left;'>
+            <div style='width:19%; float: left;'>
                 <p>-------------------</p>
                 <p>Collected By</p>
             </div>
-            <div style='width:20%; float: left;'>
+            <div style='width:19%; float: left;'>
                 <p>-------------------</p>
                 <p>Customer's Signature</p>
             </div>
@@ -171,6 +179,8 @@
     $mpdf->WriteHTML($stylesheet,\Mpdf\HTMLParserMode::HEADER_CSS);
     $mpdf->WriteHTML($content, \Mpdf\HTMLParserMode::HTML_BODY);
     $mpdf->SetDisplayMode('fullpage');
+    // $mpdf->SetWatermarkImage(public_path('img/logo.png')); // Path to watermark image
+    $mpdf->showWatermarkImage = true;
     //$mpdf->Output("{$reportName}.pdf");
     $mpdf->Output();
 @endphp

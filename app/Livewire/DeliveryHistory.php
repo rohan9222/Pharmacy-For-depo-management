@@ -7,36 +7,63 @@ use App\Models\Invoice;
 
 use Livewire\WithoutUrlPagination;
 use Livewire\WithPagination;
+use Carbon\Carbon;
 
 use Livewire\Component;
 
 class DeliveryHistory extends Component
 {
     use WithPagination, WithoutUrlPagination;
-    public $pending_search, $delivered_search, $invoices, $managers, $sales_managers, $field_officers, $customers, $manager_id, $sales_manager_id, $field_officer_id, $customer_id,$delivered_by;
-    public $perPage = 15;
+    public $pending_search, $delivered_search, $invoices, $managers, $zses, $tses, $customers, $manager_id, $zse_id, $tse_id, $customer_id, $delivered_by, $filter_delivered_by, $filter_delivered_date;
+    public $perPage = 50;
     public $selected_invoices = [];
 
+    public function mount() {
+        if(!auth()->user()->hasPermissionTo('delivery-report') && !auth()->user()->hasRole('Super Admin')) {
+            abort(403);
+        }
+    }
 
     public function render()
     {
-        $allInvoices = Invoice::search($this->delivered_search)
-            ->where('delivery_status', 'delivered')
-            ->with('deliveredBy:id,name')
-            ->get()
-            ->groupBy(fn($invoice) => $invoice->summary_id ?? 'Unknown');
-
-        $pagedData = $allInvoices->slice((request('page', 1) - 1) * $this->perPage, $this->perPage);
-
         $this->updateInvoiceList();
 
         return view('livewire.delivery-history', [
-            'delivered_invoices' => new \Illuminate\Pagination\LengthAwarePaginator(
-                $pagedData->values(), $allInvoices->count(), $this->perPage
-            ),
             'delivery_man_lists' => User::where('role', 'Delivery Man')->get(),
+            'delivered_invoices' => $this->getDeliveredInvoices(),
         ])->layout('layouts.app');
     }
+    
+    public function getDeliveredInvoices()
+    {
+        // Step 1: Get unique summary_id values with pagination
+        $paginatedSummaryIds = Invoice::search($this->delivered_search)
+            ->where('delivery_status', 'delivered')
+            ->when($this->filter_delivered_by, fn($q) => $q->where('delivery_by', $this->filter_delivered_by))
+            ->when($this->filter_delivered_date, fn($q) => $q->whereDate('delivery_date', Carbon::parse($this->filter_delivered_date)))
+            ->select('summary_id') // Select only summary_id for pagination
+            ->groupBy('summary_id') // Grouping at the database level
+            ->orderBy('summary_id', 'desc') // Maintain order
+            ->paginate(10); // Paginate by summary_id
+    
+        // Step 2: Fetch full invoice data for the paginated summary IDs
+        $invoices = Invoice::whereIn('summary_id', $paginatedSummaryIds->pluck('summary_id'))
+            ->with('deliveredBy:id,name')
+            ->orderBy('summary_id', 'desc')
+            ->get()
+            ->groupBy('summary_id'); // Group invoices by summary_id in PHP
+    
+        // Step 3: Return paginated response with grouped invoices
+        return new \Illuminate\Pagination\LengthAwarePaginator(
+            $invoices, // Grouped data
+            $paginatedSummaryIds->total(), // Total items
+            $paginatedSummaryIds->perPage(), // Items per page
+            $paginatedSummaryIds->currentPage(), // Current page
+            ['path' => request()->url(), 'query' => request()->query()] // Maintain query parameters
+        );
+    }
+    
+    
 
     public function toggleSelectAll()
     {
@@ -47,64 +74,72 @@ class DeliveryHistory extends Component
         }
     }
 
+    public function tseIdUpdate()
+    {
+        $this->updateInvoiceList('tse');
+        $customers = User::where('role', 'Customer')->where('tse_id', $this->tse_id)->get();
+        if($this->tse_id) {
+            $this->customers = $customers;
+        }else{
+            $this->customers = [];
+        }
+        $this->customer_id = null;
+    }
+
+    public function customerIdUpdate()
+    {
+        $this->updateInvoiceList('customer');
+    }
+
     public function updateInvoiceList($type = null) {
         // Use relationships properly
         // $this->managers = User::where('role', 'Manager')->get();
-        // $sales_managers = User::where('role', 'Sales Manager');
-        $this->field_officers = User::where('role', 'Field Officer')->get();
-        $customers = User::where('role', 'Customer');
+        // $zses = User::where('role', 'Zonal Sales Executive');
+        $this->tses = User::where('role', 'Territory Sales Executive')->get();
+        
 
-        // $invoices = Invoice::where('delivery_status', 'pending');
+        $invoices = Invoice::where('delivery_status', 'pending');
         // if($this->manager_id != null){
         //     $invoices = $invoices->where('manager_id', $this->manager_id);
-        //     $sales_managers = $sales_managers->where('manager_id', $this->manager_id);
-        //     $field_officers = $field_officers->where('manager_id', $this->manager_id);
+        //     $zses = $zses->where('manager_id', $this->manager_id);
+        //     $tses = $tses->where('manager_id', $this->manager_id);
         //     $customers = $customers->where('manager_id', $this->manager_id);
-        //     $this->field_officers = $field_officers->get() ?? null;
+        //     $this->tses = $tses->get() ?? null;
         // }else{
-        //     $this->sales_manager_id = null;
-        //     $this->field_officer_id = null;
+        //     $this->zse_id = null;
+        //     $this->tse_id = null;
         //     $this->customer_id = null;
-        //     $this->sales_managers = [];
-        //     $this->field_officers = [];
+        //     $this->zses = [];
+        //     $this->tses = [];
         //     $this->customers = [];
         // }
 
-        // if($this->sales_manager_id != null){
-        //     $invoices = $invoices->where('sales_manager_id', $this->sales_manager_id);
-        //     $field_officers = $field_officers->where('sales_manager_id', $this->sales_manager_id);
-        //     $customers = $customers->where('sales_manager_id', $this->sales_manager_id);
-        //     $this->field_officers = $field_officers->get() ?? null;
+        // if($this->zse_id != null){
+        //     $invoices = $invoices->where('zse_id', $this->zse_id);
+        //     $tses = $tses->where('zse_id', $this->zse_id);
+        //     $customers = $customers->where('zse_id', $this->zse_id);
+        //     $this->tses = $tses->get() ?? null;
         // }else{
-        //     $this->field_officer_id = null;
+        //     $this->tse_id = null;
         //     $this->customer_id = null;
-        //     $this->field_officers = [];
+        //     $this->tses = [];
         //     $this->customers = [];
         // }
 
-        if($this->field_officer_id != null){
-            $this->invoices = Invoice::where('delivery_status', 'pending')->where('field_officer_id', $this->field_officer_id)->limit($this->perPage)->get() ?? null;
-            $customers = $customers->where('field_officer_id', $this->field_officer_id);
-            $this->customers = $customers->get() ?? null;
-        }else{
-            $this->invoices = null;
-            $this->customer_id = null;
-            $this->customers = [];
+        if($this->tse_id != null){
+            $invoices = $invoices->where('tse_id', $this->tse_id) ?? null;
         }
 
         if($this->customer_id != null){
-            $this->invoices = Invoice::where('delivery_status', 'pending')->where('customer_id', $this->customer_id)->limit($this->perPage)->get() ?? null;
+            $invoices = $invoices->where('customer_id', $this->customer_id) ?? null;
         }
-
         // if($type == 'manager'){
-        //     $this->sales_managers = $sales_managers->get() ?? null;
+        //     $this->zses = $zses->get() ?? null;
         // }else
-        // if($type == 'sales_manager'){
-        //     $this->field_officers = $field_officers->get() ?? null;
+        // if($type == 'zse'){
+        //     $this->tses = $tses->get() ?? null;
         // }else
-        if($type == 'field_officer'){
-            $this->customers = $customers->get() ?? null;
-        }
+        $this->invoices = $invoices->limit($this->perPage)->get() ?? null;
     }
 
     public function deliverInvoiceList() {

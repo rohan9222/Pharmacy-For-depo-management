@@ -2,10 +2,7 @@
 
 namespace App\Livewire;
 
-use App\Models\Medicine;
-use App\Models\Category;
-use App\Models\PackSize;
-use App\Models\Supplier;
+use App\Models\{Medicine,OpeningStock,Category,PackSize,Supplier};
 
 use Livewire\WithFileUploads;
 use Intervention\Image\Drivers\Gd\Driver;
@@ -21,6 +18,7 @@ use Illuminate\Support\Facades\DB; // Add this at the top of your class
 
 use DNS1D; // For 1D barcodes
 use DNS2D; // For 2D barcodes (QR codes)
+use Carbon\Carbon;
 
 use Livewire\Component;
 
@@ -28,7 +26,7 @@ class MedicinesList extends Component
 {
     use WithFileUploads, WithPagination, WithoutUrlPagination;
 
-    public $medicineId, $categoryLists, $packSizeLists, $suppliers, $barcode, $name, $generic_name, $supplier_name, $shelf, $description, $category_name, $pack_size, $search, $supplier_price, $price, $image_url;
+    public $medicineId, $categoryLists, $packSizeLists, $suppliers, $barcode, $name, $generic_name, $supplier_name, $shelf, $description, $category_name, $pack_size, $search, $supplier_price, $price, $image_url, $quantity;
     public $vat = 17.4;
     public  $status = 1;
 
@@ -73,7 +71,7 @@ class MedicinesList extends Component
             'description' => 'nullable|string|max:255',
             'category_name' => 'required|string|max:255',
             'pack_size' => 'required|string|max:255',
-            // 'quantity' => 'required|numeric',
+            'quantity' => 'nullable|numeric|required_if:medicineId,!=,null',
             'status' => 'required|boolean',
             'supplier_price' => 'required|numeric',
             'price' => 'required|numeric',
@@ -110,25 +108,40 @@ class MedicinesList extends Component
                 // save modified image in new format
                 $image->save(public_path("$path"));
             }
-
-            $newmedicine = Medicine::updateOrCreate(
+            $newMedicineData = [
+                'barcode' => $this->barcode,
+                'name' => $this->name,
+                'generic_name' => $this->generic_name,
+                'supplier' => $this->supplier_name,
+                'shelf' => $this->shelf,
+                'description' => $this->description,
+                'category_name' => $this->category_name,
+                'pack_size' => $this->pack_size,
+                'status' => $this->status,
+                'supplier_price' => $this->supplier_price,
+                'price' => $this->price,
+                'vat' => $this->vat,
+                'image_url' => $this->image_url ? $path : null,
+            ];
+            
+            // Add 'quantity' only if $this->medicineId exists
+            if (!$this->medicineId) {
+                $newMedicineData['quantity'] = $this->quantity;
+            }
+            
+            $newMedicine = Medicine::updateOrCreate(
                 ['id' => $this->medicineId],
-                [
-                    'barcode' => $this->barcode,
-                    'name' => $this->name,
-                    'generic_name' => $this->generic_name,
-                    'supplier' => $this->supplier_name,
-                    'shelf' => $this->shelf,
-                    'description' => $this->description,
-                    'category_name' => $this->category_name,
-                    'pack_size' => $this->pack_size,
-                    'status' => $this->status,
-                    'supplier_price' => $this->supplier_price,
-                    'price' => $this->price,
-                    'vat' => $this->vat,
-                    'image_url' => $this->image_url ? $path : null,
-                ]
+                $newMedicineData
             );
+            
+            if (empty($this->medicineId)) {
+                $openingStock = new OpeningStock();
+                $openingStock->medicine_id = $newMedicine->id;
+                $openingStock->opening_stock = $this->quantity;
+                $openingStock->opening_month = Carbon::now()->format('F');
+                $openingStock->opening_year = Carbon::now()->format('Y');
+                $openingStock->save();
+            }
 
             $this->reset();
             DB::commit();
@@ -155,8 +168,10 @@ class MedicinesList extends Component
             $this->shelf = $medicine->shelf;
             $this->description = $medicine->description;
             $this->category_name = $medicine->category_name;
+            $this->pack_size = $medicine->pack_size;
             $this->status = $medicine->status;
             $this->supplier_price = $medicine->supplier_price;
+            // $this->quantity = $medicine->quantity;
             $this->price = $medicine->price;
             $this->vat = $medicine->vat;
             $this->image_url = $medicine->image_url;

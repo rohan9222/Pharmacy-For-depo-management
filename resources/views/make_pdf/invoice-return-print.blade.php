@@ -64,18 +64,18 @@
     <div class="a4">
         <div class="p-1">
             <div>
-                <div style="display: inline-block; width: 45%; float: left;">
-                    <p class="m-0 subtitle ">Sales Office :</p>
-                    <p class="m-0">Address : {{$site_data->site_address}}</p>
-                    <p class="m-0">Mobile : {{$site_data->site_phone}}</p>
-                </div>
-                <div class="title">Invoice</div>
+                <!--<div style="display: inline-block; width: 45%; float: left;">-->
+                <!--    <p class="m-0 subtitle ">Sales Office :</p>-->
+                <!--    <p class="m-0">Address : {{$site_data->site_address}}</p>-->
+                <!--    <p class="m-0">Mobile : {{$site_data->site_phone}}</p>-->
+                <!--</div>-->
+                <div class="title" style="text-align: center; width: 10%; margin: auto;">Invoice</div>
             </div>
             {{-- {{ dd($invoice_data) }} --}}
             <table class="table border">
                 <tr>
                     <td >Cust ID: {{$invoice_data->customer->user_id}}</td>
-                    <td >MPO ID: {{$invoice_data->fieldOfficer->user_id}}</td>
+                    <td >TSE ID: {{$invoice_data->fieldOfficer->user_id}}</td>
                     <td>Category: {{$invoice_data->customer->category}}</td>
                 </tr>
                 <tr>
@@ -106,11 +106,6 @@
                     <th class="border-start">Total Vat</th>
                     <th class="border-start border-end">Total Price</th>
                 </tr>
-            @php
-                $sumTotalPrice = 0;
-                $sumVatAmount = 0;
-                $sumTotal = 0;
-            @endphp
 
             @foreach ($invoice_data->salesMedicines as $medicine_list)
                 @php
@@ -125,34 +120,27 @@
                     <td class="border-dotted border-start">{{$medicine_list->initial_quantity}}</td>
                     <td class="border-dotted border-start">{{$totalPrice}}</td>
                     <td class="border-dotted border-start">{{$vatAmount}}</td>
-                    <td class="border-dotted border-start border-end">{{$medicine_list->total}}</td>
+                    <td class="border-dotted border-start border-end">{{round($medicine_list->total)}}</td>
                 </tr>
-
-                @php
-                    $sumTotalPrice += $totalPrice;
-                    $sumVatAmount += $vatAmount;
-                    $sumTotal += $medicine_list->total;
-                @endphp
             @endforeach
 
-                <!-- Total Row -->
                 <tr>
                     <td class="text-start" colspan="5">Note:</td>
-                    <td class="border-start">{{$sumTotalPrice}}</td>
-                    <td class="border-start">{{$sumVatAmount}}</td>
-                    <td class="border-start border-end">{{$sumTotal}}</td>
+                    <td class="border-start">{{$invoice_data->sub_total}}</td>
+                    <td class="border-start">{{$invoice_data->vat}}</td>
+                    <td class="border-start border-end">{{$invoice_data->sub_total + $invoice_data->vat}}</td>
                 </tr>
 
                 <tr></tr>
                 <tr>
                     <td colspan="5"></td>
-                    <td class="border" colspan="2">Discount on TP ({{$invoice_data->discount+$invoice_data->spl_discount}}%):</td>
-                    <td class="border">{{$invoice_data->dis_amount+$invoice_data->spl_dis_amount}}</td>
+                    <td class="border" colspan="2">Discount on TP ({{$invoice_data->discount + $invoice_data->spl_discount}}%):</td>
+                    <td class="border">{{round($invoice_data->dis_amount + $invoice_data->spl_dis_amount)}}</td>
                 </tr>
                 <tr>
                     <td colspan="5" class="subtitle text-uppercase">IN WORD: taka. {{$grand_total_words}} only</td>
                     <td class="border" colspan="2"><b>Net Payable Amount:</b></td>
-                    <td class="border"><b>{{$invoice_data->grand_total}}</b></td>
+                    <td class="border"><b>{{round($invoice_data->grand_total)}}</b></td>
                 </tr>
             </table>
         </div>
@@ -167,10 +155,17 @@
                         <th class="border-end">Return Date</th>
                         <th class="border-end">Quantity</th>
                         <th class="border-end">Price</th>
+                        <th class="border-end">Total Price</th>
+                        <th class="border-end">Vat</th>
                         <th class="border-end">Total</th>
                     </tr>
                 </thead>
                 <tbody>
+                    @php
+                        $sumReturnTotalPrice = 0;
+                        $sumReturnVat = 0;
+                        $sumReturnTotal = 0;
+                    @endphp
                     @foreach ($invoice_data->salesReturnMedicines as $salesReturnMedicine)
                         <tr class="border">
                             <td class="border-end">{{ $loop->iteration }}</td>
@@ -178,9 +173,67 @@
                             <td class="border-end">{{ \Carbon\Carbon::parse($salesReturnMedicine->return_date)->format('d M Y') }}</td>
                             <td class="border-end">{{ $salesReturnMedicine->quantity }}</td>
                             <td class="border-end">{{ $salesReturnMedicine->price }}</td>
-                            <td class="border-end">{{ $salesReturnMedicine->total }}</td>
+                            <td class="border-end">{{ $salesReturnMedicine->total_price }}</td>
+                            <td class="border-end">{{ $salesReturnMedicine->vat }}</td>
+                            <td class="border-end">{{ round($salesReturnMedicine->total) }}</td>
                         </tr>
+                        @php
+                            $sumReturnTotalPrice += $salesReturnMedicine->total_price;
+                            $sumReturnVat += $salesReturnMedicine->vat;
+                            $sumReturnTotal += $salesReturnMedicine->total;
+                        @endphp
                     @endforeach
+
+                    {{-- <tr>
+                        <td class="text-start" colspan="5">invoice:</td>
+                        <td class="border-start">{{$invoice_data->sub_total}}</td>
+                        <td class="border-start">{{$invoice_data->vat}}</td>
+                        <td class="border-start border-end">{{$invoice_data->sub_total + $invoice_data->vat}}</td>
+                    </tr> --}}
+                    <tr class="border">
+                        <td colspan="5" class="border-end">Total Return</td>
+                        <td class="border-end">{{ round($sumReturnTotalPrice) }}</td>
+                        <td class="border-end">{{ round($sumReturnVat) }}</td>
+                        <td class="border-end">{{ round($sumReturnTotal) }}</td>
+                    </tr>
+                    
+                    {{-- <tr>
+                        <td class="text-start" colspan="5">Note:</td>
+                        <td class="border-start">{{$invoice_data->sub_total - $sumReturnTotalPrice}}</td>
+                        <td class="border-start">{{$invoice_data->vat - $sumReturnVat}}</td>
+                        <td class="border-start border-end">{{($invoice_data->sub_total + $invoice_data->vat) - $sumReturnTotal}}</td>
+                    </tr> --}}
+
+                    <tr>
+                        <td colspan="3" class="border-end">Payable Amount</td>
+                        {{-- <td colspan="3" class="border-end text-center">{{round($invoice_data->grand_total)}} - {{ round($sumReturnTotal) }}</td> --}}
+                        @php
+                            $afterReturnPrice = $invoice_data->sub_total - $sumReturnTotalPrice;
+                            $afterReturnVat = $invoice_data->vat - $sumReturnVat;
+
+                            $discount_data = json_decode($invoice_data->discount_data);
+                            $newDiscount = App\Models\DiscountValue::where('discount_type', 'General')
+                                ->where('start_amount', '<=', $afterReturnPrice)
+                                ->where('end_amount', '>=', $afterReturnPrice)
+                                ->pluck('discount')
+                                ->first();
+
+                            if (!empty($discount_data) && $discount_data->start_amount <= $afterReturnPrice && $afterReturnPrice <= $discount_data->end_amount) {
+                                $afterReturnDis = ($afterReturnPrice * $invoice_data->discount) / 100;
+                                $afterReturnDue = ($afterReturnPrice - $afterReturnDis) + $afterReturnVat;
+                                $newDiscountValue = $invoice_data->discount;
+                            } elseif ($newDiscount !== null) {
+                                $afterReturnDue = ($afterReturnPrice + $afterReturnVat) - ($afterReturnPrice * $newDiscount / 100);
+                                $newDiscountValue = $newDiscount;
+                            } else {
+                                $afterReturnDue = $afterReturnPrice + $afterReturnVat;
+                                $newDiscountValue = 0;
+                            }
+                        @endphp
+
+                        <td colspan="4" class="border-end">With Discount ({{ $newDiscountValue ?? 0 }}%)</td>
+                        <td class="border-end"><b>{{ round($afterReturnDue) }}</b></td>
+                    </tr>
                 </tbody>
             </table>
         </div>
@@ -214,8 +267,7 @@
     </div>
 </body>
 <script>
-    window.print();
-
+    // window.print();
 </script>
 </html>
 
@@ -237,7 +289,7 @@
     $mpdf = new \Mpdf\Mpdf($conf);
     $dateTime = date("d/m/Y,  h:i A", time());
     $html = "<div style='width:100%; text-align:center;'>
-                <div style='font-size:18px;text-align:center'><h2 style='margin:0; background-color:#cff4fc'>$pdf_title</h2></div>
+                <!--<div style='font-size:18px;text-align:center'><h2 style='margin:0; background-color:#cff4fc'>$pdf_title</h2></div>-->
             </div>";
 
         $mpdf->SetHTMLHeader($html);

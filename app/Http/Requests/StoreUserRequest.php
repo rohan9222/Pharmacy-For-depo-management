@@ -34,6 +34,7 @@ class StoreUserRequest extends FormRequest
                 }
             ],
             'address' => 'nullable|string|max:255',
+            'territory' => 'required|string|max:255',
             'mobile' => 'required|numeric|digits:11',
             'balance' => 'nullable|numeric',
             'product_target' => 'nullable|numeric',

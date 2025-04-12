@@ -9,17 +9,17 @@ use Livewire\Component;
 
 class SummaryList extends Component
 {
-    public $search, $admin_targets,$managers, $manager_id, $sales_managers, $sales_manager_id, $field_officers, $field_officer_id, $customers, $customer_id, $invoices, $type;
+    public $search, $admin_targets,$managers, $manager_id, $zses, $zse_id, $tses, $tse_id, $customers, $customer_id, $invoices, $type;
 
     public function mount(){
         if(auth()->user()->hasRole('Super Admin')) {
             return true;
         }elseif(auth()->user()->hasRole('Manager')) {
             $this->type = 'manager';
-        }elseif(auth()->user()->hasRole('Sales Manager')) {
-            $this->type = 'sales_manager';
-        }elseif(auth()->user()->hasRole('Field Officer')) {
-            $this->type = 'field_officer';
+        }elseif(auth()->user()->hasRole('Zonal Sales Executive')) {
+            $this->type = 'zse';
+        }elseif(auth()->user()->hasRole('Territory Sales Executive')) {
+            $this->type = 'tse';
         }
     }
 
@@ -33,8 +33,8 @@ class SummaryList extends Component
     public function updateUserList() {
         // Use relationships properly
         $managers = User::where('role', 'Manager');
-        $sales_managers = User::where('role', 'Sales Manager');
-        $field_officers = User::where('role', 'Field Officer');
+        $zses = User::where('role', 'Zonal Sales Executive');
+        $tses = User::where('role', 'Territory Sales Executive');
 
         $admin_targets = TargetReport::query()->with('userData:id,name,role')->search($this->search);
 
@@ -42,49 +42,49 @@ class SummaryList extends Component
             $this->managers = $managers->get();
             if($this->manager_id != null){
                 $admin_targets = $admin_targets->where('manager', $this->manager_id);
-                $this->sales_managers = $sales_managers->where('manager_id', $this->manager_id)->get();
+                $this->zses = $zses->where('manager_id', $this->manager_id)->get();
             }else{
-                $this->sales_manager_id = null;
-                $this->sales_managers = [];
-                $this->field_officer_id = null;
-                $this->field_officers = [];
+                $this->zse_id = null;
+                $this->zses = [];
+                $this->tse_id = null;
+                $this->tses = [];
             }
 
-            if($this->sales_manager_id != null){
-                $admin_targets = $admin_targets->where('sales_manager', $this->sales_manager_id);
-                $this->field_officers = $field_officers->where('sales_manager_id', $this->sales_manager_id)->get();
+            if($this->zse_id != null){
+                $admin_targets = $admin_targets->where('zse', $this->zse_id);
+                $this->tses = $tses->where('zse_id', $this->zse_id)->get();
             }else{
-                $this->field_officer_id = null;
-                $this->field_officers = [];
+                $this->tse_id = null;
+                $this->tses = [];
             }
 
-            if($this->field_officer_id != null){
-                $admin_targets = $admin_targets->where('field_officer', $this->field_officer_id);
+            if($this->tse_id != null){
+                $admin_targets = $admin_targets->where('tse', $this->tse_id);
             }
         }elseif($this->type == 'manager'){
-            $this->sales_managers = $sales_managers->where('manager_id', auth()->user()->id)->get();
+            $this->zses = $zses->where('manager_id', auth()->user()->id)->get();
             $this->admin_targets = $admin_targets->where('user_id', auth()->user()->id)->get();
 
 
-            if($this->sales_manager_id != null){
-                $admin_targets = $admin_targets->where('sales_manager', $this->sales_manager_id);
-                $this->field_officers = $field_officers->where('sales_manager_id', $this->sales_manager_id)->get();
+            if($this->zse_id != null){
+                $admin_targets = $admin_targets->where('zse', $this->zse_id);
+                $this->tses = $tses->where('zse_id', $this->zse_id)->get();
             }else{
-                $this->field_officer_id = null;
-                $this->field_officers = [];
+                $this->tse_id = null;
+                $this->tses = [];
             }
 
-            if($this->field_officer_id != null){
-                $admin_targets = $admin_targets->where('field_officer', $this->field_officer_id);
+            if($this->tse_id != null){
+                $admin_targets = $admin_targets->where('tse', $this->tse_id);
             }
-        }elseif($this->type == 'sales_manager'){
-            $this->field_officers = $field_officers->where('sales_manager_id', auth()->user()->id)->get();
+        }elseif($this->type == 'zse'){
+            $this->tses = $tses->where('zse_id', auth()->user()->id)->get();
             $this->admin_targets = $admin_targets->where('user_id', auth()->user()->id)->get();
 
-            if($this->field_officer_id != null){
-                $admin_targets = $admin_targets->where('field_officer', $this->field_officer_id);
+            if($this->tse_id != null){
+                $admin_targets = $admin_targets->where('tse', $this->tse_id);
             }
-        }elseif($this->type == 'field_officer'){
+        }elseif($this->type == 'tse'){
             $this->admin_targets = $admin_targets->where('user_id', auth()->user()->id)->get();
         }else{
             $this->admin_targets = $admin_targets->get();

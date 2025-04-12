@@ -38,7 +38,7 @@
 
                             <a href="{{ route('roles.show', $role->id) }}" class="btn btn-warning btn-sm"><i class="bi bi-eye"></i> Show</a>
 
-                            @if (!in_array($role->name, ['Super Admin', 'Depo Incharge', 'Manager', 'Sales Manager', 'Field Officer', 'Delivery Man']))
+                            @if (!in_array($role->name, ['Super Admin', 'Depo Incharge', 'Manager', 'Zonal Sales Executive', 'Territory Sales Executive', 'Delivery Man']))
                                 @can('edit-role')
                                     <a href="{{ route('roles.edit', $role->id) }}" class="btn btn-primary btn-sm"><i class="bi bi-pencil-square"></i> Edit</a>
                                 @endcan

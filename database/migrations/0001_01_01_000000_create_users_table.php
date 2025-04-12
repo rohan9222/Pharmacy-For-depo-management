@@ -24,11 +24,12 @@ return new class extends Migration
             $table->string('category')->nullable();
 
             $table->foreignId('manager_id')->nullable()->constrained('users')->nullOnDelete()->cascadeOnUpdate()->comment('user id who has manager role');
-            $table->foreignId('sales_manager_id')->nullable()->constrained('users')->nullOnDelete()->cascadeOnUpdate()->comment('user id who has sales manager role');
-            $table->foreignId('field_officer_id')->nullable()->constrained('users')->nullOnDelete()->cascadeOnUpdate()->comment('user id who has field officer role');
-
-            $table->string('product_target')->nullable();
-            $table->string('sales_target')->nullable();
+            $table->foreignId('zse_id')->nullable()->constrained('users')->nullOnDelete()->cascadeOnUpdate()->comment('user id who has Zonal Sales Executive role');
+            $table->foreignId('tse_id')->nullable()->constrained('users')->nullOnDelete()->cascadeOnUpdate()->comment('user id who has Territory Sales Executive role');
+            
+            $table->longtext('product_target_data')->nullable();
+            $table->decimal('product_target', 11, 2)->nullable()->default(0.00);
+            $table->decimal('sales_target', 11, 2)->nullable()->default(0.00);
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->rememberToken();

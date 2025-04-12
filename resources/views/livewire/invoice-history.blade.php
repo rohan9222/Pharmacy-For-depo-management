@@ -13,7 +13,7 @@
                                 <livewire:user-data-manage />
                             </div>
                         </div>
-                        <div class="row mt-3" wire:ignore>
+                        <div class="row mt-3 table-responsive" wire:ignore>
                             <table class="table" id="invoiceTable">
                                 <thead>
                                     <tr>
@@ -22,6 +22,7 @@
                                         <th>Invoice NO</th>
                                         <th>Invoice Date</th>
                                         <th>Total</th>
+                                        <th>Return</th>
                                         <th>Paid</th>
                                         <th>Due</th>
                                         <th>Customer Name</th>
@@ -52,29 +53,39 @@
                     </div>
                     <div class="modal-body">
                         @if($selectedInvoice)
+                            @php
+                                $afterReturnPrice = $selectedInvoice->sub_total - $selectedInvoice->salesReturnMedicines->sum('total_price');
+                                $afterReturnVat = $selectedInvoice->vat - $selectedInvoice->salesReturnMedicines->sum('vat');
+                                $sumReturnTotal = $selectedInvoice->salesReturnMedicines->sum('total_price');
+
+                                $discount_data = json_decode($selectedInvoice->discount_data);
+                                $newDiscount = App\Models\DiscountValue::where('discount_type', 'General')
+                                    ->where('start_amount', '<=', $afterReturnPrice)
+                                    ->where('end_amount', '>=', $afterReturnPrice)
+                                    ->pluck('discount')
+                                    ->first();
+
+                                if (!empty($discount_data) && $discount_data->start_amount <= $afterReturnPrice && $afterReturnPrice <= $discount_data->end_amount) {
+                                    $afterReturnDis = ($afterReturnPrice * $selectedInvoice->discount) / 100;
+                                    $afterReturnDue = ($afterReturnPrice - $afterReturnDis) + $afterReturnVat; 
+                                } elseif ($newDiscount !== null) {
+                                    $afterReturnDue = ($afterReturnPrice + $afterReturnVat) - ($afterReturnPrice * $newDiscount / 100);
+                                } else {
+                                    $afterReturnDue = $afterReturnPrice + $afterReturnVat;
+                                }
+
+                                $actualDue = round(max($afterReturnDue - $selectedInvoice->paid, 0), 2);
+                            @endphp
                             <input type="hidden" wire:model="selectedInvoice.id">
                             <div class="form-group">
                                 <label class="form-label fw-bold">Due Amount</label>
                                 <input type="text" class="form-control"
-                                    value="{{ $site_settings->site_currency }}{{ $selectedInvoice->due }}"
+                                    value="{{ $site_settings->site_currency }} {{ $actualDue }}"
                                     readonly>
                             </div>
                             <div class="form-group mt-2">
                                 <label class="form-label fw-bold">Amount</label>
-                                <input type="number" wire:model="amount" class="form-control" required>
-                                @error('amount') <span class="text-danger">{{ $message }}</span> @enderror
-                            </div>
-                        @endif
-                        @if($partialPayment)
-                            <div class="form-group">
-                                <label class="form-label fw-bold">Due Amount</label>
-                                <input type="text" class="form-control"
-                                    value="{{ $site_settings->site_currency }}{{ $customerData->total_due}}"
-                                    readonly>
-                            </div>
-                            <div class="form-group mt-2">
-                                <label class="form-label fw-bold">Amount</label>
-                                <input type="number" wire:model="amount" class="form-control" required>
+                                <input type="text" wire:model="amount" class="form-control" required>
                                 @error('amount') <span class="text-danger">{{ $message }}</span> @enderror
                             </div>
                         @endif
@@ -158,18 +169,41 @@
                                                         @error('return_medicine') <span class="text-danger">{{ $message }}</span> @enderror
                                                     </div>
                                                 </div>
-                                                <div class="col-sm-6 col-md-3">
+                                                <div class="col-sm-6 col-md-2">
                                                     <div class="mb-3">
                                                         <label for="return_quantity" class="form-label">Return Quantity</label>
                                                         <input type="number" class="form-control" wire:model="return_quantity">
                                                         @error('return_quantity') <span class="text-danger">{{ $message }}</span> @enderror
                                                     </div>
                                                 </div>
-                                                <div class="col-sm-6 col-md-3">
+                                                <div class="col-sm-3 col-md-2">
                                                     <div class="mb-3 mt-2">
                                                         <button type="submit" class="btn btn-primary btn-sm mt-4">Submit</button>
                                                     </div>
                                                 </div>
+                                                <div class="col-sm-3 col-md-2">
+                                                    <div class="mb-3 mt-2">
+                                                        <!-- Button trigger modal -->
+                                                        <span class="btn btn-sm btn-info mt-4" data-bs-toggle="modal" data-bs-target="#returnModal">
+                                                            Full Return
+                                                        </span>
+                                                        
+                                                        <!-- Modal -->
+                                                        <div class="modal fade" id="returnModal" tabindex="-1" aria-labelledby="returnModalLabel" aria-hidden="true">
+                                                            <div class="modal-dialog">
+                                                                <div class="modal-content">
+                                                                    <div class="modal-body text-danger">
+                                                                        Are You Confirm To Return This Full Invoice
+                                                                    </div>
+                                                                    <div class="modal-footer">
+                                                                        <span class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Cancel</span>
+                                                                        <span class="btn btn-sm btn-danger" data-bs-dismiss="modal" wire:click="confirmFullReturn({{ $invoice_data->id }})">Confirm</span>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>                                              
                                             </div>
                                         </form>
                                     </div>
@@ -189,13 +223,14 @@
         var table = $('#invoiceTable').DataTable({
             processing: true,
             serverSide: true,
+            // responsive: true,
             order: [[ 1, 'desc' ]],
             ajax: {
                 url: "{{ route('sales-medicines-table') }}", // Ensure correct route
                 data: function(d) {
                     d.manager_id = $('#manager_id').val();
-                    d.sales_manager_id = $('#sales_manager_id').val();
-                    d.field_officer_id = $('#field_officer_id').val();
+                    d.zse_id = $('#zse_id').val();
+                    d.tse_id = $('#tse_id').val();
                     d.customer_id = $('#customer_id').val();
                     d.start_date = $('#start_date').val();
                     d.end_date = $('#end_date').val();
@@ -207,6 +242,7 @@
                 { data: 'invoice_no', name: 'invoice_no' },
                 { data: 'invoice_date', name: 'invoice_date' },
                 { data: 'grand_total', name: 'grand_total' },
+                { data: 'returnAmount', name: 'returnAmount' },
                 { data: 'paid', name: 'paid' },
                 { data: 'due', name: 'due' },
                 { data: 'customer.name', name: 'customer.name' },
@@ -217,7 +253,7 @@
             ],
             columnDefs: [
                 {
-                    targets: [3, 10],  // Invoice Date and Delivery Date
+                    targets: [3, 11],  // Invoice Date and Delivery Date
                     render: function(data, type, row) {
                         return moment(data).format('D-MMM-YYYY');  // Format date
                     }

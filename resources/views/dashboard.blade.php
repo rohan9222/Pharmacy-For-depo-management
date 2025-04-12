@@ -1,120 +1,82 @@
 <x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Dashboard') }}
-        </h2>
-    </x-slot>
+    <div class="row sparkboxes mt-4 g-1">
+        <div class="col-md-3 col-sm-6">
+            <div class="box box1">
+                <div class="details">
+                    <h3>{{$total_medicine}}</h3>
+                    <h4>Stock Medicine</h4>
+                </div>
+                <div id="spark1"></div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6">
+            <div class="box box2">
+                <div class="details">
+                    <h3>{{$total_sales}}</h3>
+                    <h4>Total Sales</h4>
+                </div>
+                <div id="spark2"></div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6">
+            <div class="box box3">
+                <div class="details">
+                    <h3>{{$total_purchases}}</h3>
+                    <h4>Total Purchases</h4>
+                </div>
+                <div id="spark3"></div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6">
+            <div class="box box4">
+                <div class="details">
+                    <h3>{{$total_customers}}</h3>
+                    <h4>Total Customers</h4>
+                </div>
+                <div id="spark4"></div>
+            </div>
+        </div>
+    </div>
 
-    <div class="row my-2">
-        <div class="col-md-8">
-            <div class="shadow p-3 mb-5 bg-white rounded">
-                <div class="card-header bg-transparent border-0">
-                    <h4>Reports</h4>
-                </div>
-                <div class="card-body">
-                    <div class="row g-1">
-                        <div class="col-lg-3 col-6">
-                            <div class="card p-2 bg-info-subtle">
-                                <div class="small-box d-flex justify-content-between flex-column">
-                                    <div class="border rounded-circle p-2 bg-info fw-bold fs-4 text-white" style="width: 2em; height: 2em;">
-                                        <i class="bi bi-capsule-pill"></i>
-                                    </div>
-                                    <div class="inner text-center">
-                                        <h3>{{$total_medicine}}</h3>
-                                    </div>
-                                </div>
-                                <a href="{{ route('medicines') }}" class="nav-link">
-                                    <span>Stock Medicine</span> <i class="bi bi-arrow-right-circle-fill"></i>
-                                </a>
-                            </div>
-                        </div>
-                        <div class="col-lg-3 col-6">
-                            <div class="card p-2 bg-success-subtle">
-                                <div class="small-box d-flex justify-content-between flex-column">
-                                    <div class="border rounded-circle p-2 bg-success fw-bold fs-4 text-white" style="width: 2em; height: 2em;">
-                                        <i class="bi bi-currency-dollar"></i>
-                                    </div>
-                                    <div class="inner text-center">
-                                        <h3>৳ {{$total_sales}}</h3>
-                                    </div>
-                                </div>
-                                <a href="{{ route('sales-medicines-list') }}" class="nav-link">
-                                    <span>Total Sales</span> <i class="bi bi-arrow-right-circle-fill"></i>
-                                </a>
-                            </div>
-                        </div>
-                        <div class="col-lg-3 col-6">
-                            <div class="card p-2 bg-danger-subtle">
-                                <div class="small-box d-flex justify-content-between flex-column">
-                                    <div class="border rounded-circle p-2 bg-danger fw-bold fs-4 text-white" style="width: 2em; height: 2em;">
-                                        <i class="bi bi-currency-dollar"></i>
-                                    </div>
-                                    <div class="inner text-center">
-                                        <h3>৳ {{$total_purchases}}</h3>
-                                    </div>
-                                </div>
-                                <a href="{{ route('stock-medicines-list') }}" class="nav-link">
-                                    <span>Total Purchases</span> <i class="bi bi-arrow-right-circle-fill"></i>
-                                </a>
-                            </div>
-                        </div>
-                        <div class="col-lg-3 col-6">
-                            <div class="card p-2 bg-secondary-subtle">
-                                <div class="small-box d-flex justify-content-between flex-column">
-                                    <div class="border rounded-circle p-2 bg-secondary fw-bold fs-4 text-white" style="width: 2em; height: 2em;">
-                                        <i class="bi bi-people"></i>
-                                    </div>
-                                    <div class="inner text-center">
-                                        <h3>{{$total_customers}}</h3>
-                                    </div>
-                                </div>
-                                <a href="{{ route('customers') }}" class="nav-link">
-                                    <span>Total Customers</span> <i class="bi bi-arrow-right-circle-fill"></i>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+    <div class="row mt-4 g-2">
+        {{-- <div class="col-md-5">
+            <div class="box shadow mt-4">
+                <div id="radialBarBottom"></div>
+            </div>
+        </div> --}}
+        <div class="col-sm-12 col-md-12 col-lg-6">
+            <div class="box shadow mt-4">
+                <div id="line-adwords" class=""></div>
             </div>
         </div>
-        <div class="col-md-4">
-            <div class="card border-0 border-r20 mb-3">
-                <div class="card-header bg-transparent border-0">
-                    <h4 class="card-title">Purchases &amp; Sales</h4>
-                </div>
-                <div class="card-body">
-                    <div id="line-example" style="height: 180px; color: red; position: relative; -webkit-tap-highlight-color: rgba(0, 0, 0, 0);" class="line-atl morris-chart"><svg height="180" version="1.1" width="346" xmlns="http://www.w3.org/2000/svg" style="overflow: hidden; position: relative; left: -0.625px; top: -0.574997px;"><desc style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);">Created with Raphaël 2.1.0</desc><defs style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></defs><text x="36.42500114440918" y="141.39999961853027" text-anchor="end" font="10px &quot;Arial&quot;" stroke="none" fill="#888888" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); text-anchor: end; font: 12px sans-serif;" font-size="12px" font-family="sans-serif" font-weight="normal"><tspan dy="4.400002479553223" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);">0</tspan></text><path fill="none" stroke="#aaaaaa" d="M48.92500114440918,141.39999961853027H321.062" stroke-width="0.5" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></path><text x="36.42500114440918" y="112.2999997138977" text-anchor="end" font="10px &quot;Arial&quot;" stroke="none" fill="#888888" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); text-anchor: end; font: 12px sans-serif;" font-size="12px" font-family="sans-serif" font-weight="normal"><tspan dy="4.400001049041748" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);">0.25</tspan></text><path fill="none" stroke="#aaaaaa" d="M48.92500114440918,112.2999997138977H321.062" stroke-width="0.5" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></path><text x="36.42500114440918" y="83.19999980926514" text-anchor="end" font="10px &quot;Arial&quot;" stroke="none" fill="#888888" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); text-anchor: end; font: 12px sans-serif;" font-size="12px" font-family="sans-serif" font-weight="normal"><tspan dy="4.399999618530273" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);">0.5</tspan></text><path fill="none" stroke="#aaaaaa" d="M48.92500114440918,83.19999980926514H321.062" stroke-width="0.5" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></path><text x="36.42500114440918" y="54.09999990463257" text-anchor="end" font="10px &quot;Arial&quot;" stroke="none" fill="#888888" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); text-anchor: end; font: 12px sans-serif;" font-size="12px" font-family="sans-serif" font-weight="normal"><tspan dy="4.399998188018799" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);">0.75</tspan></text><path fill="none" stroke="#aaaaaa" d="M48.92500114440918,54.09999990463257H321.062" stroke-width="0.5" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></path><text x="36.42500114440918" y="25" text-anchor="end" font="10px &quot;Arial&quot;" stroke="none" fill="#888888" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); text-anchor: end; font: 12px sans-serif;" font-size="12px" font-family="sans-serif" font-weight="normal"><tspan dy="4.399999618530273" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);">1</tspan></text><path fill="none" stroke="#aaaaaa" d="M48.92500114440918,25H321.062" stroke-width="0.5" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></path><text x="282.18528587777274" y="153.89999961853027" text-anchor="middle" font="10px &quot;Arial&quot;" stroke="none" fill="#888888" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); text-anchor: middle; font: 12px sans-serif;" font-size="12px" font-family="sans-serif" font-weight="normal" transform="matrix(1,0,0,1,0,6.8)"><tspan dy="4.400002479553223" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);">2025-01-26</tspan></text><text x="165.55514351109096" y="153.89999961853027" text-anchor="middle" font="10px &quot;Arial&quot;" stroke="none" fill="#888888" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); text-anchor: middle; font: 12px sans-serif;" font-size="12px" font-family="sans-serif" font-weight="normal" transform="matrix(1,0,0,1,0,6.8)"><tspan dy="4.400002479553223" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);">2025-01-23</tspan></text><text x="48.92500114440918" y="153.89999961853027" text-anchor="middle" font="10px &quot;Arial&quot;" stroke="none" fill="#888888" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); text-anchor: middle; font: 12px sans-serif;" font-size="12px" font-family="sans-serif" font-weight="normal" transform="matrix(1,0,0,1,0,6.8)"><tspan dy="4.400002479553223" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);">2025-01-20</tspan></text><path fill="none" stroke="#7a92a3" d="M48.92500114440918,25C58.644179674966,25,78.08253673607963,10.450000047683714,87.80171526663645,25C97.52089379719327,39.549999952316284,116.95925085830689,126.84999966621399,126.6784293888637,141.39999961853027C136.39760791942052,141.39999961853027,155.83596498053416,141.39999961853027,165.55514351109096,141.39999961853027C175.2743220416478,141.39999961853027,194.7126791027614,141.39999961853027,204.43185763331823,141.39999961853027C214.15103616387503,141.39999961853027,233.58939322498867,141.39999961853027,243.30857175554547,141.39999961853027C253.02775028610228,141.39999961853027,272.46610734721594,141.39999961853027,282.18528587777274,141.39999961853027C291.90446440832955,141.39999961853027,311.3428214694432,141.39999961853027,321.062,141.39999961853027" stroke-width="3" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></path><path fill="none" stroke="#0b62a4" d="M48.92500114440918,141.39999961853027C58.644179674966,112.2999997138977,78.08253673607963,25,87.80171526663645,25C97.52089379719327,25,116.95925085830689,126.84999966621399,126.6784293888637,141.39999961853027C136.39760791942052,141.39999961853027,155.83596498053416,141.39999961853027,165.55514351109096,141.39999961853027C175.2743220416478,141.39999961853027,194.7126791027614,141.39999961853027,204.43185763331823,141.39999961853027C214.15103616387503,141.39999961853027,233.58939322498867,141.39999961853027,243.30857175554547,141.39999961853027C253.02775028610228,141.39999961853027,272.46610734721594,141.39999961853027,282.18528587777274,141.39999961853027C291.90446440832955,141.39999961853027,311.3428214694432,141.39999961853027,321.062,141.39999961853027" stroke-width="3" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></path><circle cx="48.92500114440918" cy="25" r="4" fill="#7a92a3" stroke="#ffffff" stroke-width="1" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></circle><circle cx="87.80171526663645" cy="25" r="4" fill="#7a92a3" stroke="#ffffff" stroke-width="1" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></circle><circle cx="126.6784293888637" cy="141.39999961853027" r="4" fill="#7a92a3" stroke="#ffffff" stroke-width="1" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></circle><circle cx="165.55514351109096" cy="141.39999961853027" r="7" fill="#7a92a3" stroke="#ffffff" stroke-width="1" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></circle><circle cx="204.43185763331823" cy="141.39999961853027" r="4" fill="#7a92a3" stroke="#ffffff" stroke-width="1" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></circle><circle cx="243.30857175554547" cy="141.39999961853027" r="4" fill="#7a92a3" stroke="#ffffff" stroke-width="1" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></circle><circle cx="282.18528587777274" cy="141.39999961853027" r="4" fill="#7a92a3" stroke="#ffffff" stroke-width="1" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></circle><circle cx="321.062" cy="141.39999961853027" r="4" fill="#7a92a3" stroke="#ffffff" stroke-width="1" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></circle><circle cx="48.92500114440918" cy="141.39999961853027" r="4" fill="#0b62a4" stroke="#ffffff" stroke-width="1" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></circle><circle cx="87.80171526663645" cy="25" r="4" fill="#0b62a4" stroke="#ffffff" stroke-width="1" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></circle><circle cx="126.6784293888637" cy="141.39999961853027" r="4" fill="#0b62a4" stroke="#ffffff" stroke-width="1" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></circle><circle cx="165.55514351109096" cy="141.39999961853027" r="7" fill="#0b62a4" stroke="#ffffff" stroke-width="1" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></circle><circle cx="204.43185763331823" cy="141.39999961853027" r="4" fill="#0b62a4" stroke="#ffffff" stroke-width="1" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></circle><circle cx="243.30857175554547" cy="141.39999961853027" r="4" fill="#0b62a4" stroke="#ffffff" stroke-width="1" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></circle><circle cx="282.18528587777274" cy="141.39999961853027" r="4" fill="#0b62a4" stroke="#ffffff" stroke-width="1" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></circle><circle cx="321.062" cy="141.39999961853027" r="4" fill="#0b62a4" stroke="#ffffff" stroke-width="1" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></circle></svg><div class="morris-hover morris-default-style" style="left: 125.161px; top: 53px;"><div class="morris-hover-row-label">2025-01-23</div><div class="morris-hover-point" style="color: #0b62a4">
-            Sales:
-            0
-            </div><div class="morris-hover-point" style="color: #7A92A3">
-            Purchase:
-            0
-            </div></div></div>
-                </div>
+        <div class="col-sm-12 col-md-12 col-lg-6">
+            <div class="box shadow mt-4">
+                <div id="svg-tree"></div>
             </div>
         </div>
     </div>
-    <div class="row my-2">
-        <div class="col-md-6">
-            <div class="card border-0 border-r20 mb-3">
-                <div class="card-header bg-transparent border-0">
-                    <h4 class="card-title">Supporter List</h4>
-                </div>
-                <div class="card-body">
-                    <div id="svg-tree"></div>
-                </div>
-            </div>
+
+    {{-- <div class="row mt-4">
+        <div class="col-md-5">
+        <div class="box shadow mt-4">
+            <div id="barchart"></div>
         </div>
-    </div>
+        </div>
+        <div class="col-md-7">
+        <div class="box shadow mt-4">
+            <div id="areachart"></div>
+        </div>
+        </div>
+    </div> --}}
 
 <!-- Bootstrap 5 Modal -->
 <div class="modal fade" id="alertModal" tabindex="-1" aria-labelledby="alertModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
+    <div class="modal-dialog ">
         <div class="modal-content">
-            <div class="modal-header">
+            {{-- <div class="modal-header">
                 <h5 class="modal-title" id="alertModalLabel">Modal Title</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
+            </div> --}}
             <div class="modal-body">
                 @if ($low_stock_medicine != null)
                     <h3 class="text-center h3">Low Stock Medicine</h3>
@@ -213,41 +175,517 @@
 </div>
 
 
-@push('scripts')
-    {{-- <script type="text/javascript">
-        document.addEventListener('DOMContentLoaded', function () {
-            const data = @json($hierarchy);
-            const options = {
-                contentKey: 'data',
-                width: 800,
-                height: 600,
-                nodeWidth: 150,
-                nodeHeight: 100,
-                fontColor: '#fff',
-                borderColor: '#333',
-                childrenSpacing: 50,
-                siblingSpacing: 20,
-                direction: 'top',
-                enableExpandCollapse: true,
-                nodeTemplate: (content) =>
-                    `<div style='display: flex;flex-direction: column;gap: 10px;justify-content: center;align-items: center;height: 100%;'>
-                        <img style='width: 50px;height: 50px;border-radius: 50%;' src='${content.imageURL}' alt='' />
-                        <div style="font-weight: bold; font-family: Arial; font-size: 14px">${content.name}</div>
-                        <div style="font-size: 12px; color: #999">${content.role}</div>
-                    </div>`,
-                canvasStyle: 'border: 1px solid black;background: #f6f6f6;',
-                enableToolbar: true,
-            };
 
-            const tree = new ApexTree(document.getElementById('svg-tree'), options);
-            tree.render(data);
-        });
-    </script> --}}
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            var myModal = new window.bootstrap.Modal(document.getElementById('alertModal'));
-            myModal.show();
-        });
-    </script>
-@endpush
+    @push('styles')
+        <style>
+            h1, h2, h3, h4, h5, h6, strong {
+                font-weight: 600;
+            }
+
+
+            .content-area {
+                max-width: 1280px;
+                margin: 0 auto;
+            }
+
+            .box {
+                background-color: #ffffff;
+                padding: 25px 20px;
+            }
+
+            .shadow {
+                box-shadow: 0px 1px 15px 1px rgba(69, 65, 78, 0.08);
+            }
+            .sparkboxes .box {
+                padding-top: 10px;
+                padding-bottom: 10px;
+                text-shadow: 0 1px 1px 1px #666;
+                box-shadow: 0px 1px 15px 1px rgba(69, 65, 78, 0.08);
+                position: relative;
+                border-radius: 5px;
+            }
+
+            .sparkboxes .box .details {
+                position: absolute;
+                color: #fff;
+                transform: scale(0.7) translate(-22px, 20px);
+            }
+            .sparkboxes strong {
+                position: relative;
+                z-index: 3;
+                top: -8px;
+                color: #fff;
+            }
+
+            .sparkboxes .box1 {
+                background-image: linear-gradient( 135deg, #ABDCFF 10%, #0396FF 100%);
+            }
+
+            .sparkboxes .box2 {
+                background-image: linear-gradient( 135deg, #2AFADF 10%, #4C83FF 100%);
+            }
+
+            .sparkboxes .box3 {
+                background-image: linear-gradient( 135deg, #FFD3A5 10%, #FD6585 100%);
+            }
+
+            .sparkboxes .box4 {
+                background-image: linear-gradient( 135deg, #EE9AE5 10%, #5961F9 100%);
+            }
+        </style>
+    @endpush
+
+    @push('scripts')
+        <script>
+            document.addEventListener("DOMContentLoaded", function() {
+                var myModal = new window.bootstrap.Modal(document.getElementById('alertModal'));
+                myModal.show();
+
+                window.Apex = {
+                    chart: {
+                        foreColor: '#ccc',
+                        toolbar: {
+                            show: false
+                        },
+                    },
+                    stroke: {
+                        width: 3
+                    },
+                    dataLabels: {
+                        enabled: false
+                    },
+                    tooltip: {
+                        theme: 'dark'
+                    },
+                    grid: {
+                        borderColor: "#535A6C",
+                        xaxis: {
+                            lines: {
+                                show: true
+                            }
+                        }
+                    }
+                };
+
+                var spark1 = {
+                    chart: {
+                        id: 'spark1',
+                        group: 'sparks',
+                        type: 'line',
+                        height: 80,
+                        sparkline: {
+                            enabled: true
+                        },
+                        dropShadow: {
+                            enabled: true,
+                            top: 1,
+                            left: 1,
+                            blur: 2,
+                            opacity: 0.5,
+                        }
+                    },
+                    series: [{
+                        data: [25, 66, 41, 59, 25, 44, 12, 36, 9, 21]
+                    }],
+                    stroke: {
+                        curve: 'smooth'
+                    },
+                    markers: {
+                        size: 0
+                    },
+                    grid: {
+                        padding: {
+                        top: 20,
+                        bottom: 10,
+                        left: 110
+                        }
+                    },
+                    colors: ['#fff'],
+                    tooltip: {
+                        x: {
+                            show: false
+                        },
+                        y: {
+                            title: {
+                                formatter: function formatter(val) {
+                                return '';
+                                }
+                            }
+                        }
+                    }
+                }
+
+                var spark2 = {
+                    chart: {
+                        id: 'spark2',
+                        group: 'sparks',
+                        type: 'line',
+                        height: 80,
+                        sparkline: {
+                            enabled: true
+                        },
+                        dropShadow: {
+                            enabled: true,
+                            top: 1,
+                            left: 1,
+                            blur: 2,
+                            opacity: 0.5,
+                        }
+                    },
+                    series: [{
+                        data: [12, 14, 2, 47, 32, 44, 14, 55, 41, 69]
+                    }],
+                    stroke: {
+                        curve: 'smooth'
+                    },
+                    grid: {
+                        padding: {
+                        top: 20,
+                        bottom: 10,
+                        left: 110
+                        }
+                    },
+                    markers: {
+                        size: 0
+                    },
+                    colors: ['#fff'],
+                    tooltip: {
+                        x: {
+                        show: false
+                        },
+                        y: {
+                        title: {
+                            formatter: function formatter(val) {
+                            return '';
+                            }
+                        }
+                        }
+                    }
+                }
+
+                var spark3 = {
+                    chart: {
+                        id: 'spark3',
+                        group: 'sparks',
+                        type: 'line',
+                        height: 80,
+                        sparkline: {
+                            enabled: true
+                        },
+                        dropShadow: {
+                        enabled: true,
+                        top: 1,
+                        left: 1,
+                        blur: 2,
+                        opacity: 0.5,
+                        }
+                    },
+                    series: [{
+                        data: [47, 45, 74, 32, 56, 31, 44, 33, 45, 19]
+                    }],
+                    stroke: {
+                        curve: 'smooth'
+                    },
+                    markers: {
+                        size: 0
+                    },
+                    grid: {
+                        padding: {
+                        top: 20,
+                        bottom: 10,
+                        left: 110
+                        }
+                    },
+                    colors: ['#fff'],
+                    xaxis: {
+                        crosshairs: {
+                        width: 1
+                        },
+                    },
+                    tooltip: {
+                        x: {
+                        show: false
+                        },
+                        y: {
+                        title: {
+                            formatter: function formatter(val) {
+                            return '';
+                            }
+                        }
+                        }
+                    }
+                }
+
+                var spark4 = {
+                    chart: {
+                        id: 'spark4',
+                        group: 'sparks',
+                        type: 'line',
+                        height: 80,
+                        sparkline: {
+                        enabled: true
+                        },
+                        dropShadow: {
+                        enabled: true,
+                        top: 1,
+                        left: 1,
+                        blur: 2,
+                        opacity: 0.5,
+                        }
+                    },
+                    series: [{
+                        data: [15, 75, 47, 65, 14, 32, 19, 54, 44, 61]
+                    }],
+                    stroke: {
+                        curve: 'smooth'
+                    },
+                    markers: {
+                        size: 0
+                    },
+                    grid: {
+                        padding: {
+                        top: 20,
+                        bottom: 10,
+                        left: 110
+                        }
+                    },
+                    colors: ['#fff'],
+                    xaxis: {
+                        crosshairs: {
+                        width: 1
+                        },
+                    },
+                    tooltip: {
+                        x: {
+                            show: false
+                        },
+                        y: {
+                        title: {
+                            formatter: function formatter(val) {
+                            return '';
+                            }
+                        }
+                        }
+                    }
+                }
+
+                new ApexCharts(document.querySelector("#spark1"), spark1).render();
+                new ApexCharts(document.querySelector("#spark2"), spark2).render();
+                new ApexCharts(document.querySelector("#spark3"), spark3).render();
+                new ApexCharts(document.querySelector("#spark4"), spark4).render();
+
+                // var optionsCircle4 = {
+                //     chart: {
+                //         type: 'radialBar',
+                //         height: 345,
+                //         width: 380,
+                //     },
+                //     plotOptions: {
+                //         radialBar: {
+                //         size: undefined,
+                //         inverseOrder: true,
+                //         hollow: {
+                //             margin: 5,
+                //             size: '48%',
+                //             background: 'transparent',
+
+                //         },
+                //         track: {
+                //             show: false,
+                //         },
+                //         startAngle: -180,
+                //         endAngle: 180
+
+                //         },
+                //     },
+                //     stroke: {
+                //         lineCap: 'round'
+                //     },
+                //     series: [{{$total_medicine}}, {{$total_purchases}}, {{$total_sales}}],
+                //     labels: ['Medicine', 'Purchases', 'Sales'],
+                //     legend: {
+                //         show: true,
+                //         floating: true,
+                //         position: 'right',
+                //         offsetX: 70,
+                //         offsetY: 230
+                //     },
+                // }
+
+                // var chartCircle4 = new ApexCharts(document.querySelector('#radialBarBottom'), optionsCircle4);
+                // chartCircle4.render();
+
+
+                var optionsLine = {
+                    chart: {
+                        height: 330,
+                        type: 'line',
+                        zoom: {
+                            enabled: true
+                        },
+                        dropShadow: {
+                            enabled: true,
+                            top: 2,
+                            left: 2,
+                            blur: 4,
+                            opacity: 1,
+                        }
+                    },
+                    stroke: {
+                        curve: 'smooth',
+                        width: 2
+                    },
+                    // colors: ["#3F51B5", '#2196F3'],
+                    series: @json($series),
+                    title: {
+                        text: 'Last 7 Days Sales History for All Medicines',
+                        align: 'left',
+                        offsetY: 25,
+                        offsetX: 20
+                    },
+                    subtitle: {
+                        text: 'Statistics',
+                        offsetY: 50,
+                        offsetX: 20
+                    },
+                    markers: {
+                        size: 6,
+                        strokeWidth: 0,
+                        hover: {
+                        size: 9
+                        }
+                    },
+                    grid: {
+                        show: true,
+                        padding: {
+                        bottom: 0
+                        }
+                    },
+                    // labels: ['01/15/2002', '01/16/2002', '01/17/2002', '01/18/2002', '01/19/2002', '01/20/2002'],
+                    xaxis: {
+                        categories: @json($dates)
+                    },
+                    legend: {
+                        position: 'top',
+                        horizontalAlign: 'right',
+                        offsetY: -20,
+                        offsetX: 50
+                    }
+                }
+
+                var chartLine = new ApexCharts(document.querySelector('#line-adwords'), optionsLine);
+                chartLine.render();
+
+
+                // var optionsBar = {
+                //     chart: {
+                //         height: 380,
+                //         type: 'bar',
+                //         stacked: true,
+                //     },
+                //     plotOptions: {
+                //         bar: {
+                //         columnWidth: '30%',
+                //         horizontal: false,
+                //         },
+                //     },
+                //     series: [{
+                //         name: 'PRODUCT A',
+                //         data: [14, 25, 21, 17, 12, 13, 11, 19]
+                //     }, {
+                //         name: 'PRODUCT B',
+                //         data: [13, 23, 20, 8, 13, 27, 33, 12]
+                //     }, {
+                //         name: 'PRODUCT C',
+                //         data: [11, 17, 15, 15, 21, 14, 15, 13]
+                //     }],
+                //     xaxis: {
+                //         categories: ['2011 Q1', '2011 Q2', '2011 Q3', '2011 Q4', '2012 Q1', '2012 Q2', '2012 Q3', '2012 Q4'],
+                //     },
+                //     fill: {
+                //         opacity: 1
+                //     },
+                // }
+                // var chartBar = new ApexCharts(document.querySelector("#barchart"),optionsBar);
+                // chartBar.render();
+
+                // var optionsArea = {
+                //     chart: {
+                //         height: 380,
+                //         type: 'area',
+                //         stacked: false,
+                //     },
+                //     stroke: {
+                //         curve: 'straight'
+                //     },
+                //     series: [{
+                //         name: "Music",
+                //         data: [11, 15, 26, 20, 33, 27]
+                //         },
+                //         {
+                //         name: "Photos",
+                //         data: [32, 33, 21, 42, 19, 32]
+                //         },
+                //         {
+                //         name: "Files",
+                //         data: [20, 39, 52, 11, 29, 43]
+                //         }
+                //     ],
+                //     xaxis: {
+                //         categories: ['2011 Q1', '2011 Q2', '2011 Q3', '2011 Q4', '2012 Q1', '2012 Q2'],
+                //     },
+                //     tooltip: {
+                //         followCursor: true
+                //     },
+                //     fill: {
+                //         opacity: 1,
+                //     },
+                // }
+
+                // var chartArea = new ApexCharts(document.querySelector("#areachart"),optionsArea);
+                // chartArea.render();
+                function renderTree() {
+                    var containerWidth = $('#svg-tree').width(); // always get latest width
+
+                    const options = {
+                        contentKey: 'data',
+                        width: containerWidth,
+                        height: 350,
+                        nodeWidth: 250,
+                        nodeHeight: 60,
+                        fontColor: '#fff',
+                        borderColor: '#333',
+                        childrenSpacing: 50,
+                        siblingSpacing: 20,
+                        direction: 'top',
+                        enableExpandCollapse: true,
+                        nodeTemplate: (content) =>
+                            `<div class="row p-2">
+                                <div class="col-3">
+                                    <img style='width: 45px;height: 45px;border-radius: 50%;' src='${content.imageURL}' alt=''>
+                                </div>
+                                <div class="col-9">
+                                    <div class="fw-bold" style="font-family: Arial; font-size: 12px">Name: ${content.name}</div>
+                                    <div style="font-family: Arial; font-size: 10px">Role: ${content.role ?? ''}</div>
+                                </div>
+                            </div>`,
+                        canvasStyle: 'border: 1px solid black;background: #f6f6f6;',
+                        enableToolbar: true,
+                    };
+
+                    const tree = new ApexTree(document.getElementById('svg-tree'), options);
+                    tree.render(data); // global data, must be defined outside
+                }
+
+                const data = {!! $hierarchy !!}; // keep data accessible globally
+                renderTree(); // Initial render
+
+                // Re-render on window resize
+                $(window).on('resize', function () {
+                    $('#svg-tree').empty(); // Clear old canvas
+                    renderTree();           // Re-render with new width
+                });
+            });
+        </script>
+        @endpush
 </x-app-layout>

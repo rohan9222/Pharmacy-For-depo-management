@@ -16,12 +16,13 @@ return new class extends Migration
             $table->foreignId('invoice_id')->constrained()->cascadeOnDelete()->cascadeOnUpdate();
             $table->foreignId('medicine_id')->nullable()->constrained()->restrictOnDelete()->cascadeOnUpdate();
             $table->foreignId('sales_medicine_id')->nullable()->constrained()->nullOnDelete()->cascadeOnUpdate();
-            $table->timestamp('return_date')->default(now());
+            $table->timestamp('return_date')->default(DB::raw('CURRENT_TIMESTAMP'))->nullable();
             // $table->string('medicine_name');
             $table->string('batch_number', 50)->nullable();
             $table->timestamp('expiry_date')->nullable();
             $table->integer('quantity')->default(1);
             $table->decimal('price', 11, 2)->default(0.00)->nullable();
+            $table->decimal('total_price', 11, 2)->default(0.00)->nullable();
             $table->decimal('discount', 11, 2)->default(0.00)->nullable();
             $table->enum('dis_type', ['percentage', 'fixed'])->default('percentage')->nullable();
             $table->decimal('dis_amount', 11, 2)->default(0.00)->nullable();

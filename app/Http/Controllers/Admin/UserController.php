@@ -61,11 +61,11 @@ class UserController extends Controller
         if(!auth()->user()->canany(['edit-manager', 'delete-manager'])){
             $users = $users->whereNotIn('role', ['Super Admin','Manager']);
         }
-        if(!auth()->user()->canany(['edit-sales-manager', 'delete-sales-manager'])){
-            $users = $users->whereNotIn('role', ['Super Admin','Sales Manager']);
+        if(!auth()->user()->canany(['edit-zonal-sales-executive', 'delete-zonal-sales-executive'])){
+            $users = $users->whereNotIn('role', ['Super Admin','Zonal Sales Executive']);
         }
-        if(!auth()->user()->canany(['edit-field-officer', 'delete-field-officer'])){
-            $users = $users->whereNotIn('role', ['Super Admin','Field Officer']);
+        if(!auth()->user()->canany(['edit-territory-sales-executive', 'delete-territory-sales-executive'])){
+            $users = $users->whereNotIn('role', ['Super Admin','Territory Sales Executive']);
         }
         if(!auth()->user()->canany(['edit-depo-manager', 'delete-depo-manager'])){
             $users = $users->whereNotIn('role', ['Super Admin','Depo Incharge']);
@@ -83,10 +83,11 @@ class UserController extends Controller
     {
         return view('users.create', [
             'managers' => User::select('id', 'name')->role('Manager')->get(),
-            'salesManagers' => User::select('id', 'name')->role('Sales Manager')->get(),
-            'fieldOfficers' => User::select('id', 'name')->role('Field Officer')->get(),
+            'salesManagers' => User::select('id', 'name')->role('Zonal Sales Executive')->get(),
+            'fieldOfficers' => User::select('id', 'name')->role('Territory Sales Executive')->get(),
             'teams' => Team::select('id', 'name')->get(),
-            'roles' => Role::pluck('name')->all()
+            'roles' => Role::pluck('name')->all(),
+            'territories' => User::select('route')->distinct()->pluck('route') ?? [],
         ]);
     }
 
@@ -101,12 +102,12 @@ class UserController extends Controller
         ];
 
         // Check roles from the request
-        if (in_array('Sales Manager', $request->roles) || in_array('Field Officer', $request->roles)) {
+        if (in_array('Zonal Sales Executive', $request->roles) || in_array('Territory Sales Executive', $request->roles)) {
             $validation['manager_id'] = 'required|exists:users,id';
         }
 
-        if (in_array('Field Officer', $request->roles)) {
-            $validation['sales_manager_id'] = 'required|exists:users,id';
+        if (in_array('Territory Sales Executive', $request->roles)) {
+            $validation['zse_id'] = 'required|exists:users,id';
         }
 
         // Validate the request
@@ -120,7 +121,7 @@ class UserController extends Controller
 
         if (!empty($request->roles)) {
             // Define valid roles
-            $validRoles = ['Super Admin', 'Sales Manager', 'Field Officer', 'Delivery Man', 'Manager', 'Depo Incharge'];
+            $validRoles = ['Super Admin', 'Zonal Sales Executive', 'Territory Sales Executive', 'Delivery Man', 'Manager', 'Depo Incharge'];
 
             // Filter roles to include only valid ones
             $filteredRoles = array_intersect($validRoles, $request->roles);
@@ -130,16 +131,17 @@ class UserController extends Controller
                 $input['role'] = reset($filteredRoles);
             }
         }
+        $input['route'] = $request->territory;
 
         $user = User::create($input);
         $user->assignRole($request->roles);
 
-        if (in_array($input['role'], ['Manager', 'Sales Manager', 'Field Officer'])) {
+        if (in_array($input['role'], ['Manager', 'Zonal Sales Executive', 'Territory Sales Executive'])) {
             TargetReport::create([
                 'user_id' => $user->id,
                 'manager' => $user->manager_id ?? null,
-                'sales_manager' => $user->sales_manager_id ?? null,
-                // 'field_officer' => $user->field_officer_id ?? null,
+                'zse' => $user->zse_id ?? null,
+                // 'tse' => $user->tse_id ?? null,
                 // 'role' => $input['role'],
                 'sales_target' => $user->sales_target ?? 0,
                 'target_month' => Carbon::now()->format('F'),
@@ -176,11 +178,12 @@ class UserController extends Controller
         return view('users.edit', [
             'user' => $user,
             'managers' => User::select('id', 'name')->role('Manager')->get(),
-            'salesManagers' => User::select('id', 'name')->role('Sales Manager')->get(),
-            'fieldOfficers' => User::select('id', 'name')->role('Field Officer')->get(),
+            'salesManagers' => User::select('id', 'name')->role('Zonal Sales Executive')->get(),
+            'fieldOfficers' => User::select('id', 'name')->role('Territory Sales Executive')->get(),
             'teams' => Team::select('id', 'name')->get(),
             'roles' => Role::pluck('name')->all(),
-            'userRoles' => $user->roles->pluck('name')->all()
+            'userRoles' => $user->roles->pluck('name')->all(),
+            'territories' => User::select('route')->distinct()->pluck('route') ?? [],
         ]);
     }
 
@@ -195,12 +198,12 @@ class UserController extends Controller
         ];
 
         // Check roles from the request
-        if (in_array('Sales Manager', $request->roles) || in_array('Field Officer', $request->roles)) {
+        if (in_array('Zonal Sales Executive', $request->roles) || in_array('Territory Sales Executive', $request->roles)) {
             $validation['manager_id'] = 'required|exists:users,id';
         }
 
-        if (in_array('Field Officer', $request->roles)) {
-            $validation['sales_manager_id'] = 'required|exists:users,id';
+        if (in_array('Territory Sales Executive', $request->roles)) {
+            $validation['zse_id'] = 'required|exists:users,id';
         }
 
         // Validate the request
@@ -214,7 +217,7 @@ class UserController extends Controller
         }
         if (!empty($request->roles)) {
             // Define valid roles
-            $validRoles = ['Super Admin', 'Sales Manager', 'Field Officer', 'Delivery Man', 'Manager', 'Depo Incharge'];
+            $validRoles = ['Super Admin', 'Zonal Sales Executive', 'Territory Sales Executive', 'Delivery Man', 'Manager', 'Depo Incharge'];
 
             // Filter roles to include only valid ones
             $filteredRoles = array_intersect($validRoles, $request->roles);
@@ -224,7 +227,7 @@ class UserController extends Controller
                 $input['role'] = reset($filteredRoles);
             }
         }
-
+        $input['route'] = $request->territory;
         $user->update($input);
 
         $user->syncRoles($request->roles);
@@ -254,10 +257,10 @@ class UserController extends Controller
 
     public function salesManagers(Request $request)
     {
-        //  Fetch sales managers for the given manager_id
+        //  Fetch Zonal Sales Executives for the given manager_id
         return User::select('id', 'name')
             ->where('manager_id', $request->manager_id)
-            ->role('Sales Manager') // Assuming a `role` scope or function exists
+            ->role('Zonal Sales Executive') // Assuming a `role` scope or function exists
             ->get();
     }
 }
