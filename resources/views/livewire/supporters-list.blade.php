@@ -106,7 +106,7 @@
                             <div class="card-body">
                                 <div class="user-avatar-section">
                                     <div class="d-flex align-items-center flex-column">
-                                        <img class="img-fluid rounded-circle mb-2" src="{{ asset('img/noimage.png') }}" onerror="this.src='{{ asset('img/noimage.png') }}'" height="100" width="100" alt="User avatar">
+                                        <img class="img-fluid rounded-circle mb-2" src="{{ $adminUserData->profile_photo_url ?? asset('img/noimage.png') }}" onerror="this.src='{{ asset('img/noimage.png') }}'" height="100" width="100" alt="User avatar">
                                         <div class="user-info text-center">
                                             <h4>{{ $adminUserData->name }}</h4>
                                             <span class="d-inline-flex px-2 text-success-emphasis bg-success-subtle border border-success-subtle rounded-2">{{ $adminUserData->role }}</span>
@@ -230,13 +230,13 @@
                                 </select>
                             </div>
                         @endif
-                            <div class="col-lg-3 col-md-6">
+                            {{-- <div class="col-lg-3 col-md-6">
                                 <div class="input-group mb-3">
                                     <input type="date" class="form-control form-control-sm" placeholder="Start Date" wire:model="start_date">
                                     <span class="input-group-text">To</span>
                                     <input type="date" class="form-control" placeholder="End Date" wire:model="end_date">
                                 </div>
-                            </div>
+                            </div> --}}
                         </div>
 
                         <div class="card">

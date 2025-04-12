@@ -3,7 +3,7 @@
         <a href="/" class="navbar-brand d-flex align-items-center mb-md-0 me-md-auto link-body-emphasis text-decoration-none">
             <!-- Logo -->
             <x-application-mark class="sidebar-logo" style="height: 2rem !important; width: 3rem !important;" />
-            {!! siteUrlSettings('site_name') !!}
+            {{-- {!! siteUrlSettings('site_name') !!} --}}
         </a>
         
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
